@@ -1,5 +1,5 @@
-results
-data
+#results
+#input
 *.DS_Store
 .idea
 
