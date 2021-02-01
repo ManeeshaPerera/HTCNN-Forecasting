@@ -1,7 +1,8 @@
 import tensorflow as tf
 import numpy as np
 import pandas as pd
-import pickle
+import pickle5 as pickle
+# import pickle
 strategy = tf.distribute.MirroredStrategy()
 
 
