@@ -47,7 +47,7 @@ with strategy.scope():
     model.summary()
 history = model.fit(dataset, epochs=500)
 
-with open('results/trainHistoryDict', 'wb') as file_pi:
+with open('results/trainHistoryDict1', 'wb') as file_pi:
     pickle.dump(history.history, file_pi)
 
 forecast = []
@@ -56,5 +56,5 @@ for time in range(len(series) - window_size):
 
 forecast = forecast[split_time - window_size:]
 results = np.array(forecast)[:, 0, 0]
-with open('results/forecast_region', 'wb') as file_forecast:
+with open('results/forecast_region1', 'wb') as file_forecast:
     pickle.dump(results, file_forecast)
