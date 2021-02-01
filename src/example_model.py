@@ -15,7 +15,10 @@ def windowed_dataset(series, window_size, batch_size, shuffle_buffer):
     return dataset
 
 
-data = pd.read_pickle('input/hf_data')
+# data = pd.read_pickle('input/hf_data')
+with open('input/hf_data', 'rb') as f:
+    data = pickle.load(f)
+
 series = data['grid'][0:50000].values
 time = data.index[0:50000].values
 
