@@ -25,8 +25,14 @@
 #SBATCH --mail-type=BEGIN,FAIL,END
 
 # The modules to load:
-module load Python/3.6.10-intel-2017.u2-GCC-6.2.0-CUDA10.1
-module load Tensorflow/2.1.0-intel-2017.u2-GCC-6.2.0-CUDA10.1-Python-3.6.10-GPU
+# module load Python/3.6.10-intel-2017.u2-GCC-6.2.0-CUDA10.1
+# module load Tensorflow/2.1.0-intel-2017.u2-GCC-6.2.0-CUDA10.1-Python-3.6.10-GPU
+
+source /usr/local/module/spartan_new.sh
+module load gcc/8.3.0 openmpi/3.1.4
+module load fosscuda/2019b
+module load python/3.7.4
+module load tensorflow/2.3.1-python-3.7.4
 
 # The job command(s):
 python run.py 'stackedRNN_region' 3 > results/stackedRNN_region.txt
