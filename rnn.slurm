@@ -29,4 +29,4 @@ module load Python/3.6.10-intel-2017.u2-GCC-6.2.0-CUDA10.1
 module load Tensorflow/2.1.0-intel-2017.u2-GCC-6.2.0-CUDA10.1-Python-3.6.10-GPU
 
 # The job command(s):
-python src/example_model.py > results/rnn_model.txt
+python run.py 'stackedRNN_region' 3 > results/stackedRNN_region.txt
