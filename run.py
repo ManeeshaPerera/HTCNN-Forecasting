@@ -2,6 +2,7 @@ import pickle5 as pickle
 import matplotlib.pyplot as plt
 import seaborn as sns
 import sys
+import pandas as pd
 from src.WindowGenerator.window_generator import WindowGenerator
 from src.RNN_Architectures.stacked_rnn import StackedRNN
 
@@ -21,8 +22,9 @@ if __name__ == '__main__':
 
     OUT_STEPS = horizon
     # read the data (using pickle5 due the compatibility issues with Spartan)
-    with open('input/hf_data', 'rb') as f:
-        pv_data = pickle.load(f)[['grid']]
+    # with open('input/hf_data', 'rb') as f:
+    #     pv_data = pickle.load(f)[['grid']]
+    pv_data = pd.read_csv('input/hf_data.csv', index_col=[0])[['grid']]
 
     # train, val, test split
     n = len(pv_data)
