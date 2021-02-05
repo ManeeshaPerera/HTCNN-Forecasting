@@ -29,12 +29,10 @@ if __name__ == '__main__':
     # train, val, test split
     n = len(pv_data)
     train_df = pv_data[0:int(n * 0.7)]
-    val_df = pv_data[int(n * 0.7):int(n * 0.9)]
-    test_df = pv_data[int(n * 0.9):]
-    print(pv_data)
+    val_df = pv_data[:int(n * 0.9)]
+    test_df = pv_data
 
     num_features = pv_data.shape[1]
-    print(num_features)
 
     train_mean = train_df.mean()
     train_std = train_df.std()
@@ -48,20 +46,25 @@ if __name__ == '__main__':
     # plot_distribution(df_std)
 
     # create the dataset
-    window_data = WindowGenerator(288, OUT_STEPS, OUT_STEPS, train_df, val_df, test_df, batch_size=2016, label_columns=['grid'])
+    window_data = WindowGenerator(288, OUT_STEPS, OUT_STEPS, train_df, val_df, test_df, batch_size=2016,
+                                  label_columns=['grid'])
     for example_inputs, example_labels in window_data.train.take(1):
         print(f'Inputs shape (batch, time, features): {example_inputs.shape}')
         print(f'Labels shape (batch, time, features): {example_labels.shape}')
 
-    lstm = StackedRNN(1, OUT_STEPS, num_features, 500, window_data)
+    lstm = StackedRNN(1, OUT_STEPS, num_features, epochs=500, window_generator=window_data)
     lstm.create_model()
     history = lstm.compile_and_fit()
+
     performance = lstm.evaluate()
     print(f'performance: {performance}')
-    forecast = lstm.forecast(df_std, OUT_STEPS)
+    forecast, actual = lstm.forecast()
 
     with open(f'results/training_loss_{model_name}', 'wb') as file_loss:
         pickle.dump(history.history, file_loss)
 
     with open(f'results/forecast_{model_name}', 'wb') as file_fc:
         pickle.dump(forecast, file_fc)
+
+    with open(f'results/actual_{model_name}', 'wb') as file_ac:
+        pickle.dump(actual, file_ac)
