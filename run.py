@@ -46,7 +46,7 @@ if __name__ == '__main__':
     # plot_distribution(df_std)
 
     # create the dataset
-    window_data = WindowGenerator(288, OUT_STEPS, OUT_STEPS, train_df, val_df, test_df, batch_size=2016,
+    window_data = WindowGenerator(864, OUT_STEPS, OUT_STEPS, train_df, val_df, test_df, batch_size=2016,
                                   label_columns=['grid'])
     for example_inputs, example_labels in window_data.train.take(1):
         print(f'Inputs shape (batch, time, features): {example_inputs.shape}')

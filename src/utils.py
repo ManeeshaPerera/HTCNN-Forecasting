@@ -37,6 +37,18 @@ def load_pickle(file):
         content = pickle.load(f)
     return content
 
-# if __name__ == '__main__':
-#     actual = load_pickle('actual_stackedRNN_region')
-#     print(actual)
+
+def normalise_data(data):
+    n = len(data)
+    train_df = data[0:int(n * 0.7)]
+    val_df = data[:int(n * 0.9)]
+    test_df = data
+
+    train_mean = train_df.mean()
+    train_std = train_df.std()
+
+    train_df = (train_df - train_mean) / train_std
+    val_df = (val_df - train_mean) / train_std
+    test_df = (test_df - train_mean) / train_std
+
+    return train_df, val_df, test_df
