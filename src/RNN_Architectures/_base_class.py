@@ -27,5 +27,5 @@ class RNN:
         for sample_input, sample_output in self.window_generator.test:
             fc = self.model.predict(sample_input)
             forecast.append(fc)
-            actual.append(sample_output)
+            actual.append(sample_output.numpy()[:, :, 0])
         return forecast, actual
