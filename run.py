@@ -19,12 +19,15 @@ if __name__ == '__main__':
     arguments = len(sys.argv) - 1
     model_name = sys.argv[1]
     horizon = int(sys.argv[2])
+    layers = int(sys.argv[3])
+    look_back = int(sys.argv[4])
+    col_name = sys.argv[5]
 
     OUT_STEPS = horizon
     # read the data (using pickle5 due the compatibility issues with Spartan)
     # with open('input/hf_data', 'rb') as f:
     #     pv_data = pickle.load(f)[['grid']]
-    pv_data = pd.read_csv('input/rnn_data.csv', index_col=[0])[['grid']]
+    pv_data = pd.read_csv('input/rnn_data.csv', index_col=[0])[[col_name]]
 
     # train, val, test split
     n = len(pv_data)
@@ -46,13 +49,13 @@ if __name__ == '__main__':
     # plot_distribution(df_std)
 
     # create the dataset
-    window_data = WindowGenerator(864, OUT_STEPS, OUT_STEPS, train_df, val_df, test_df, batch_size=2016,
-                                  label_columns=['grid'])
+    window_data = WindowGenerator(look_back, OUT_STEPS, OUT_STEPS, train_df, val_df, test_df, batch_size=2016,
+                                  label_columns=[col_name])
     for example_inputs, example_labels in window_data.train.take(1):
         print(f'Inputs shape (batch, time, features): {example_inputs.shape}')
         print(f'Labels shape (batch, time, features): {example_labels.shape}')
 
-    lstm = StackedRNN(1, OUT_STEPS, num_features, epochs=500, window_generator=window_data)
+    lstm = StackedRNN(layers, OUT_STEPS, num_features, epochs=500, window_generator=window_data)
     lstm.create_model()
     history = lstm.compile_and_fit()
 

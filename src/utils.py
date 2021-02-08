@@ -1,6 +1,7 @@
 import matplotlib as mpl
 import matplotlib.pyplot as plt
 import seaborn as sns
+import numpy as np
 
 mpl.rcParams['figure.figsize'] = (8, 6)
 mpl.rcParams['axes.grid'] = False
@@ -52,3 +53,29 @@ def normalise_data(data):
     test_df = (test_df - train_mean) / train_std
 
     return train_df, val_df, test_df
+
+
+def denormalise_data(train_df, data):
+    train_mean = train_df.mean()
+    train_std = train_df.std()
+
+    # print(train_std, train_mean)
+    new_data = (data * train_std) + train_mean
+    return new_data
+
+
+def process_batch(tf_batch):
+    array = []
+    for batch in tf_batch:
+        array.extend(batch[:, 0].tolist())
+    return array
+
+
+def post_process_data(fc, actual, train_df):
+    fc_array = np.array(process_batch(fc))
+    actual_array = np.array(process_batch(actual))
+
+    scaled_fc = denormalise_data(train_df, fc_array)
+    scaled_actual = denormalise_data(train_df, actual_array)
+
+    return scaled_fc, scaled_actual
