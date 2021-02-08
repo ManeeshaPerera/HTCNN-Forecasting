@@ -35,4 +35,4 @@ module load python/3.7.4
 module load tensorflow/2.3.1-python-3.7.4
 
 # The job command(s):
-python run.py 'stackedRNN2_grid_288steps' 288 2 864 'grid'> results/stackedRNN_region_288_steps.txt
+python run.py 'stackedRNN3_grid_288steps' 288 3 864 'grid'> results/stackedRNN3_region_288_steps.txt
