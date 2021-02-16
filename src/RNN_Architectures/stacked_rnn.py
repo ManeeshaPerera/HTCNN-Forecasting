@@ -11,7 +11,7 @@ class StackedRNN(RNN):
 
     def create_model(self):
         model = tf.keras.Sequential()
-        for layer in range(self.lstm_layers - 2):
+        for layer in range(self.lstm_layers - 1):
             model.add(tf.keras.layers.LSTM(32, return_sequences=True))
         model.add(tf.keras.layers.LSTM(32, return_sequences=False))
         # Shape => [batch, out_steps*features]

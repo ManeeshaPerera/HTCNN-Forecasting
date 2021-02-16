@@ -22,6 +22,7 @@ if __name__ == '__main__':
     layers = int(sys.argv[3])
     look_back = int(sys.argv[4])
     col_name = sys.argv[5]
+    epochs = 700
 
     OUT_STEPS = horizon
     # read the data (using pickle5 due the compatibility issues with Spartan)
@@ -55,7 +56,7 @@ if __name__ == '__main__':
         print(f'Inputs shape (batch, time, features): {example_inputs.shape}')
         print(f'Labels shape (batch, time, features): {example_labels.shape}')
 
-    lstm = StackedRNN(layers, OUT_STEPS, num_features, epochs=500, window_generator=window_data)
+    lstm = StackedRNN(layers, OUT_STEPS, num_features, epochs=epochs, window_generator=window_data)
     lstm.create_model()
     history = lstm.compile_and_fit()
 
@@ -63,11 +64,11 @@ if __name__ == '__main__':
     print(f'performance: {performance}')
     forecast, actual = lstm.forecast()
 
-    with open(f'results/training_loss_{model_name}', 'wb') as file_loss:
+    with open(f'results/training_loss_{model_name}_{str(layers)}', 'wb') as file_loss:
         pickle.dump(history.history, file_loss)
 
-    with open(f'results/forecast_{model_name}', 'wb') as file_fc:
+    with open(f'results/forecast_{model_name}_{str(layers)}', 'wb') as file_fc:
         pickle.dump(forecast, file_fc)
 
-    with open(f'results/actual_{model_name}', 'wb') as file_ac:
+    with open(f'results/actual_{model_name}_{str(layers)}', 'wb') as file_ac:
         pickle.dump(actual, file_ac)

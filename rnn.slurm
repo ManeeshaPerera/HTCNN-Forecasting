@@ -20,6 +20,9 @@
 # The maximum running time of the job in days-hours:mins:sec
 #SBATCH --time=00-12:00:0
 
+#Job array
+#SBATCH --array=0-4
+
 # Send yourself an email when the job:
 #SBATCH --mail-user=pereramg@student.unimelb.edu.au
 #SBATCH --mail-type=BEGIN,FAIL,END
@@ -35,4 +38,4 @@ module load python/3.7.4
 module load tensorflow/2.3.1-python-3.7.4
 
 # The job command(s):
-python run.py 'stackedRNN3_grid_288steps' 288 3 864 'grid'> results/stackedRNN3_region_288_steps.txt
+python run.py 'stackedRNN_grid_3steps' 3 ${SLURM_ARRAY_TASK_ID} 12 'grid' > results/stackedRNN_${SLURM_ARRAY_TASK_ID}_region_3steps.txt
