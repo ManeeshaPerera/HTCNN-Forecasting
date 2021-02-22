@@ -15,7 +15,7 @@
 # Maximum number of tasks/CPU cores used by the job:
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=2
-#SBATCH --mem=100G
+#SBATCH --mem=64G
 
 # The maximum running time of the job in days-hours:mins:sec
 #SBATCH --time=00-12:00:0
