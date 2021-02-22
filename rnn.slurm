@@ -38,4 +38,4 @@ module load python/3.7.4
 module load tensorflow/2.3.1-python-3.7.4
 
 # The job command(s):
-python tune_and_run.py 3 ${SLURM_ARRAY_TASK_ID} > fc_results/grid_fc.txt
+python tune_and_run.py 3 ${SLURM_ARRAY_TASK_ID} > fc_results/fc_${SLURM_ARRAY_TASK_ID}.txt
