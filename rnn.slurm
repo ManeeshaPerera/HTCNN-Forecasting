@@ -21,7 +21,7 @@
 #SBATCH --time=00-12:00:0
 
 #Job array
-#SBATCH --array=0-4
+#SBATCH --array=0-38
 
 # Send yourself an email when the job:
 #SBATCH --mail-user=pereramg@student.unimelb.edu.au
@@ -38,4 +38,4 @@ module load python/3.7.4
 module load tensorflow/2.3.1-python-3.7.4
 
 # The job command(s):
-python run.py 'stackedRNN_grid_3steps_lookback2' 3 ${SLURM_ARRAY_TASK_ID} 60 'grid' > results/stackedRNN_${SLURM_ARRAY_TASK_ID}_region_3steps_lookback2.txt
+python tune_and_run.py 3 ${SLURM_ARRAY_TASK_ID} > fc_results/grid_fc.txt

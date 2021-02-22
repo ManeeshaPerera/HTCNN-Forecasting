@@ -2,10 +2,11 @@ import tensorflow as tf
 
 
 class RNN:
-    def __init__(self, epochs, window_generator):
+    def __init__(self, epochs, window_generator, lr):
         self.epochs = epochs
         self.model = None
         self.window_generator = window_generator
+        self.lr = lr
 
     def compile_and_fit(self):
         self.model.compile(loss=tf.losses.MeanSquaredError(),
@@ -29,3 +30,17 @@ class RNN:
             forecast.append(fc)
             actual.append(sample_output.numpy()[:, :, 0])
         return forecast, actual
+
+    def evaluate_model(self):
+        self.model.compile(loss=tf.losses.MeanSquaredError(),
+                           optimizer=tf.optimizers.Adam(lr=self.lr),
+                           metrics=[tf.metrics.MeanAbsoluteError()])
+
+        self.model.fit(self.window_generator.train, epochs=self.epochs)
+
+        score = self.model.evaluate(self.window_generator.val)
+        print('Validation loss:', score[0])
+        print('Validation accuracy:', score[1])
+
+        # Return the accuracy
+        return score[1]

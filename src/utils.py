@@ -33,6 +33,16 @@ def plot_loss(history):
     return fig
 
 
+def plot_multiple_loss(history, trace_names):
+    fig = go.Figure()
+    for i in range(0, len(history)):
+        fig.add_trace(go.Scatter(y=history[i]['loss'], name=trace_names[i]))
+    fig.update_xaxes(title='Epochs')
+    fig.update_yaxes(title='Loss (MSE)')
+    fig.update_layout(height=500, width=500)
+    return fig
+
+
 def load_pickle(file):
     with open(f'../results/{file}', 'rb') as f:
         content = pickle.load(f)
@@ -79,3 +89,14 @@ def post_process_data(fc, actual, train_df):
     scaled_actual = denormalise_data(train_df, actual_array)
 
     return scaled_fc, scaled_actual
+
+
+def plot_fc(data, model_data, fc, col, look_back, show_model_data=True):
+    fig = go.Figure()
+    time = data.index[look_back:]
+    fig.add_trace(go.Scatter(x=data.index, y=data[col].values, name='data'))
+    if show_model_data:
+        fig.add_trace(go.Scatter(x=time, y=model_data, name='actual'))
+    fig.add_trace(go.Scatter(x=time, y=fc, name='forecast', line=dict(dash='dot', color='orange')))
+    fig.update_layout(height=500, width=800, paper_bgcolor='rgba(0,0,0,0)')
+    return fig
