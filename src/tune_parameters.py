@@ -30,7 +30,7 @@ class TuneHyperParameters:
             random_state=1,
         )
 
-        optimizer.maximize(init_points=100, n_iter=100)
+        optimizer.maximize(init_points=10, n_iter=10)
         model_params = optimizer.max['params']
         print(model_params)
         return model_params
@@ -46,5 +46,5 @@ class TuneHyperParameters:
                           epochs=int(epochs),
                           window_generator=window_data, lr=lr)
         lstm.create_model()
-        accuracy = lstm.evaluate_model()
-        return accuracy
+        loss = lstm.evaluate_model()
+        return loss

@@ -36,11 +36,9 @@ class RNN:
                            optimizer=tf.optimizers.Adam(lr=self.lr),
                            metrics=[tf.metrics.MeanAbsoluteError()])
 
-        self.model.fit(self.window_generator.train, epochs=self.epochs)
+        self.model.fit(self.window_generator.train, epochs=self.epochs, verbose=0)
 
-        score = self.model.evaluate(self.window_generator.val)
-        print('Validation loss:', score[0])
-        print('Validation accuracy:', score[1])
+        score = self.model.evaluate(self.window_generator.val, verbose=0)
 
-        # Return the accuracy
-        return score[1]
+        # Return the loss (minimize the loss)
+        return -score[0]
