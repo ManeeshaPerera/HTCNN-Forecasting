@@ -10,7 +10,7 @@
 #SBATCH --qos gpgpumse
 
 # Number of GPUs requested per node:
-#SBATCH --gres=gpu:1
+#SBATCH --gres=gpu:2
 
 # Maximum number of tasks/CPU cores used by the job:
 #SBATCH --ntasks=1
