@@ -15,6 +15,7 @@ if __name__ == '__main__':
     columns = data.columns
     col_name = columns[col_id]
     pv_data = data[[col_name]]
+    print("\ncolumn name: ", col_name)
 
     # train, val, test split
     n = len(pv_data)
