@@ -11,7 +11,7 @@ if __name__ == '__main__':
     col_id = int(sys.argv[2])
 
     OUT_STEPS = horizon
-    data = pd.read_csv('input/timeseries.csv', index_col=[0])
+    data = pd.read_csv('input/solar_timeseries.csv', index_col=[0])
     columns = data.columns
     col_name = columns[col_id]
     pv_data = data[[col_name]]
@@ -34,6 +34,7 @@ if __name__ == '__main__':
 
     df_std = (pv_data - train_mean) / train_std
 
+    print("\nstarting hyper-parameter tuning")
     hp = TuneHyperParameters(OUT_STEPS, num_features, seasonality, train_df, val_df, test_df, col_name)
     model_params = hp.tune_parameters()
 
@@ -44,22 +45,22 @@ if __name__ == '__main__':
     num_layers = int(model_params['num_layers'])
     cell_dimension = int(model_params['cell_dimension'])
     epochs = int(model_params['epochs'])
+    print("\nhyper-parameter tuning ended")
 
     # create the dataset
+    print("\ncreating final model ==>")
     window_data = WindowGenerator(look_back, OUT_STEPS, OUT_STEPS, train_df, val_df, test_df, batch_size=batch_size,
                                   label_columns=[col_name])
-    for example_inputs, example_labels in window_data.train.take(1):
-        print(f'Inputs shape (batch, time, features): {example_inputs.shape}')
-        print(f'Labels shape (batch, time, features): {example_labels.shape}')
 
     lstm = StackedRNN(num_layers, OUT_STEPS, num_features, cell_dimension=cell_dimension, epochs=epochs,
                       window_generator=window_data, lr=lr)
-    lstm.create_model()
-    history = lstm.compile_and_fit()
+    model = lstm.create_model()
+    history = lstm.fit(model)
 
-    performance = lstm.evaluate()
+    print("\nsaving files ==>")
+    performance = lstm.evaluate_performance(model)
     print(f'performance: {performance}')
-    forecast, actual = lstm.forecast()
+    forecast, actual = lstm.forecast(model)
 
     with open(f'fc_results/training_loss_{str(col_name)}', 'wb') as file_loss:
         pickle.dump(history.history, file_loss)

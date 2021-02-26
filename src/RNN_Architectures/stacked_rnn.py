@@ -11,14 +11,20 @@ class StackedRNN(RNN):
         self.cell_dimension = cell_dimension
 
     def create_model(self):
-        model = tf.keras.Sequential()
-        for layer in range(self.lstm_layers - 1):
-            model.add(tf.keras.layers.LSTM(self.cell_dimension, return_sequences=True))
-        model.add(tf.keras.layers.LSTM(self.cell_dimension, return_sequences=False))
-        # Shape => [batch, out_steps*features]
-        model.add(tf.keras.layers.Dense(self.output_steps * self.num_features,
-                                        kernel_initializer=tf.initializers.zeros))
-        # Shape => [batch, out_steps, features]
-        tf.keras.layers.Reshape([self.output_steps, self.num_features])
+        strategy = tf.distribute.MirroredStrategy()
+        print('Number of devices: {}'.format(strategy.num_replicas_in_sync))
+        with strategy.scope():
+            model = tf.keras.Sequential()
+            for layer in range(self.lstm_layers - 1):
+                model.add(tf.keras.layers.LSTM(self.cell_dimension, return_sequences=True))
+            model.add(tf.keras.layers.LSTM(self.cell_dimension, return_sequences=False))
+            # Shape => [batch, out_steps*features]
+            model.add(tf.keras.layers.Dense(self.output_steps * self.num_features,
+                                            kernel_initializer=tf.initializers.zeros))
+            # Shape => [batch, out_steps, features]
+            tf.keras.layers.Reshape([self.output_steps, self.num_features])
 
-        self.model = model
+            model.compile(loss=tf.losses.MeanSquaredError(),
+                          optimizer=tf.optimizers.Adam(self.lr),
+                          metrics=[tf.metrics.MeanAbsoluteError()])
+            return model
