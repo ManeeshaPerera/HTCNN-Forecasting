@@ -42,7 +42,8 @@ if __name__ == '__main__':
     # get best params
     look_back = int(model_params['look_back'])
     lr = model_params['lr']
-    batch_size = int(model_params['batch_size'])
+    # batch_size = int(model_params['batch_size'])
+    batch_size = 128
     num_layers = int(model_params['num_layers'])
     cell_dimension = int(model_params['cell_dimension'])
     epochs = int(model_params['epochs'])
