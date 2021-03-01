@@ -6,29 +6,17 @@ import pandas as pd
 from src.WindowGenerator.window_generator import WindowGenerator
 from src.RNN_Architectures.stacked_rnn import StackedRNN
 
-
-def plot_distribution(df_std):
-    df_std = df_std.melt(var_name='Column', value_name='Normalized')
-    plt.figure(figsize=(12, 6))
-    ax = sns.violinplot(x='Column', y='Normalized', data=df_std)
-    _ = ax.set_xticklabels(pv_data.keys(), rotation=90)
-    plt.show()
-
-
 if __name__ == '__main__':
     arguments = len(sys.argv) - 1
-    model_name = sys.argv[1]
-    horizon = int(sys.argv[2])
-    layers = int(sys.argv[3])
-    look_back = int(sys.argv[4])
-    col_name = sys.argv[5]
-    epochs = 700
+    horizon = int(sys.argv[1])
+    col_id = int(sys.argv[2])
 
     OUT_STEPS = horizon
-    # read the data (using pickle5 due the compatibility issues with Spartan)
-    # with open('input/hf_data', 'rb') as f:
-    #     pv_data = pickle.load(f)[['grid']]
-    pv_data = pd.read_csv('input/rnn_data.csv', index_col=[0])[[col_name]]
+    data = pd.read_csv('input/solar_timeseries.csv', index_col=[0])
+    columns = data.columns
+    col_name = columns[col_id]
+    pv_data = data[[col_name]]
+    print("\ncolumn name: ", col_name)
 
     # train, val, test split
     n = len(pv_data)
@@ -46,29 +34,25 @@ if __name__ == '__main__':
     test_df = (test_df - train_mean) / train_std
 
     df_std = (pv_data - train_mean) / train_std
-    # plot the distribution of features
-    # plot_distribution(df_std)
 
     # create the dataset
-    window_data = WindowGenerator(look_back, OUT_STEPS, OUT_STEPS, train_df, val_df, test_df, batch_size=2016,
+    print("\ncreating final model ==>")
+    window_data = WindowGenerator(12, OUT_STEPS, OUT_STEPS, train_df, val_df, test_df, batch_size=2016,
                                   label_columns=[col_name])
-    for example_inputs, example_labels in window_data.train.take(1):
-        print(f'Inputs shape (batch, time, features): {example_inputs.shape}')
-        print(f'Labels shape (batch, time, features): {example_labels.shape}')
 
-    lstm = StackedRNN(layers, OUT_STEPS, num_features, epochs=epochs, window_generator=window_data)
-    lstm.create_model()
-    history = lstm.compile_and_fit()
+    lstm = StackedRNN(2, OUT_STEPS, num_features, cell_dimension=32, epochs=500,
+                      window_generator=window_data, lr=0.001)
+    model = lstm.create_model()
+    history = lstm.fit(model)
 
-    performance = lstm.evaluate()
-    print(f'performance: {performance}')
-    forecast, actual = lstm.forecast()
+    print("\nsaving files ==>")
+    forecast, actual = lstm.forecast(model)
 
-    with open(f'results/training_loss_{model_name}_{str(layers)}', 'wb') as file_loss:
+    with open(f'fc_results/training_loss_{col_name}', 'wb') as file_loss:
         pickle.dump(history.history, file_loss)
 
-    with open(f'results/forecast_{model_name}_{str(layers)}', 'wb') as file_fc:
+    with open(f'fc_results/forecast_{col_name}', 'wb') as file_fc:
         pickle.dump(forecast, file_fc)
 
-    with open(f'results/actual_{model_name}_{str(layers)}', 'wb') as file_ac:
+    with open(f'fc_results/actual_{col_name}', 'wb') as file_ac:
         pickle.dump(actual, file_ac)
