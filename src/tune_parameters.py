@@ -20,7 +20,7 @@ class TuneHyperParameters:
 
         # min_batch_min = len(self.train) * 0.1
         # min_batch_max = min_batch_min + 100
-        pbounds = {'lr': (1e-3, 1e-1), 'num_layers': (1, 5), 'cell_dimension': (20, 50), 'epochs': (10, 50),
+        pbounds = {'lr': (1e-3, 1e-1), 'num_layers': (1, 5), 'cell_dimension': (20, 50), 'epochs': (200, 500),
                    'look_back': (look_back_min, look_back_max)}
 
         optimizer = BayesianOptimization(
