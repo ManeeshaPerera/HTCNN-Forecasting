@@ -33,7 +33,7 @@ def load_pickle(file):
 
 def combine_hf_fc(df, horizon):
     fc_dfs = []
-    for col in df.columns():
+    for col in df.columns:
         fc_file = load_pickle(f'forecast_{str(col)}')
         fc_dataframe = post_process_data(fc_file, df, horizon, col)
         fc_dfs.append(fc_dataframe)

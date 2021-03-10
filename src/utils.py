@@ -100,3 +100,10 @@ def plot_fc(data, model_data, fc, col, look_back, show_model_data=True):
     fig.add_trace(go.Scatter(x=time, y=fc, name='forecast', line=dict(dash='dot', color='orange')))
     fig.update_layout(height=500, width=800, paper_bgcolor='rgba(0,0,0,0)')
     return fig
+
+
+def get_samples(data, horizon):
+    train_index = (int(len(data) * 0.7) // horizon) * horizon
+    val_index = (int(len(data) * 0.9) // horizon) * horizon
+
+    return data[0:train_index], data[train_index:val_index], data[val_index:]

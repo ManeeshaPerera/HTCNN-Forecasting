@@ -37,7 +37,7 @@ def calculate_errors(df, df_fc, seasonality, horizon):
     train_df = df[0:int(n * 0.7)]
     test_df = df[int(n*0.9):]
 
-    for col in df.columns():
+    for col in df.columns:
         col_data = train_df[col]
         denominator = calculate_denom(col_data, seasonality)
         y_actual = test_df[col].values
