@@ -27,6 +27,7 @@ class RNN:
         return forecast, actual
 
     def evaluate_model(self, model):
+        print("evaluation")
         callback = tf.keras.callbacks.EarlyStopping(monitor='loss', patience=50)
         model.fit(self.window_generator.train, validation_data=self.window_generator.val, epochs=self.epochs, verbose=0,
                   callbacks=[callback])

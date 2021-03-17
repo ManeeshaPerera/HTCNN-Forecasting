@@ -11,11 +11,11 @@ class StackedRNN(RNN):
         self.cell_dimension = cell_dimension
 
     def create_model(self):
+        tf.keras.backend.clear_session()
         strategy = tf.distribute.MirroredStrategy()
         print('Number of devices: {}'.format(strategy.num_replicas_in_sync))
         with strategy.scope():
             # clearing the tensorflow session before creating a new model
-            tf.keras.backend.clear_session()
             model = tf.keras.Sequential()
             for layer in range(self.lstm_layers - 1):
                 model.add(tf.keras.layers.LSTM(self.cell_dimension, return_sequences=True))
