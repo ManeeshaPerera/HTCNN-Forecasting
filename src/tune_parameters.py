@@ -15,12 +15,12 @@ class TuneHyperParameters:
 
     def tune_parameters(self):
         # Bounded region of parameter space
-        look_back_min = 1.25 * self.output_steps
-        look_back_max = self.seasonality * 1.25
+        min_days = 1
+        max_days = 7
+        look_back_min = 14 * min_days
+        look_back_max = 14 * max_days
 
-        # min_batch_min = len(self.train) * 0.1
-        # min_batch_max = min_batch_min + 100
-        pbounds = {'lr': (1e-3, 1e-1), 'num_layers': (1, 5), 'cell_dimension': (20, 50), 'epochs': (200, 500),
+        pbounds = {'lr': (1e-3, 1e-1), 'num_layers': (1, 5), 'cell_dimension': (20, 50), 'epochs': (200, 1000),
                    'look_back': (look_back_min, look_back_max)}
 
         optimizer = BayesianOptimization(
@@ -30,7 +30,7 @@ class TuneHyperParameters:
             random_state=1,
         )
 
-        optimizer.maximize(init_points=2, n_iter=4)
+        optimizer.maximize(init_points=10, n_iter=50)
         model_params = optimizer.max['params']
         print("final hyper-parameters=", model_params)
         return model_params

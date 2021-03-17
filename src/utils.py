@@ -107,3 +107,13 @@ def get_samples(data, horizon):
     val_index = (int(len(data) * 0.9) // horizon) * horizon
 
     return data[0:train_index], data[train_index:val_index], data[val_index:]
+
+
+def split_hourly_data(data):
+    test_days = 36
+    val_days = 73
+    test = data[-14 * test_days:]
+    val = data[-14 * (val_days + test_days): -14 * test_days]
+    train = data[0:-14 * (val_days + test_days)]
+
+    return train, val, test

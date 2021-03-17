@@ -1,8 +1,11 @@
 results
 input
 fc_results
+ts_data
 *.DS_Store
 .idea
+lstm_results
+cnn_results
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
