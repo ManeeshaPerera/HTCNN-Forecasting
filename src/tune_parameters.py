@@ -30,7 +30,7 @@ class TuneHyperParameters:
             random_state=1,
         )
 
-        optimizer.maximize(init_points=10, n_iter=50)
+        optimizer.maximize(init_points=5, n_iter=5)
         model_params = optimizer.max['params']
         print("final hyper-parameters=", model_params)
         return model_params

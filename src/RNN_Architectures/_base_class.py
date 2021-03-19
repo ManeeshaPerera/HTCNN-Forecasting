@@ -29,7 +29,7 @@ class RNN:
     def evaluate_model(self, model):
         print("evaluation")
         callback = tf.keras.callbacks.EarlyStopping(monitor='loss', patience=50)
-        model.fit(self.window_generator.train, validation_data=self.window_generator.val, epochs=self.epochs, verbose=0,
+        model.fit(self.window_generator.train, validation_data=self.window_generator.val, epochs=self.epochs, verbose=1,
                   callbacks=[callback])
         score = model.evaluate(self.window_generator.val, verbose=0)
         # Return the loss (minimize the loss)
