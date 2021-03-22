@@ -9,7 +9,9 @@ from sklearn.preprocessing import StandardScaler
 
 if __name__ == '__main__':
     arguments = len(sys.argv) - 1
-    filename = sys.argv[1]
+    fileindex = int(sys.argv[1])
+    h_ts = pd.read_csv('input/ts_1h.csv', index_col=[0])
+    filename = h_ts.columns[fileindex]
 
     OUT_STEPS = 14  # day ahead forecast
     data = pd.read_csv(f'ts_data/{filename}.csv', index_col=[0])
