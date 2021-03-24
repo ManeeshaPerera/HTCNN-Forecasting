@@ -3,7 +3,7 @@
 #SBATCH --account="punim0512"
 
 # The name of the job:
-#SBATCH --job-name="lstm-train"
+#SBATCH --job-name="lstm"
 
 # Partition for the job:
 #SBATCH --partition gpgpu
@@ -18,18 +18,14 @@
 #SBATCH --mem=64G
 
 # The maximum running time of the job in days-hours:mins:sec
-#SBATCH --time=00-12:00:0
+#SBATCH --time=01-00:00:0
 
 #Job array
-#SBATCH --array=1-38
+#SBATCH --array=0-38
 
 # Send yourself an email when the job:
 #SBATCH --mail-user=pereramg@student.unimelb.edu.au
 #SBATCH --mail-type=BEGIN,FAIL,END
-
-# The modules to load:
-# module load Python/3.6.10-intel-2017.u2-GCC-6.2.0-CUDA10.1
-# module load Tensorflow/2.1.0-intel-2017.u2-GCC-6.2.0-CUDA10.1-Python-3.6.10-GPU
 
 source /usr/local/module/spartan_new.sh
 module load fosscuda/2019b
@@ -38,4 +34,4 @@ module load python/3.7.4
 module load tensorflow/2.3.1-python-3.7.4
 
 # The job command(s):
-python tune_and_run.py ${SLURM_ARRAY_TASK_ID} > lstm_results/${SLURM_ARRAY_TASK_ID}.txt
+python run.py ${SLURM_ARRAY_TASK_ID} > lstm_results/${SLURM_ARRAY_TASK_ID}.txt

@@ -1,4 +1,5 @@
 import tensorflow as tf
+import pandas as pd
 
 
 class RNN:
@@ -7,9 +8,12 @@ class RNN:
         self.window_generator = window_generator
         self.lr = lr
 
-    def fit(self, model):
-        history = model.fit(self.window_generator.train, epochs=self.epochs)
+    def fit(self, model, model_name):
+        callback = tf.keras.callbacks.EarlyStopping(monitor='loss', patience=100)
+        history = model.fit(self.window_generator.train, validation_data=self.window_generator.val, epochs=self.epochs,
+                            verbose=1, callbacks=[callback])
         print(model.summary())
+        model.save(f'../../lstm_results/models/{model_name}')
         return history
 
     def evaluate_performance(self, model):
@@ -28,7 +32,7 @@ class RNN:
 
     def evaluate_model(self, model):
         print("evaluation")
-        callback = tf.keras.callbacks.EarlyStopping(monitor='loss', patience=50)
+        callback = tf.keras.callbacks.EarlyStopping(monitor='loss', patience=100)
         model.fit(self.window_generator.train, validation_data=self.window_generator.val, epochs=self.epochs, verbose=1,
                   callbacks=[callback])
         score = model.evaluate(self.window_generator.val, verbose=0)

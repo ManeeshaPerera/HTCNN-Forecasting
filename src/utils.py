@@ -2,6 +2,7 @@ import matplotlib as mpl
 import matplotlib.pyplot as plt
 import seaborn as sns
 import numpy as np
+import constants
 
 mpl.rcParams['figure.figsize'] = (8, 6)
 mpl.rcParams['axes.grid'] = False
@@ -109,11 +110,9 @@ def get_samples(data, horizon):
     return data[0:train_index], data[train_index:val_index], data[val_index:]
 
 
-def split_hourly_data(data):
-    test_days = 36
-    val_days = 73
-    test = data[-14 * test_days:]
-    val = data[-14 * (val_days + test_days): -14 * test_days]
-    train = data[0:-14 * (val_days + test_days)]
+def split_hourly_data(data, look_back):
+    test = data[-((14 * constants.TEST_DAYS) + look_back):]
+    val = data[-14 * (constants.VAL_DAYS + constants.TEST_DAYS): -14 * constants.TEST_DAYS]
+    train = data[0:-14 * (constants.VAL_DAYS + constants.TEST_DAYS)]
 
     return train, val, test
