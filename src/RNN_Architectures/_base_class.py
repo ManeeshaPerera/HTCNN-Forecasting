@@ -13,7 +13,7 @@ class RNN:
         history = model.fit(self.window_generator.train, validation_data=self.window_generator.val, epochs=self.epochs,
                             verbose=1, callbacks=[callback])
         print(model.summary())
-        model.save(f'../../lstm_results/models/{model_name}')
+        # model.save(f'../../lstm_results/models/{model_name}')
         return history
 
     def evaluate_performance(self, model):

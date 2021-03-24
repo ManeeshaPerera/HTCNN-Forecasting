@@ -41,18 +41,21 @@ if __name__ == '__main__':
 
     lstm = StackedRNN(2, OUT_STEPS, num_features, cell_dimension=32, epochs=500,
                       window_generator=window_data, lr=0.001)
-    model = lstm.create_model()
-    history = lstm.fit(model, filename)
 
-    print("\nforecasting ==>")
-    forecast, actual = lstm.forecast(model)
+    # run the model for 5 iterations
+    for num_iter in range(1, 6):
+        model = lstm.create_model()
+        history = lstm.fit(model, filename)
 
-    print("\nsaving files ==>")
-    with open(f'lstm_results/training_loss_{filename}', 'wb') as file_loss:
-        pickle.dump(history.history, file_loss)
+        print("\nforecasting ==>")
+        forecast, actual = lstm.forecast(model)
 
-    with open(f'lstm_results/forecast_{filename}', 'wb') as file_fc:
-        pickle.dump(forecast, file_fc)
+        print("\nsaving files ==>")
+        with open(f'lstm_results/training_loss_{filename}_iteration_{num_iter}', 'wb') as file_loss:
+            pickle.dump(history.history, file_loss)
 
-    with open(f'lstm_results/actual_{filename}', 'wb') as file_ac:
-        pickle.dump(actual, file_ac)
+        with open(f'lstm_results/forecast_{filename}_iteration_{num_iter}', 'wb') as file_fc:
+            pickle.dump(forecast, file_fc)
+
+        with open(f'lstm_results/actual_{filename}_iteration_{num_iter}', 'wb') as file_ac:
+            pickle.dump(actual, file_ac)
