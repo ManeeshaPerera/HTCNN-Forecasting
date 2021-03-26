@@ -50,7 +50,7 @@ if __name__ == '__main__':
         count = 0
         for iter_num_fc in fc_array:
             count = count + 1
-            fc_samples = extract_non_overlapping_samples(fc_array, scaler)
+            fc_samples = extract_non_overlapping_samples(iter_num_fc, scaler)
             dataframe_store[f'fc_{count}'] = fc_samples
         dataframe_store['average_fc'] = dataframe_store.iloc[:, 1:].mean(axis=1)
 
