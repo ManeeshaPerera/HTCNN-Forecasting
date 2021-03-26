@@ -26,7 +26,7 @@ def extract_non_overlapping_samples(tf_data, scaler, horizon=14):
 def read_all_forecast_files(ts_name, num_of_iter):
     fc = []
     for num_iter in range(1, num_of_iter):
-        fc_iter = pd.read_pickle(f'../lstm_results/forecast_{ts_name}_iteration_{num_iter}')
+        fc_iter = pd.read_pickle(f'lstm_results/forecast_{ts_name}_iteration_{num_iter}')
         fc.append(fc_iter)
 
     return fc
