@@ -25,7 +25,7 @@ class StackedRNN(RNN):
             model.add(tf.keras.layers.Dense(self.output_steps * self.num_features,
                                             kernel_initializer=tf.initializers.zeros))
             # Shape => [batch, out_steps, features]
-            tf.keras.layers.Reshape([self.output_steps, self.num_features])
+            model.add(tf.keras.layers.Reshape([self.output_steps, self.num_features]))
 
             model.compile(loss=tf.losses.MeanSquaredError(),
                           optimizer=tf.optimizers.Adam(self.lr),
