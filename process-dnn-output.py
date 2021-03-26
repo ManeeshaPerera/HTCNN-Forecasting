@@ -45,7 +45,7 @@ if __name__ == '__main__':
         scaler = StandardScaler()
         scaler.fit(train[['power']].values)
 
-        fc_array = read_all_forecast_files(ts, 5)
+        fc_array = read_all_forecast_files(ts, 6)
 
         count = 0
         for iter_num_fc in fc_array:
