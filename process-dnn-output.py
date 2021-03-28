@@ -26,7 +26,7 @@ def extract_non_overlapping_samples(tf_data, scaler, horizon=14):
 def read_all_forecast_files(ts_name, num_of_iter):
     fc = []
     for num_iter in range(1, num_of_iter):
-        fc_iter = pd.read_pickle(f'lstm_results/forecast_{ts_name}_iteration_{num_iter}')
+        fc_iter = pd.read_pickle(f'{filepath}/forecast_{ts_name}_iteration_{num_iter}')
         fc.append(fc_iter)
 
     return fc
@@ -34,6 +34,7 @@ def read_all_forecast_files(ts_name, num_of_iter):
 
 if __name__ == '__main__':
     for ts in constants.TS:
+        filepath = "cnn_results/tcn"
         print("starting ", ts)
         data = pd.read_csv(f'ts_data/{ts}.csv', index_col=[0])
         look_back = 14 * 7  # 14 hours in to 7 days
@@ -54,4 +55,4 @@ if __name__ == '__main__':
             dataframe_store[f'fc_{count}'] = fc_samples
         dataframe_store['average_fc'] = dataframe_store.iloc[:, 1:].mean(axis=1)
 
-        dataframe_store.to_csv(f'lstm_results/final_results/{ts}.csv')
+        dataframe_store.to_csv(f'{filepath}/final_results/{ts}.csv')
