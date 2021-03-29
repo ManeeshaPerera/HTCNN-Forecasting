@@ -5,6 +5,7 @@ import numpy as np
 def MASE(training_series, testing_series, prediction_series, m, denom=None):
     h = testing_series.shape[0]
     numerator = np.sum(np.abs(testing_series - prediction_series))
+    # print(numerator)
 
     n = training_series.shape[0]
     # denominator = np.abs(np.diff(training_series, m)).sum() / (n - m)
@@ -15,6 +16,7 @@ def MASE(training_series, testing_series, prediction_series, m, denom=None):
         denominator = ne / (n - m)
     else:
         denominator = denom
+    # print(denominator)
     return (numerator / denominator) / h
 
 
@@ -24,8 +26,9 @@ def test_errors(train_sample, test_sample, forecasts, horizon, seasonality, deno
     for h in range(0, len(test_sample), horizon):
         # let's add a condition to only calculate the error after sunrise and before sunset
         if np.count_nonzero(test_sample[h: h + horizon]):
-            errors.append(
-                MASE(train_sample, test_sample[h: h + horizon], forecasts[h: h + horizon], seasonality, denom))
+            error = MASE(train_sample, test_sample[h: h + horizon], forecasts[h: h + horizon], seasonality, denom)
+            # print(error)
+            errors.append(error)
 
     return np.mean(errors), errors
 
@@ -52,6 +55,6 @@ def calculate_denom(train_df, m):
     ne = 0
     n = train_df.values.shape[0]
     for i in range(m, len(train_df.values)):
-        ne = ne + abs(train_df.values[i] - train_df.values[i - m])
-        denominator = ne / (n - 1)
+        ne = ne + abs(train_df.values[i][0] - train_df.values[i - m][0])
+        denominator = ne / (n - m)
     return denominator

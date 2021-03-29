@@ -8,13 +8,16 @@ from sklearn.preprocessing import StandardScaler
 import src.utils as utils
 
 
-def save_files(model_name, filename, num_iter, history, forecast, actual):
+def save_files(model_name, filename, num_iter, history, forecast, actual, dilation=None):
     print("\nsaving files ==>")
     if (model_name == "lstm"):
         dir_name = "lstm_results"
     else:
         if (model_name == "tcn"):
-            dir_name = "cnn_results/tcn"
+            if dilation:
+                dir_name = f'cnn_results/tcn/{dilation}'
+            else:
+                dir_name = "cnn_results/tcn"
         else:
             dir_name = "cnn_results/wavenet"
 
@@ -75,8 +78,10 @@ if __name__ == '__main__':
             save_files(model_name, filename, num_iter, history, forecast, actual)
 
     if model_name == "tcn":
-        dilation_rates = [2 ** i for i in range(6)]
-        tcn = DilatedCNN(6, OUT_STEPS, num_features, n_filters=32, epochs=500, kernel_size=2,
+        num_layers = 6
+        dilation_rate = 3
+        dilation_rates = [dilation_rate ** i for i in range(num_layers)]
+        tcn = DilatedCNN(num_layers, OUT_STEPS, num_features, n_filters=32, epochs=500, kernel_size=2,
                          dilation_rates=dilation_rates,
                          window_generator=window_data, lr=0.001)
 
@@ -87,4 +92,4 @@ if __name__ == '__main__':
 
             print("\nforecasting ==>")
             forecast, actual = tcn.forecast(model)
-            save_files(model_name, filename, num_iter, history, forecast, actual)
+            save_files(model_name, filename, num_iter, history, forecast, actual, dilation_rate)
