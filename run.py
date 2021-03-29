@@ -79,8 +79,9 @@ if __name__ == '__main__':
 
     if model_name == "tcn":
         num_layers = 6
-        dilation_rate = 3
-        dilation_rates = [dilation_rate ** i for i in range(num_layers)]
+        dilation_rate = 1
+        # dilation_rates = [dilation_rate ** i for i in range(num_layers)]
+        dilation_rates = [1, 2, 3, 4, 5, 6]
         tcn = DilatedCNN(num_layers, OUT_STEPS, num_features, n_filters=32, epochs=500, kernel_size=2,
                          dilation_rates=dilation_rates,
                          window_generator=window_data, lr=0.001)
