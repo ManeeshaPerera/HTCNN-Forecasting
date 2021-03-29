@@ -15,7 +15,7 @@ def save_files(model_name, filename, num_iter, history, forecast, actual, dilati
     else:
         if (model_name == "tcn"):
             if dilation:
-                dir_name = f'cnn_results/tcn/{dilation}'
+                dir_name = f'cnn_results/tcn/dilation_{dilation}'
             else:
                 dir_name = "cnn_results/tcn"
         else:
