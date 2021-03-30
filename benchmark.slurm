@@ -3,7 +3,7 @@
 #SBATCH --account="punim0512"
 
 # The name of the job:
-#SBATCH --job-name="lstm"
+#SBATCH --job-name="benchmark"
 
 # Partition for the job:
 #SBATCH --partition gpgpu
