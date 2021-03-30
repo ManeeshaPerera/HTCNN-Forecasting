@@ -116,3 +116,10 @@ def split_hourly_data(data, look_back):
     train = data[0:-14 * (constants.VAL_DAYS + constants.TEST_DAYS)]
 
     return train, val, test
+
+
+def split_hourly_data_for_stat_models(data):
+    test = data[-14 * constants.TEST_DAYS:]
+    train = data[0:-14 * constants.TEST_DAYS]
+
+    return train, test
