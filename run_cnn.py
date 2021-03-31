@@ -8,7 +8,7 @@ from sklearn.preprocessing import StandardScaler
 import src.utils as utils
 
 
-def save_files(model_name, filename, num_iter, history, forecast, actual, dilation=None):
+def save_files(model_name, filename, num_iter, history, forecast, actual, dilation=None, num_layers=None):
     print("\nsaving files ==>")
     if (model_name == "lstm"):
         dir_name = "lstm_results"
@@ -16,7 +16,7 @@ def save_files(model_name, filename, num_iter, history, forecast, actual, dilati
         if (model_name == "tcn"):
             if dilation:
                 # dir_name = f'cnn_results/tcn/dilation_{dilation}'
-                dir_name = f'cnn_results/tcn2'
+                dir_name = f'cnn_results/tcn2/layers_{num_layers}'
             else:
                 dir_name = "cnn_results/tcn"
         else:
@@ -35,6 +35,7 @@ def save_files(model_name, filename, num_iter, history, forecast, actual, dilati
 if __name__ == '__main__':
     fileindex = int(sys.argv[1])
     model_name = sys.argv[2]
+    layers = int(sys.argv[3])
     h_ts = pd.read_csv('input/ts_1h.csv', index_col=[0])
     filename = h_ts.columns[fileindex]
 
@@ -65,24 +66,14 @@ if __name__ == '__main__':
     window_data = WindowGenerator(look_back, OUT_STEPS, OUT_STEPS, train_df, val_df, test_df, batch_size=128,
                                   label_columns=[col_name])
 
-    if model_name == "lstm":
-        lstm = StackedRNN(2, OUT_STEPS, num_features, cell_dimension=32, epochs=500,
-                          window_generator=window_data, lr=0.001)
-
-        # run the model for 5 iterations
-        for num_iter in range(1, 6):
-            model = lstm.create_model()
-            history = lstm.fit(model, filename)
-
-            print("\nforecasting ==>")
-            forecast, actual = lstm.forecast(model)
-            save_files(model_name, filename, num_iter, history, forecast, actual)
-
     if model_name == "tcn":
-        num_layers = 6
-        dilation_rate = 1
-        # dilation_rates = [dilation_rate ** i for i in range(num_layers)]
-        dilation_rates = [1, 2, 3, 4, 5, 6]
+        if layers == 0:
+            num_layers = 6
+        else:
+            num_layers = 2
+        dilation_rate = 2
+        dilation_rates = [dilation_rate ** i for i in range(num_layers)]
+        # dilation_rates = [1, 2, 3, 4, 5, 6]
         tcn = DilatedCNN(num_layers, OUT_STEPS, num_features, n_filters=32, epochs=500, kernel_size=2,
                          dilation_rates=dilation_rates,
                          window_generator=window_data, lr=0.001)
@@ -94,4 +85,4 @@ if __name__ == '__main__':
 
             print("\nforecasting ==>")
             forecast, actual = tcn.forecast(model)
-            save_files(model_name, filename, num_iter, history, forecast, actual, dilation_rate)
+            save_files(model_name, filename, num_iter, history, forecast, actual, dilation_rate, num_layers)

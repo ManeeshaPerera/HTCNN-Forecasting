@@ -22,7 +22,12 @@ class DilatedCNN(RNN):
         with strategy.scope():
             # clearing the tensorflow session before creating a new model
             model = tf.keras.Sequential()
-            layer1 = tf.keras.layers.Lambda(lambda x: x[:, -(self.kernel_size - 1):, :])
+            # layer1 = tf.keras.layers.Lambda(lambda x: x[:, -(self.kernel_size-1):, :])
+            layer1 = tf.keras.layers.Conv1D(filters=self.n_filters,
+                                            kernel_size=self.kernel_size,
+                                            padding='causal',
+                                            input_shape=(14 * 7, 1))
+
             model.add(layer1)
             for layer in range(self.cnn_layers):
                 cnn_layer = tf.keras.layers.Conv1D(filters=self.n_filters,
@@ -32,11 +37,14 @@ class DilatedCNN(RNN):
                                                    )
                 model.add(cnn_layer)
 
+            model.add(tf.keras.layers.Flatten())
             # Shape => [batch, out_steps*features]
             model.add(tf.keras.layers.Dense(self.output_steps * self.num_features,
                                             kernel_initializer=tf.initializers.zeros()))
+            # print(model.summary())
             # Shape => [batch, out_steps, features]
             model.add(tf.keras.layers.Reshape([self.output_steps, self.num_features]))
+
 
             model.compile(loss=tf.losses.MeanSquaredError(),
                           optimizer=tf.optimizers.Adam(self.lr),
