@@ -33,4 +33,4 @@ module load gcc/8.3.0 cuda/10.1.243 openmpi/3.1.4
 module load python/3.7.4
 
 # The job command(s):
-python run_benchmarks.py ${SLURM_ARRAY_TASK_ID} 'arima' > benchmark_results/arima/${SLURM_ARRAY_TASK_ID}.txt
+python run_benchmarks.py ${SLURM_ARRAY_TASK_ID} 'tbats' > benchmark_results/tbats/${SLURM_ARRAY_TASK_ID}.txt
