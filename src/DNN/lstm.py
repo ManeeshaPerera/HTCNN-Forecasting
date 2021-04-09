@@ -41,5 +41,5 @@ class LSTMModel(DNNModel):
                           optimizer=tf.optimizers.Adam(self.lr),
                           metrics=[tf.metrics.MeanAbsoluteError()])
 
-            history = model.fit(train_X, train_Y, epochs=self.epochs, validation_data=(val_X, val_Y))
-            return history, model
+        history = model.fit(train_X, train_Y, epochs=self.epochs, validation_data=(val_X, val_Y))
+        return history, model
