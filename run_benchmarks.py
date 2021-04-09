@@ -5,6 +5,7 @@ import constants as const
 from src.Benchmarks.arima import ARIMA
 from src.Benchmarks.naive import NaiveModel
 from src.Benchmarks.tbats import TbatsModel
+from src.Benchmarks.prophet_model import ProphetModel
 
 
 def run_naive(seasonality, horizon):
@@ -60,3 +61,10 @@ if __name__ == '__main__':
 
         print("Saving files ==>")
         forecasts.to_csv(f'benchmark_results/tbats/final_results/{filename}.csv')
+
+    if method == 'prophet':
+        prophet_m = ProphetModel(train, test, horizon, seasonality, 'power', exog)
+        forecasts = prophet_m.fit_and_forecast()
+
+        print("Saving files ==>")
+        forecasts.to_csv(f'benchmark_results/{method}/final_results/{filename}.csv')
