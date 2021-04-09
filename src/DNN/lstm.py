@@ -12,11 +12,11 @@ class LSTMModel(DNNModel):
         self.cell_dim = cell_dim
 
     def compile_and_fit_lstm(self, train_X, train_Y, val_X, val_Y):
+        # clearing the tensorflow session before creating a new model
         tf.keras.backend.clear_session()
         strategy = tf.distribute.MirroredStrategy()
         print('Number of devices: {}'.format(strategy.num_replicas_in_sync))
         with strategy.scope():
-            # clearing the tensorflow session before creating a new model
             model = tf.keras.Sequential()
             if self.layers > 1:
                 model.add(tf.keras.layers.LSTM(self.cell_dim, return_sequences=True,
