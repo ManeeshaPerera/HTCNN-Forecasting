@@ -31,7 +31,7 @@ if __name__ == '__main__':
     lstm = LSTMModel(horizon, num_lags, data, epochs, lr, layers, cell_dim, exog)
     train_X, train_Y, val_X, val_Y, test_X, test_Y = lstm.get_train_val_test()
 
-    for i in range(1, 2):
+    for i in range(1, 11):
         history, model = lstm.compile_and_fit_lstm(train_X, train_Y, val_X, val_Y)
         forecasts = lstm.get_forecast(test_X, model)
         print("Saving files ==>")
