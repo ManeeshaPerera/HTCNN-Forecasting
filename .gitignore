@@ -7,6 +7,7 @@ ts_data
 lstm_results
 cnn_results
 benchmark_results
+dnn_results
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
