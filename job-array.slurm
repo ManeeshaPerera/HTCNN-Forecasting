@@ -34,4 +34,4 @@ module load python/3.7.4
 module load tensorflow/2.3.1-python-3.7.4
 
 # The job command(s):
-python run_dnns.py ${SLURM_ARRAY_TASK_ID} 'lstm' > dnn_results/lstm_${SLURM_ARRAY_TASK_ID}.txt
+python run.py ${SLURM_ARRAY_TASK_ID} 'tcn' > cnn_results/tcn_new/dilation2_${SLURM_ARRAY_TASK_ID}.txt

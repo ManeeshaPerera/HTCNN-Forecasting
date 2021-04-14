@@ -1,0 +1,27 @@
+,Grid Forecasts mean MASE
+LSTM - Grid,1.468
+LSTM - TL aggregated,1.416
+LSTM - SUB aggregated,1.33
+LSTM - PC aggregated,1.123
+LSTM - Site aggregated,1.013
+CNN - Grid,4.292
+CNN - TL aggregated,4.285
+CNN - SUB aggregated,4.288
+CNN - PC aggregated,1.229
+CNN - Site aggregated,1.253
+AutoARIMA - Grid,1.054
+AutoARIMA - TL aggregated,1.023
+AutoARIMA - SUB aggregated,1.024
+AutoARIMA - PC aggregated,0.929
+AutoARIMA - Site aggregated,1.008
+TBATS - Grid,1.875
+TBATS - TL aggregated,1.749
+TBATS - SUB aggregated,1.706
+TBATS - PC aggregated,1.544
+TBATS - Site aggregated,1.683
+Prophet - Grid,1.962
+Prophet - TL aggregated,1.967
+Prophet - SUB aggregated,1.967
+Prophet - PC aggregated,1.08
+Prophet - Site aggregated,1.09
+Seasonal Naive,1.079
