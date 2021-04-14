@@ -79,13 +79,17 @@ if __name__ == '__main__':
             save_files(model_name, filename, num_iter, history, forecast, actual)
 
     if model_name == "tcn":
+        if fileindex > 6:
+            input_shape = 106
+        else:
+            input_shape = 1
         num_layers = 6
         dilation_rate = 2
         dilation_rates = [dilation_rate ** i for i in range(num_layers)]
         # dilation_rates = [1, 2, 3, 4, 5, 6]
         tcn = DilatedCNN(num_layers, OUT_STEPS, num_features, n_filters=32, epochs=500, kernel_size=2,
                          dilation_rates=dilation_rates,
-                         window_generator=window_data, lr=0.0001)
+                         window_generator=window_data, lr=0.0001, input_shape=input_shape)
 
         # run the model for 5 iterations
         for num_iter in range(1, 6):

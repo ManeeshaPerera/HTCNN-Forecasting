@@ -6,7 +6,7 @@ import tensorflow as tf
 
 class DilatedCNN(RNN):
     def __init__(self, cnn_layers, output_steps, num_features, n_filters, epochs, lr, window_generator, kernel_size,
-                 dilation_rates):
+                 dilation_rates, input_shape):
         super().__init__(epochs, window_generator, lr)
         self.cnn_layers = cnn_layers
         self.output_steps = output_steps
@@ -14,6 +14,7 @@ class DilatedCNN(RNN):
         self.n_filters = n_filters
         self.kernel_size = kernel_size
         self.dilation_rates = dilation_rates
+        self.input_shape = input_shape
 
     def create_model(self):
         tf.keras.backend.clear_session()
@@ -26,7 +27,7 @@ class DilatedCNN(RNN):
             layer1 = tf.keras.layers.Conv1D(filters=self.n_filters,
                                             kernel_size=self.kernel_size,
                                             padding='causal',
-                                            input_shape=(14 * 7, 1))
+                                            input_shape=(14 * 7, self.input_shape))
 
             model.add(layer1)
             for layer in range(self.cnn_layers):
