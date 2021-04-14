@@ -34,7 +34,7 @@ def read_all_forecast_files(ts_name, num_of_iter):
 
 if __name__ == '__main__':
     for ts in constants.TS:
-        filepath = "cnn_results/tcn2/layers_6/lr"
+        filepath = "cnn_results/tcn_new/dilation_2"
         print("starting ", ts)
         data = pd.read_csv(f'ts_data/{ts}.csv', index_col=[0])
         look_back = 14 * 7  # 14 hours in to 7 days
