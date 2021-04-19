@@ -15,7 +15,8 @@ def save_files(model_name, filename, num_iter, history, forecast, actual, dilati
     else:
         if (model_name == "tcn"):
             if dilation:
-                dir_name = f'cnn_results/tcn_new/dilation_{dilation}'
+                # dir_name = f'cnn_results/tcn_new/dilation_{dilation}'
+                dir_name = f'cnn_results/tcn_new/filter_64'
                 # dir_name = f'cnn_results/tcn2'
             else:
                 dir_name = "cnn_results/tcn_new"
@@ -87,7 +88,7 @@ if __name__ == '__main__':
         dilation_rate = 2
         dilation_rates = [dilation_rate ** i for i in range(num_layers)]
         # dilation_rates = [1, 2, 3, 4, 5, 6]
-        tcn = DilatedCNN(num_layers, OUT_STEPS, num_features, n_filters=32, epochs=500, kernel_size=2,
+        tcn = DilatedCNN(num_layers, OUT_STEPS, num_features, n_filters=64, epochs=500, kernel_size=2,
                          dilation_rates=dilation_rates,
                          window_generator=window_data, lr=0.0001, input_shape=input_shape)
 
