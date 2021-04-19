@@ -4,11 +4,11 @@ LSTM - TL aggregated,1.416
 LSTM - SUB aggregated,1.33
 LSTM - PC aggregated,1.123
 LSTM - Site aggregated,1.013
-CNN - Grid,4.292
-CNN - TL aggregated,4.285
-CNN - SUB aggregated,4.288
-CNN - PC aggregated,1.229
-CNN - Site aggregated,1.253
+CNN - Grid,1.15
+CNN - TL aggregated,1.169
+CNN - SUB aggregated,1.172
+CNN - PC aggregated,1.198
+CNN - Site aggregated,1.17
 AutoARIMA - Grid,1.054
 AutoARIMA - TL aggregated,1.023
 AutoARIMA - SUB aggregated,1.024
