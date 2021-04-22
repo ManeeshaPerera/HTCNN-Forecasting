@@ -3,14 +3,14 @@
 #SBATCH --account="punim0512"
 
 # The name of the job:
-#SBATCH --job-name="lstm"
+#SBATCH --job-name="dnns"
 
 # Partition for the job:
 #SBATCH --partition gpgpu
 #SBATCH --qos gpgpumse
 
 # Number of GPUs requested per node:
-#SBATCH --gres=gpu:1
+#SBATCH --gres=gpu:2
 
 # Maximum number of tasks/CPU cores used by the job:
 #SBATCH --ntasks=1
@@ -34,4 +34,4 @@ module load python/3.7.4
 module load tensorflow/2.3.1-python-3.7.4
 
 # The job command(s):
-python run.py ${SLURM_ARRAY_TASK_ID} 'tcn' > cnn_results/tcn_new/filter_64_${SLURM_ARRAY_TASK_ID}.txt
+python run.py ${SLURM_ARRAY_TASK_ID} 'lstm' > lstm_results/lstm2/lstm2_${SLURM_ARRAY_TASK_ID}.txt

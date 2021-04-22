@@ -11,7 +11,7 @@ import src.utils as utils
 def save_files(model_name, filename, num_iter, history, forecast, actual, dilation=None):
     print("\nsaving files ==>")
     if (model_name == "lstm"):
-        dir_name = "lstm_results"
+        dir_name = "lstm_results/lstm2"
     else:
         if (model_name == "tcn"):
             if dilation:
@@ -67,8 +67,8 @@ if __name__ == '__main__':
                                   label_columns=[col_name])
 
     if model_name == "lstm":
-        lstm = StackedRNN(2, OUT_STEPS, num_features, cell_dimension=32, epochs=500,
-                          window_generator=window_data, lr=0.001)
+        lstm = StackedRNN(2, OUT_STEPS, num_features, cell_dimension=64, epochs=500,
+                          window_generator=window_data, lr=0.0001)
 
         # run the model for 5 iterations
         for num_iter in range(1, 6):
