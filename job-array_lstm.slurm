@@ -18,7 +18,7 @@
 #SBATCH --mem=64G
 
 # The maximum running time of the job in days-hours:mins:sec
-#SBATCH --time=03-00:00:0
+#SBATCH --time=04-00:00:0
 
 #Job array
 #SBATCH --array=0-38

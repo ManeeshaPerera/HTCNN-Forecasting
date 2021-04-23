@@ -7,7 +7,7 @@ import constants
 import store_files
 
 
-def run_dnn(file_index, model_name, num_of_layers, cell_dimension, epochs, lr, main_dir, model_num):
+def run_dnn(file_index, model_name, num_of_layers, cell_dimension, epochs, lr, lookback, main_dir, model_num):
     filename = constants.TS[file_index]
 
     horizon = 14  # day ahead forecast
@@ -16,7 +16,7 @@ def run_dnn(file_index, model_name, num_of_layers, cell_dimension, epochs, lr, m
 
     num_features = 1
     # 14 hours in to 7 days
-    look_back = 14 * 7
+    look_back = 14 * lookback
 
     # train, val, test split
     train, val, test = utils.split_hourly_data(data, look_back)

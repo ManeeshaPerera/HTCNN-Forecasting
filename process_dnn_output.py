@@ -33,11 +33,11 @@ def read_all_forecast_files(ts_name, num_of_iter, filepath):
     return fc
 
 
-def run_process(filepath):
+def run_process(filepath, lookback):
     for ts in constants.TS:
         print("starting ", ts)
         data = pd.read_csv(f'ts_data/{ts}.csv', index_col=[0])
-        look_back = 14 * 7  # 14 hours in to 7 days
+        look_back = 14 * lookback
 
         # train, val, test split
         train, val, test = util.split_hourly_data(data, look_back)

@@ -21,13 +21,17 @@ if __name__ == '__main__':
 
         learning_rate = [0.001, 0.0001]
         epochs = 1000
+
+        lookback = [1, 3, 7]
         model_num = 1
 
         for cell_dim in cell_dims:
             for lstm_layer in num_layers:
                 for lr in learning_rate:
-                    print("current model running")
-                    print(cell_dim, lstm_layer, lr)
-                    run_lstm.run_dnn(file_index, model_name, lstm_layer, cell_dim, epochs, lr, main_dir, model_num)
-                    filepath = f'{main_dir}/{model_name}_{model_num}'
-                    process_dnn_output.run_process(filepath)
+                    for lag in lookback:
+                        print("current model running")
+                        print(cell_dim, lstm_layer, lr, lookback)
+                        run_lstm.run_dnn(file_index, model_name, lstm_layer, cell_dim, epochs, lr, lookback, main_dir,
+                                         model_num)
+                        filepath = f'{main_dir}/{model_name}_{model_num}'
+                        process_dnn_output.run_process(filepath, lookback)
