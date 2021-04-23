@@ -30,8 +30,8 @@ if __name__ == '__main__':
                 for lr in learning_rate:
                     for lag in lookback:
                         print("current model running")
-                        print(cell_dim, lstm_layer, lr, lookback)
-                        run_lstm.run_dnn(file_index, model_name, lstm_layer, cell_dim, epochs, lr, lookback, main_dir,
+                        print(cell_dim, lstm_layer, lr, lag)
+                        run_lstm.run_dnn(file_index, model_name, lstm_layer, cell_dim, epochs, lr, lag, main_dir,
                                          model_num)
                         filepath = f'{main_dir}/{model_name}_{model_num}'
-                        process_dnn_output.run_process(filepath, lookback)
+                        process_dnn_output.run_process(filepath, lag)
