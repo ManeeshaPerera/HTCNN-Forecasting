@@ -8,6 +8,7 @@ import pandas as pd
 import src.utils as util
 import constants
 from sklearn.preprocessing import StandardScaler
+import os
 
 
 def extract_non_overlapping_samples(tf_data, scaler, horizon=14):
@@ -23,7 +24,7 @@ def extract_non_overlapping_samples(tf_data, scaler, horizon=14):
     return fc_values
 
 
-def read_all_forecast_files(ts_name, num_of_iter):
+def read_all_forecast_files(ts_name, num_of_iter, filepath):
     fc = []
     for num_iter in range(1, num_of_iter):
         fc_iter = pd.read_pickle(f'{filepath}/forecast_{ts_name}_iteration_{num_iter}')
@@ -32,9 +33,8 @@ def read_all_forecast_files(ts_name, num_of_iter):
     return fc
 
 
-if __name__ == '__main__':
+def run_process(filepath):
     for ts in constants.TS:
-        filepath = "lstm_results/lstm2"
         print("starting ", ts)
         data = pd.read_csv(f'ts_data/{ts}.csv', index_col=[0])
         look_back = 14 * 7  # 14 hours in to 7 days
@@ -46,7 +46,7 @@ if __name__ == '__main__':
         scaler = StandardScaler()
         scaler.fit(train[['power']].values)
 
-        fc_array = read_all_forecast_files(ts, 3)
+        fc_array = read_all_forecast_files(ts, 3, filepath)
 
         count = 0
         for iter_num_fc in fc_array:
@@ -55,4 +55,8 @@ if __name__ == '__main__':
             dataframe_store[f'fc_{count}'] = fc_samples
         dataframe_store['average_fc'] = dataframe_store.iloc[:, 1:].mean(axis=1)
 
-        dataframe_store.to_csv(f'{filepath}/final_results/{ts}.csv')
+        directory_path = f'{filepath}/final_results/'
+        if not os.path.exists(directory_path):
+            os.makedirs(directory_path)
+
+        dataframe_store.to_csv(f'{directory_path}/{ts}.csv')

@@ -3,7 +3,7 @@
 #SBATCH --account="punim0512"
 
 # The name of the job:
-#SBATCH --job-name="dnns"
+#SBATCH --job-name="LSTM"
 
 # Partition for the job:
 #SBATCH --partition gpgpu
@@ -18,7 +18,7 @@
 #SBATCH --mem=64G
 
 # The maximum running time of the job in days-hours:mins:sec
-#SBATCH --time=01-00:00:0
+#SBATCH --time=03-00:00:0
 
 #Job array
 #SBATCH --array=0-38
@@ -34,4 +34,4 @@ module load python/3.7.4
 module load tensorflow/2.3.1-python-3.7.4
 
 # The job command(s):
-python run.py ${SLURM_ARRAY_TASK_ID} 'lstm' > lstm_results/lstm2/lstm2_${SLURM_ARRAY_TASK_ID}.txt
+python run_job.py ${SLURM_ARRAY_TASK_ID} 'lstm' 'lstm_new_results'> lstm_new_results/lstm_${SLURM_ARRAY_TASK_ID}.txt

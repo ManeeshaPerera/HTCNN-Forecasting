@@ -9,7 +9,7 @@ class RNN:
         self.lr = lr
 
     def fit(self, model, model_name):
-        callback = tf.keras.callbacks.EarlyStopping(monitor='loss', patience=100)
+        callback = tf.keras.callbacks.EarlyStopping(monitor='loss', patience=50)
         history = model.fit(self.window_generator.train, validation_data=self.window_generator.val, epochs=self.epochs,
                             verbose=1, callbacks=[callback])
         print(model.summary())
