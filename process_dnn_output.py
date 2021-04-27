@@ -33,30 +33,30 @@ def read_all_forecast_files(ts_name, num_of_iter, filepath):
     return fc
 
 
-def run_process(filepath, lookback):
-    for ts in constants.TS:
-        print("starting ", ts)
-        data = pd.read_csv(f'ts_data/{ts}.csv', index_col=[0])
-        look_back = 14 * lookback
+def run_process(filepath, lookback, ts):
+    # for ts in constants.TS:
+    print("starting ", ts)
+    data = pd.read_csv(f'ts_data/{ts}.csv', index_col=[0])
+    look_back = 14 * lookback
 
-        # train, val, test split
-        train, val, test = util.split_hourly_data(data, look_back)
-        dataframe_store = test[look_back:][['power']]
+    # train, val, test split
+    train, val, test = util.split_hourly_data(data, look_back)
+    dataframe_store = test[look_back:][['power']]
 
-        scaler = StandardScaler()
-        scaler.fit(train[['power']].values)
+    scaler = StandardScaler()
+    scaler.fit(train[['power']].values)
 
-        fc_array = read_all_forecast_files(ts, 3, filepath)
+    fc_array = read_all_forecast_files(ts, 3, filepath)
 
-        count = 0
-        for iter_num_fc in fc_array:
-            count = count + 1
-            fc_samples = extract_non_overlapping_samples(iter_num_fc, scaler)
-            dataframe_store[f'fc_{count}'] = fc_samples
-        dataframe_store['average_fc'] = dataframe_store.iloc[:, 1:].mean(axis=1)
+    count = 0
+    for iter_num_fc in fc_array:
+        count = count + 1
+        fc_samples = extract_non_overlapping_samples(iter_num_fc, scaler)
+        dataframe_store[f'fc_{count}'] = fc_samples
+    dataframe_store['average_fc'] = dataframe_store.iloc[:, 1:].mean(axis=1)
 
-        directory_path = f'{filepath}/final_results/'
-        if not os.path.exists(directory_path):
-            os.makedirs(directory_path)
+    directory_path = f'{filepath}/final_results/'
+    if not os.path.exists(directory_path):
+        os.makedirs(directory_path)
 
-        dataframe_store.to_csv(f'{directory_path}/{ts}.csv')
+    dataframe_store.to_csv(f'{directory_path}/{ts}.csv')

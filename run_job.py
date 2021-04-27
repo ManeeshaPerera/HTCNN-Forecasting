@@ -4,6 +4,7 @@
 import sys
 import run_lstm
 import process_dnn_output
+import constants
 
 if __name__ == '__main__':
     # getting the model and time series to run
@@ -34,4 +35,4 @@ if __name__ == '__main__':
                         run_lstm.run_dnn(file_index, model_name, lstm_layer, cell_dim, epochs, lr, lag, main_dir,
                                          model_dir)
                         filepath = f'{main_dir}/{model_name}_{model_dir}'
-                        process_dnn_output.run_process(filepath, lag)
+                        process_dnn_output.run_process(filepath, lag, constants.TS[file_index])
