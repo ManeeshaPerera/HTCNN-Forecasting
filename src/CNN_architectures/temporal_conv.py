@@ -1,3 +1,7 @@
+# CODE EXTRACTED FROM THE FOLLOWING PYTHON PROJECT AND EDITED
+# https://github.com/philipperemy/keras-tcn/blob/master/tcn/tcn.py
+
+
 import inspect
 from typing import List
 
