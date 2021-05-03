@@ -53,9 +53,13 @@ def create_combine_network():
     combinedInput = layers.concatenate(
         [grid_network.output, pc_6010.output, pc_6014.output, pc_6011.output, pc_6280.output, pc_6281.output,
          pc_6284.output])
-    x = layers.Conv1D(kernel_size=2, padding='causal', filters=32, dilation_rate=1, name='combined')(combinedInput)
-    x = layers.BatchNormalization()(x)
-    x = layers.Activation("relu")(x)
+    x = layers.Conv1D(kernel_size=2, padding='causal', filters=32, dilation_rate=1)(combinedInput)
+    x = layers.Conv1D(kernel_size=2, padding='causal', filters=32, dilation_rate=2)(x)
+    x = layers.Conv1D(kernel_size=2, padding='causal', filters=32, dilation_rate=4)(x)
+    x = layers.Conv1D(kernel_size=2, padding='causal', filters=32, dilation_rate=8)(x)
+    x = layers.Conv1D(kernel_size=2, padding='causal', filters=32, dilation_rate=16)(x)
+    # x = layers.BatchNormalization()(x)
+    # x = layers.Activation("relu")(x)
     x = layers.Flatten(name='flatten_combined')(x)
     x = layers.Dense(14, activation="relu")(x)
     hf_model = keras.Model(
