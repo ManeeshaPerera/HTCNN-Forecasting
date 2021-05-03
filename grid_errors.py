@@ -132,6 +132,7 @@ if __name__ == '__main__':
                         # print(filter_val, cnn_layer, lr, lag)
                         model_dir = f'{filter_val}_{cnn_layer}_{lr}_{lag}'
                         dir_path = f'cnn_new_results/{model_dir}/final_results/'
+                        print(dir_path)
 
                         if os.path.exists(dir_path):
                             print("here")
