@@ -70,6 +70,46 @@ class WindowGenerator:
 
         return ds
 
+    def map_data(self, data, train_val_test):
+        if train_val_test == 'train':
+            data = np.array(data.train_df, dtype=np.float32)
+        elif train_val_test == 'val':
+            data = np.array(data.val_df, dtype=np.float32)
+        else:
+            data = np.array(data.test_df, dtype=np.float32)
+
+        ds = tf.keras.preprocessing.timeseries_dataset_from_array(
+            data=data,
+            targets=None,
+            sequence_length=self.total_window_size,
+            sequence_stride=1,
+            shuffle=False,
+            batch_size=1, )
+        ds = ds.map(self.split_window)
+        return ds
+
+    def make_dataset_combine(self, data, window_array, train_val_test, batch_size):
+        data_grid = np.array(data, dtype=np.float32)
+
+        ds = tf.keras.preprocessing.timeseries_dataset_from_array(
+            data=data_grid,
+            targets=None,
+            sequence_length=self.total_window_size,
+            sequence_stride=1,
+            shuffle=False,
+            batch_size=1, )
+        ds = ds.map(self.split_window)
+
+        # all six postcodes
+        ds1 = self.map_data(window_array[0], train_val_test)
+        ds2 = self.map_data(window_array[1], train_val_test)
+        ds3 = self.map_data(window_array[2], train_val_test)
+        ds4 = self.map_data(window_array[3], train_val_test)
+        ds5 = self.map_data(window_array[4], train_val_test)
+        ds6 = self.map_data(window_array[5], train_val_test)
+
+        return ds, ds1, ds2, ds3, ds4, ds5, ds6
+
     @property
     def train(self):
         print("creating tf train dataset")
@@ -84,3 +124,15 @@ class WindowGenerator:
     def test(self):
         print("creating tf test dataset")
         return self.make_dataset(self.test_df, self.batch_size)
+
+    def train_combine(self, window_array):
+        print("creating tf train dataset")
+        return self.make_dataset_combine(self.train_df, window_array, 'train', self.batch_size)
+
+    def val_combine(self, window_array):
+        print("creating tf val dataset")
+        return self.make_dataset_combine(self.val_df, window_array, 'val', self.batch_size)
+
+    def test_combine(self, window_array):
+        print("creating tf test dataset")
+        return self.make_dataset_combine(self.test_df, window_array, 'test', self.batch_size)

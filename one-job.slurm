@@ -3,14 +3,14 @@
 #SBATCH --account="punim0512"
 
 # The name of the job:
-#SBATCH --job-name="lstm"
+#SBATCH --job-name="HFModel"
 
 # Partition for the job:
-#SBATCH --partition gpgpu
-#SBATCH --qos gpgpumse
+#SBATCH --partition deeplearn
+#SBATCH --qos gpgpudeeplearn
 
 # Number of GPUs requested per node:
-#SBATCH --gres=gpu:2
+#SBATCH --gres=gpu:1
 
 # Maximum number of tasks/CPU cores used by the job:
 #SBATCH --ntasks=1
@@ -18,7 +18,7 @@
 #SBATCH --mem=64G
 
 # The maximum running time of the job in days-hours:mins:sec
-#SBATCH --time=02-00:00:0
+#SBATCH --time=01-00:00:0
 
 # Send yourself an email when the job:
 #SBATCH --mail-user=pereramg@student.unimelb.edu.au
@@ -31,4 +31,4 @@ module load python/3.7.4
 module load tensorflow/2.3.1-python-3.7.4
 
 # The job command(s):
-python process-dnn-output.py
+python run_global_approach.py
