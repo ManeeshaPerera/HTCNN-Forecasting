@@ -13,7 +13,7 @@ def sum_fc_results(ts_array, model_path):
     return concat_df
 
 
-def calculate_grid_error(start, end, model_path, error_metric):
+def calculate_grid_error(start, end, model_path1, model_path2, error_metric):
     if end == -1:
         ts_array = const.TS[start:]
     else:
@@ -26,9 +26,9 @@ def calculate_grid_error(start, end, model_path, error_metric):
     train_df = train[['power']]
     denom = err.calculate_denom(train_df, const.H_SEASONALITY)
 
-    results_df = pd.read_csv(f'{model_path}/final_results/grid.csv', index_col=[0])
+    results_df = pd.read_csv(f'{model_path1}/final_results/grid.csv', index_col=[0])
     test_sample = results_df['power'].values
-    forecasts = sum_fc_results(ts_array, model_path).values
+    forecasts = sum_fc_results(ts_array, model_path2).values
     horizon = 14
 
     if error_metric == "RMSE":
@@ -42,11 +42,11 @@ def calculate_grid_error(start, end, model_path, error_metric):
 def mase_grid(model_path1, model_path2, error_metric="MASE"):
     level_mase = []
     level_mase_dist = {}
-    grid_mase, grid_dist = calculate_grid_error(0, 1, model_path1, error_metric)
-    tl_mase, tl_dist = calculate_grid_error(1, 3, model_path1, error_metric)
-    sub_mase, sub_dist = calculate_grid_error(3, 7, model_path1, error_metric)
-    pc_mase, pc_dist = calculate_grid_error(7, 13, model_path2, error_metric)
-    site_mase, site_dist = calculate_grid_error(13, -1, model_path2, error_metric)
+    grid_mase, grid_dist = calculate_grid_error(0, 1, model_path1, model_path1, error_metric)
+    tl_mase, tl_dist = calculate_grid_error(1, 3, model_path1, model_path1, error_metric)
+    sub_mase, sub_dist = calculate_grid_error(3, 7, model_path1, model_path1, error_metric)
+    pc_mase, pc_dist = calculate_grid_error(7, 13, model_path1, model_path2, error_metric)
+    site_mase, site_dist = calculate_grid_error(13, -1, model_path1, model_path2, error_metric)
 
     level_mase.append(grid_mase)
     level_mase.append(tl_mase)
