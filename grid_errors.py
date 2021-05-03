@@ -129,10 +129,11 @@ if __name__ == '__main__':
             for cnn_layer in num_layers:
                 for lr in learning_rate:
                     for lag in lookback:
-                        print(filter_val, cnn_layer, lr, lag)
+                        # print(filter_val, cnn_layer, lr, lag)
                         model_dir = f'{filter_val}_{cnn_layer}_{lr}_{lag}'
                         dir_path = f'cnn_new_results/{model_dir}/final_results/'
 
                         if os.path.exists(dir_path):
+                            print("here")
                             all_files_available = get_file_count(dir_path)
                             print(all_files_available)
