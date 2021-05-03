@@ -56,6 +56,6 @@ def create_combine_network():
                 pc_6284.input], outputs=x)
 
     hf_model.compile(loss=tf.losses.MeanSquaredError(),
-                     optimizer=tf.optimizers.Adam(0.0001),
+                     optimizer=tf.optimizers.Adam(0.001),
                      metrics=[tf.metrics.MeanAbsoluteError()])
     return hf_model
