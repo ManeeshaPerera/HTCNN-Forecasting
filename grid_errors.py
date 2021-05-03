@@ -131,7 +131,7 @@ if __name__ == '__main__':
                     for lag in lookback:
                         # print(filter_val, cnn_layer, lr, lag)
                         model_dir = f'{filter_val}_{cnn_layer}_{lr}_{lag}'
-                        dir_path = f'cnn_new_results/{model_dir}/final_results'
+                        dir_path = f'cnn_new_results/cnn_{model_dir}/final_results'
                         print(dir_path)
 
                         if os.path.exists(dir_path):
