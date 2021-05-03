@@ -146,9 +146,10 @@ if __name__ == '__main__':
 
                         if os.path.exists(dir_path):
                             print(dir_path)
+                            dir_path_updated = f'cnn_new_results/cnn_{model_dir}'
                             all_files_available = get_file_count(dir_path)
                             if all_files_available:
-                                mase_df, rmse_df = calculate_tcn_errors(dir_path, model_dir)
+                                mase_df, rmse_df = calculate_tcn_errors(dir_path_updated, model_dir)
                                 MASE.append(mase_df)
                                 RMSE.append(rmse_df)
 
