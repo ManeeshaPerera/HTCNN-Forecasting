@@ -89,13 +89,16 @@ if __name__ == '__main__':
                     lstm_layer2 = num_layers2[layer]
                     print(cell_dim, lstm_layer1, lr, lag)
                     print(cell_dim, lstm_layer2, lr, lag)
-                    model_dir1 = f'{cell_dim}_{lstm_layer1}_{lr}_{lag}'
-                    model_dir2 = f'{cell_dim}_{lstm_layer2}_{lr}_{lag}'
+                    model_name1 = f'{cell_dim}_{lstm_layer1}_{lr}_{lag}'
+                    model_name2 = f'{cell_dim}_{lstm_layer2}_{lr}_{lag}'
+
+                    model_dir1 = f'lstm_new_results/lstm_{model_name1}'
+                    model_dir2 = f'lstm_new_results/lstm_{model_name2}'
                     mase, _ = mase_grid(model_dir1, model_dir2)
                     rmse, _ = mase_grid(model_dir1, model_dir2, error_metric="RMSE")
 
-                    mase_df = get_df_method(mase, model_dir1)
-                    rmse_df = get_df_method(rmse, model_dir1)
+                    mase_df = get_df_method(mase, model_name1)
+                    rmse_df = get_df_method(rmse, model_name2)
 
                     MASE.append(mase_df)
                     RMSE.append(rmse_df)
