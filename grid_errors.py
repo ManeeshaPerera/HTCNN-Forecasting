@@ -2,6 +2,8 @@ import pandas as pd
 import constants as const
 import src.utils as util
 import src.calculate_errors as err
+import sys
+import os, os.path
 
 
 def sum_fc_results(ts_array, model_path):
@@ -62,6 +64,7 @@ def mase_grid(model_path1, model_path2, error_metric="MASE"):
 
     return level_mase, level_mase_dist
 
+
 def get_df_method(error_list, method):
     df = pd.DataFrame(error_list).transpose()
     df.columns = ['Grid', 'TL - Aggregated', 'SUB - Aggregated', 'PC - Aggregated', 'Site - Aggregated']
@@ -69,42 +72,67 @@ def get_df_method(error_list, method):
     return df
 
 
+def get_file_count(dir_path):
+    count = 0
+    for name in os.listdir(dir_path):
+        count += 1
+    return count == 39
+
+
 if __name__ == '__main__':
+    model = sys.argv[1]
     MASE = []
     RMSE = []
 
-    cell_dims = [32, 64]
-    num_layers2 = [3, 5]
-    num_layers = [2, 3]
+    if model == 'lstm':
+        cell_dims = [32, 64]
+        num_layers2 = [3, 5]
+        num_layers = [2, 3]
 
-    learning_rate = [0.001, 0.0001]
-    epochs = 1000
+        learning_rate = [0.001, 0.0001]
+        epochs = 1000
 
-    lookback = [1, 3, 7]
-    for cell_dim in cell_dims:
-        for layer in range(0, len(num_layers)):
-            for lr in learning_rate:
-                for lag in lookback:
-                    lstm_layer1 = num_layers[layer]
-                    lstm_layer2 = num_layers2[layer]
-                    print(cell_dim, lstm_layer1, lr, lag)
-                    print(cell_dim, lstm_layer2, lr, lag)
-                    model_name1 = f'{cell_dim}_{lstm_layer1}_{lr}_{lag}'
-                    model_name2 = f'{cell_dim}_{lstm_layer2}_{lr}_{lag}'
+        lookback = [1, 3, 7]
+        for cell_dim in cell_dims:
+            for layer in range(0, len(num_layers)):
+                for lr in learning_rate:
+                    for lag in lookback:
+                        lstm_layer1 = num_layers[layer]
+                        lstm_layer2 = num_layers2[layer]
+                        print(cell_dim, lstm_layer1, lr, lag)
+                        print(cell_dim, lstm_layer2, lr, lag)
+                        model_name1 = f'{cell_dim}_{lstm_layer1}_{lr}_{lag}'
+                        model_name2 = f'{cell_dim}_{lstm_layer2}_{lr}_{lag}'
 
-                    model_dir1 = f'lstm_new_results/lstm_{model_name1}'
-                    model_dir2 = f'lstm_new_results/lstm_{model_name2}'
-                    mase, _ = mase_grid(model_dir1, model_dir2)
-                    rmse, _ = mase_grid(model_dir1, model_dir2, error_metric="RMSE")
+                        model_dir1 = f'lstm_new_results/lstm_{model_name1}'
+                        model_dir2 = f'lstm_new_results/lstm_{model_name2}'
+                        mase, _ = mase_grid(model_dir1, model_dir2)
+                        rmse, _ = mase_grid(model_dir1, model_dir2, error_metric="RMSE")
 
-                    mase_df = get_df_method(mase, model_name1)
-                    rmse_df = get_df_method(rmse, model_name2)
+                        mase_df = get_df_method(mase, model_name1)
+                        rmse_df = get_df_method(rmse, model_name2)
 
-                    MASE.append(mase_df)
-                    RMSE.append(rmse_df)
-    mase_final_results = pd.concat(MASE).round(3)
-    rmse_final_results = pd.concat(RMSE).round(3)
+                        MASE.append(mase_df)
+                        RMSE.append(rmse_df)
+        mase_final_results = pd.concat(MASE).round(3)
+        rmse_final_results = pd.concat(RMSE).round(3)
 
-    mase_final_results.to_csv('lstm_new_results/mase.csv')
-    rmse_final_results.to_csv('lstm_new_results/rmse.csv')
+        mase_final_results.to_csv('lstm_new_results/mase.csv')
+        rmse_final_results.to_csv('lstm_new_results/rmse.csv')
+    elif model == 'tcn':
+        num_layers = [4, 6, 8, 10]
+        n_filters = [32, 64, 128]
+        learning_rate = [0.001, 0.0001]
+        lookback = [1, 3, 7]
 
+        for filter_val in n_filters:
+            for cnn_layer in num_layers:
+                for lr in learning_rate:
+                    for lag in lookback:
+                        print(filter_val, cnn_layer, lr, lag)
+                        model_dir = f'{filter_val}_{cnn_layer}_{lr}_{lag}'
+                        dir_path = f'cnn_new_results/{model_dir}/final_results/'
+
+                        if os.path.exists(dir_path):
+                            all_files_available = get_file_count(dir_path)
+                            print(all_files_available)
