@@ -22,9 +22,9 @@ def create_network(pc):
 def create_grid_network():
     input_grid = keras.Input(shape=(14 * 7, 1), name='input_grid')
     y = layers.Conv1D(kernel_size=2, padding='causal', filters=64, dilation_rate=1, name='cnn1_grid')(input_grid)
-    y = layers.BatchNormalization()(y)
-    y = layers.Activation("relu")(y)
-    y = layers.Dropout(0.5)(y)
+    # y = layers.BatchNormalization()(y)
+    # y = layers.Activation("relu")(y)
+    # y = layers.Dropout(0.5)(y)
     y = layers.Conv1D(kernel_size=2, padding='causal', filters=64, dilation_rate=2, name='cnn2_grid')(y)
     y = layers.BatchNormalization()(y)
     y = layers.Activation("relu")(y)
@@ -56,6 +56,6 @@ def create_combine_network():
                 pc_6284.input], outputs=x)
 
     hf_model.compile(loss=tf.losses.MeanSquaredError(),
-                     optimizer=tf.optimizers.Adam(0.001),
+                     optimizer=tf.optimizers.Adam(0.0001),
                      metrics=[tf.metrics.MeanAbsoluteError()])
     return hf_model
