@@ -79,6 +79,17 @@ def get_file_count(dir_path):
     return count == 39
 
 
+def calculate_tcn_errors(model_path, name):
+    mase, _ = mase_grid(model_path, model_path)
+    rmse, _ = mase_grid(model_path, model_path, error_metric="RMSE")
+
+    mase_df = get_df_method(mase, name)
+    rmse_df = get_df_method(rmse, name)
+    return mase_df, rmse_df
+
+
+
+
 if __name__ == '__main__':
     model = sys.argv[1]
     MASE = []
@@ -132,9 +143,17 @@ if __name__ == '__main__':
                         # print(filter_val, cnn_layer, lr, lag)
                         model_dir = f'{filter_val}_{cnn_layer}_{lr}_{lag}'
                         dir_path = f'cnn_new_results/cnn_{model_dir}/final_results'
-                        print(dir_path)
 
                         if os.path.exists(dir_path):
-                            print("here")
+                            print(dir_path)
                             all_files_available = get_file_count(dir_path)
-                            print(all_files_available)
+                            if all_files_available:
+                                mase_df, rmse_df = calculate_tcn_errors(dir_path, model_dir)
+                                MASE.append(mase_df)
+                                RMSE.append(rmse_df)
+
+        mase_final_results = pd.concat(MASE).round(3)
+        rmse_final_results = pd.concat(RMSE).round(3)
+
+        mase_final_results.to_csv('cnn_new_results/mase.csv')
+        rmse_final_results.to_csv('cnn_new_results/rmse.csv')
