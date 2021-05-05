@@ -14,8 +14,8 @@ def create_network(pc):
     x = layers.BatchNormalization()(x)
     x = layers.Activation("relu")(x)
     # x = layers.Dropout(0.5)(x)
-    x = layers.Flatten(name=f'flatten_postcode_{pc}')(x)
-    x = layers.Dense(14, name=f'dense_postcode_{pc}')(x)
+    # x = layers.Flatten(name=f'flatten_postcode_{pc}')(x)
+    # x = layers.Dense(14, name=f'dense_postcode_{pc}')(x)
     model = keras.Model(input_layer, x)
     return model
 
@@ -32,8 +32,8 @@ def create_grid_network():
     y = layers.BatchNormalization()(y)
     y = layers.Activation("relu")(y)
     # y = layers.Dropout(0.5)(y)
-    y = layers.Flatten(name='flatten_grid')(y)
-    y = layers.Dense(14, name='dense_grid')(y)
+    # y = layers.Flatten(name='flatten_grid')(y)
+    # y = layers.Dense(14, name='dense_grid')(y)
     grid = keras.Model(input_grid, y)
     return grid
 
