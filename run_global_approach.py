@@ -7,6 +7,7 @@ import os
 from src.CNN_architectures.combined_model import create_combine_network
 import numpy as np
 import pickle5 as pickle
+import tensorflow as tf
 
 
 def create_window_data(file_index, lookback):
@@ -97,15 +98,17 @@ def run_combine_model(lookback):
     data_pc6_test = create_numpy_arrays(pc_6_test)
 
     model = create_combine_network()
+    callback = tf.keras.callbacks.EarlyStopping(monitor='loss', patience=50)
     history = model.fit({'input_grid': data_grid, 'input_postcode_6010': data_pc1, 'input_postcode_6014': data_pc2,
-               'input_postcode_6011': data_pc3, 'input_postcode_6280': data_pc4, 'input_postcode_6281': data_pc5,
-               'input_postcode_6284': data_pc6},
-              label_grid, batch_size=128, epochs=1000, validation_data=(
+                         'input_postcode_6011': data_pc3, 'input_postcode_6280': data_pc4,
+                         'input_postcode_6281': data_pc5,
+                         'input_postcode_6284': data_pc6},
+                        label_grid, batch_size=128, epochs=2000, validation_data=(
             {'input_grid': data_grid_val, 'input_postcode_6010': data_pc1_val, 'input_postcode_6014': data_pc2_val,
              'input_postcode_6011': data_pc3_val, 'input_postcode_6280': data_pc4_val,
              'input_postcode_6281': data_pc5_val,
              'input_postcode_6284': data_pc6_val},
-            label_grid_val))
+            label_grid_val), callbacks=[callback])
 
     # Forecast
     data = pd.read_csv(f'ts_data/grid.csv', index_col=[0])
@@ -136,7 +139,7 @@ def run_combine_model(lookback):
 
 
 forecasts, history = run_combine_model(7)
-dir_path = 'combined_nn_results/model6'
+dir_path = 'combined_nn_results/model7'
 if not os.path.exists(dir_path):
     os.makedirs(dir_path)
 
