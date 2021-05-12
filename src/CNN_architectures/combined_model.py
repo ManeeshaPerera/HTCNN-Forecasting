@@ -2,6 +2,7 @@ import numpy as np
 import tensorflow as tf
 from tensorflow import keras
 from tensorflow.keras import layers
+import src.CNN_architectures.temporal_conv as tcn
 
 
 def create_network(pc):
@@ -16,7 +17,7 @@ def create_network(pc):
     # x = layers.Dropout(0.5)(x)
     # x = layers.Flatten(name=f'flatten_postcode_{pc}')(x)
     # x = layers.Dense(14, name=f'dense_postcode_{pc}')(x)
-    x = layers.Dense(14, name=f'dense_postcode_{pc}')(input_layer)
+    x = layers.Dense(40, name=f'dense_postcode_{pc}')(input_layer)
     model = keras.Model(input_layer, x)
     return model
 
@@ -35,7 +36,7 @@ def create_grid_network():
     # y = layers.Dropout(0.5)(y)
     # y = layers.Flatten(name='flatten_grid')(y)
     # y = layers.Dense(14, name='dense_grid')(y)
-    y = layers.Dense(14, name='dense_grid')(input_grid)
+    y = layers.Dense(40, name='dense_grid')(input_grid)
     grid = keras.Model(input_grid, y)
     return grid
 
@@ -66,6 +67,26 @@ def create_combine_network():
     x = layers.Conv1D(kernel_size=2, padding='causal', filters=32, dilation_rate=16)(x)
     # x = layers.BatchNormalization()(x)
     # x = layers.Activation("relu")(x)
+    # cnn_layer = 6
+    # dilation_rate = 2
+    # dilation_rates = [dilation_rate ** i for i in range(cnn_layer)]
+    # padding = 'causal'
+    # use_skip_connections = False
+    # return_sequences = True
+    # dropout_rate = 0.05
+    # name = 'tcn'
+    # kernel_initializer = 'he_normal'
+    # activation = 'relu'
+    # opt = 'adam'
+    # use_batch_norm = False
+    # use_layer_norm = False
+    # use_weight_norm = True
+    #
+    # x = tcn.TCN(nb_filters=32, kernel_size=2, nb_stacks=cnn_layer, dilations=dilation_rates, padding=padding,
+    #             use_skip_connections=use_skip_connections, dropout_rate=dropout_rate, return_sequences=return_sequences,
+    #             activation=activation, kernel_initializer=kernel_initializer, use_batch_norm=use_batch_norm,
+    #             use_layer_norm=use_layer_norm,
+    #             use_weight_norm=use_weight_norm, name=name)(x)
     x = layers.Flatten(name='flatten_combined')(x)
     x = layers.Dense(14, activation="relu")(x)
     hf_model = keras.Model(
