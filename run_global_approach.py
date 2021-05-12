@@ -108,7 +108,13 @@ def run_combine_model(lookback):
     #          'input_postcode_6284': data_pc6_val},
     #         label_grid_val), callbacks=[callback])
 
-    history = model.fit({'input_grid': data_grid, 'input_postcode_6010': data_pc1, 'input_postcode_6014': data_pc2,
+    # history = model.fit({'input_grid': data_grid, 'input_postcode_6010': data_pc1, 'input_postcode_6014': data_pc2,
+    #                      'input_postcode_6011': data_pc3, 'input_postcode_6280': data_pc4,
+    #                      'input_postcode_6281': data_pc5,
+    #                      'input_postcode_6284': data_pc6},
+    #                     label_grid, batch_size=128, epochs=2000, callbacks=[callback])
+
+    history = model.fit({'input_postcode_6010': data_pc1, 'input_postcode_6014': data_pc2,
                          'input_postcode_6011': data_pc3, 'input_postcode_6280': data_pc4,
                          'input_postcode_6281': data_pc5,
                          'input_postcode_6284': data_pc6},
@@ -143,7 +149,7 @@ def run_combine_model(lookback):
 
 
 forecasts, history = run_combine_model(7)
-dir_path = 'combined_nn_results/new_models/model1'
+dir_path = 'combined_nn_results/new_models/model2'
 if not os.path.exists(dir_path):
     os.makedirs(dir_path)
 
