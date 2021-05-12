@@ -20,20 +20,23 @@ def create_window_data(file_index, lookback):
     look_back = 14 * lookback
 
     # train, val, test split
-    train, test = utils.split_hourly_data_test(data, look_back)
+    # train, test = utils.split_hourly_data_test(data, look_back)
+    train, val, test = utils.split_hourly_data(data, look_back)
 
     scaler = StandardScaler()
     scaler.fit(train.values)
     train_array = scaler.transform(train.values)
+    val_array = scaler.transform(val.values)
     test_array = scaler.transform(test.values)
 
     train_df = pd.DataFrame(train_array, columns=data.columns)
+    val_df = pd.DataFrame(val_array, columns=data.columns)
     test_df = pd.DataFrame(test_array, columns=data.columns)
     col_name = 'power'
 
     # create the dataset
     print("\ncreating final model ==>")
-    window_data = WindowGenerator(look_back, horizon, horizon, train_df, None, test_df, batch_size=128,
+    window_data = WindowGenerator(look_back, horizon, horizon, train_df, val_df, test_df, batch_size=128,
                                   label_columns=[col_name])
     return window_data
 
@@ -68,7 +71,7 @@ def run_combine_model(lookback):
     window_array = [window_pc_6010, window_pc_6014, window_pc_6011, window_pc_6280, window_pc_6281, window_pc_6284]
 
     grid, pc_1, pc_2, pc_3, pc_4, pc_5, pc_6 = window_grid.train_combine(window_array)
-    # grid_val, pc_1_val, pc_2_val, pc_3_val, pc_4_val, pc_5_val, pc_6_val = window_grid.val_combine(window_array)
+    grid_val, pc_1_val, pc_2_val, pc_3_val, pc_4_val, pc_5_val, pc_6_val = window_grid.val_combine(window_array)
     grid_test, pc_1_test, pc_2_test, pc_3_test, pc_4_test, pc_5_test, pc_6_test = window_grid.test_combine(window_array)
 
     data_grid, label_grid = create_numpy_arrays(grid, require_labels=True)
@@ -79,13 +82,13 @@ def run_combine_model(lookback):
     data_pc5 = create_numpy_arrays(pc_5)
     data_pc6 = create_numpy_arrays(pc_6)
 
-    # data_grid_val, label_grid_val = create_numpy_arrays(grid_val, require_labels=True)
-    # data_pc1_val = create_numpy_arrays(pc_1_val)
-    # data_pc2_val = create_numpy_arrays(pc_2_val)
-    # data_pc3_val = create_numpy_arrays(pc_3_val)
-    # data_pc4_val = create_numpy_arrays(pc_4_val)
-    # data_pc5_val = create_numpy_arrays(pc_5_val)
-    # data_pc6_val = create_numpy_arrays(pc_6_val)
+    data_grid_val, label_grid_val = create_numpy_arrays(grid_val, require_labels=True)
+    data_pc1_val = create_numpy_arrays(pc_1_val)
+    data_pc2_val = create_numpy_arrays(pc_2_val)
+    data_pc3_val = create_numpy_arrays(pc_3_val)
+    data_pc4_val = create_numpy_arrays(pc_4_val)
+    data_pc5_val = create_numpy_arrays(pc_5_val)
+    data_pc6_val = create_numpy_arrays(pc_6_val)
 
     data_grid_test, label_grid_test = create_numpy_arrays(grid_test, require_labels=True)
     data_pc1_test = create_numpy_arrays(pc_1_test)
@@ -96,17 +99,17 @@ def run_combine_model(lookback):
     data_pc6_test = create_numpy_arrays(pc_6_test)
 
     model = create_combine_network()
-    callback = tf.keras.callbacks.EarlyStopping(monitor='loss', patience=50)
-    # history = model.fit({'input_grid': data_grid, 'input_postcode_6010': data_pc1, 'input_postcode_6014': data_pc2,
-    #                      'input_postcode_6011': data_pc3, 'input_postcode_6280': data_pc4,
-    #                      'input_postcode_6281': data_pc5,
-    #                      'input_postcode_6284': data_pc6},
-    #                     label_grid, batch_size=128, epochs=2000, validation_data=(
-    #         {'input_grid': data_grid_val, 'input_postcode_6010': data_pc1_val, 'input_postcode_6014': data_pc2_val,
-    #          'input_postcode_6011': data_pc3_val, 'input_postcode_6280': data_pc4_val,
-    #          'input_postcode_6281': data_pc5_val,
-    #          'input_postcode_6284': data_pc6_val},
-    #         label_grid_val), callbacks=[callback])
+    callback = tf.keras.callbacks.EarlyStopping(monitor='val_loss', patience=50)
+    history = model.fit({'input_grid': data_grid, 'input_postcode_6010': data_pc1, 'input_postcode_6014': data_pc2,
+                         'input_postcode_6011': data_pc3, 'input_postcode_6280': data_pc4,
+                         'input_postcode_6281': data_pc5,
+                         'input_postcode_6284': data_pc6},
+                        label_grid, batch_size=128, epochs=2000, validation_data=(
+            {'input_grid': data_grid_val, 'input_postcode_6010': data_pc1_val, 'input_postcode_6014': data_pc2_val,
+             'input_postcode_6011': data_pc3_val, 'input_postcode_6280': data_pc4_val,
+             'input_postcode_6281': data_pc5_val,
+             'input_postcode_6284': data_pc6_val},
+            label_grid_val), callbacks=[callback])
 
     # history = model.fit({'input_grid': data_grid, 'input_postcode_6010': data_pc1, 'input_postcode_6014': data_pc2,
     #                      'input_postcode_6011': data_pc3, 'input_postcode_6280': data_pc4,
@@ -114,33 +117,33 @@ def run_combine_model(lookback):
     #                      'input_postcode_6284': data_pc6},
     #                     label_grid, batch_size=128, epochs=2000, callbacks=[callback])
 
-    history = model.fit({'input_postcode_6010': data_pc1, 'input_postcode_6014': data_pc2,
-                         'input_postcode_6011': data_pc3, 'input_postcode_6280': data_pc4,
-                         'input_postcode_6281': data_pc5,
-                         'input_postcode_6284': data_pc6},
-                        label_grid, batch_size=128, epochs=2000, callbacks=[callback])
+    # history = model.fit({'input_postcode_6010': data_pc1, 'input_postcode_6014': data_pc2,
+    #                      'input_postcode_6011': data_pc3, 'input_postcode_6280': data_pc4,
+    #                      'input_postcode_6281': data_pc5,
+    #                      'input_postcode_6284': data_pc6},
+    #                     label_grid, batch_size=128, epochs=2000, callbacks=[callback])
 
     # Forecast
     data = pd.read_csv(f'ts_data/grid.csv', index_col=[0])
     look_back = 14 * lookback
 
     # train, val, test split
-    train, test = utils.split_hourly_data_test(data, look_back)
+    train, val, test = utils.split_hourly_data(data, look_back)
     dataframe_store = test[look_back:][['power']]
 
     scaler = StandardScaler()
     scaler.fit(train[['power']].values)
 
     fc_array = []
-    # fc = model.predict({'input_grid': data_grid_test, 'input_postcode_6010': data_pc1_test,
-    #                     'input_postcode_6014': data_pc2_test, 'input_postcode_6011': data_pc3_test,
-    #                     'input_postcode_6280': data_pc4_test, 'input_postcode_6281': data_pc5_test,
-    #                     'input_postcode_6284': data_pc6_test})
+    fc = model.predict({'input_grid': data_grid_test, 'input_postcode_6010': data_pc1_test,
+                        'input_postcode_6014': data_pc2_test, 'input_postcode_6011': data_pc3_test,
+                        'input_postcode_6280': data_pc4_test, 'input_postcode_6281': data_pc5_test,
+                        'input_postcode_6284': data_pc6_test})
 
-    fc = model.predict({'input_postcode_6010': data_pc1_test,
-                                           'input_postcode_6014': data_pc2_test, 'input_postcode_6011': data_pc3_test,
-                                           'input_postcode_6280': data_pc4_test, 'input_postcode_6281': data_pc5_test,
-                                           'input_postcode_6284': data_pc6_test})
+    # fc = model.predict({'input_postcode_6010': data_pc1_test,
+    #                                        'input_postcode_6014': data_pc2_test, 'input_postcode_6011': data_pc3_test,
+    #                                        'input_postcode_6280': data_pc4_test, 'input_postcode_6281': data_pc5_test,
+    #                                        'input_postcode_6284': data_pc6_test})
 
     for sample in range(0, len(fc), 14):
         fc_sample = fc[sample]
@@ -154,7 +157,7 @@ def run_combine_model(lookback):
 
 
 forecasts, history = run_combine_model(7)
-dir_path = 'combined_nn_results/new_models/model2'
+dir_path = 'combined_nn_results/new_models/model3'
 if not os.path.exists(dir_path):
     os.makedirs(dir_path)
 

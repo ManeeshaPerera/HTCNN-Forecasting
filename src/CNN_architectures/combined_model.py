@@ -48,14 +48,14 @@ def create_combine_network():
     pc_6281 = create_network(6281)
     pc_6284 = create_network(6284)
 
-    # grid_network = create_grid_network()
+    grid_network = create_grid_network()
 
-    # combinedInput = layers.concatenate(
-    #     [grid_network.output, pc_6010.output, pc_6014.output, pc_6011.output, pc_6280.output, pc_6281.output,
-    #      pc_6284.output])
     combinedInput = layers.concatenate(
-        [pc_6010.output, pc_6014.output, pc_6011.output, pc_6280.output, pc_6281.output,
+        [grid_network.output, pc_6010.output, pc_6014.output, pc_6011.output, pc_6280.output, pc_6281.output,
          pc_6284.output])
+    # combinedInput = layers.concatenate(
+    #     [pc_6010.output, pc_6014.output, pc_6011.output, pc_6280.output, pc_6281.output,
+    #      pc_6284.output])
     x = layers.LayerNormalization()(combinedInput)
     x = layers.Conv1D(kernel_size=2, padding='causal', filters=32, dilation_rate=1)(x)
     x = layers.Conv1D(kernel_size=2, padding='causal', filters=32, dilation_rate=2)(x)
@@ -66,12 +66,12 @@ def create_combine_network():
     # x = layers.Activation("relu")(x)
     x = layers.Flatten(name='flatten_combined')(x)
     x = layers.Dense(14, activation="relu")(x)
-    # hf_model = keras.Model(
-    #     inputs=[grid_network.input, pc_6010.input, pc_6014.input, pc_6011.input, pc_6280.input, pc_6281.input,
-    #             pc_6284.input], outputs=x)
     hf_model = keras.Model(
-        inputs=[pc_6010.input, pc_6014.input, pc_6011.input, pc_6280.input, pc_6281.input,
+        inputs=[grid_network.input, pc_6010.input, pc_6014.input, pc_6011.input, pc_6280.input, pc_6281.input,
                 pc_6284.input], outputs=x)
+    # hf_model = keras.Model(
+    #     inputs=[pc_6010.input, pc_6014.input, pc_6011.input, pc_6280.input, pc_6281.input,
+    #             pc_6284.input], outputs=x)
 
     hf_model.compile(loss=tf.losses.MeanSquaredError(),
                      optimizer=tf.optimizers.Adam(0.0001),
