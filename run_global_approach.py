@@ -132,10 +132,15 @@ def run_combine_model(lookback):
     scaler.fit(train[['power']].values)
 
     fc_array = []
-    fc = model.predict({'input_grid': data_grid_test, 'input_postcode_6010': data_pc1_test,
-                        'input_postcode_6014': data_pc2_test, 'input_postcode_6011': data_pc3_test,
-                        'input_postcode_6280': data_pc4_test, 'input_postcode_6281': data_pc5_test,
-                        'input_postcode_6284': data_pc6_test})
+    # fc = model.predict({'input_grid': data_grid_test, 'input_postcode_6010': data_pc1_test,
+    #                     'input_postcode_6014': data_pc2_test, 'input_postcode_6011': data_pc3_test,
+    #                     'input_postcode_6280': data_pc4_test, 'input_postcode_6281': data_pc5_test,
+    #                     'input_postcode_6284': data_pc6_test})
+
+    fc = model.predict({'input_postcode_6010': data_pc1_test,
+                                           'input_postcode_6014': data_pc2_test, 'input_postcode_6011': data_pc3_test,
+                                           'input_postcode_6280': data_pc4_test, 'input_postcode_6281': data_pc5_test,
+                                           'input_postcode_6284': data_pc6_test})
 
     for sample in range(0, len(fc), 14):
         fc_sample = fc[sample]
