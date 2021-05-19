@@ -156,7 +156,7 @@ def run_combine_model(lookback):
 
 
 forecasts, history = run_combine_model(7)
-dir_path = 'combined_nn_results/new_models/model10'
+dir_path = 'combined_nn_results/refined_models/model1'
 if not os.path.exists(dir_path):
     os.makedirs(dir_path)
 
