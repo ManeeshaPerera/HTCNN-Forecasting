@@ -7,17 +7,17 @@ import src.CNN_architectures.temporal_conv as tcn
 
 def create_network(pc):
     input_layer = keras.Input(shape=(14 * 7, 106), name=f'input_postcode_{pc}')
-    x = layers.Conv1D(kernel_size=2, padding='causal', filters=32, dilation_rate=1, name=f'cnn1_postcode_{pc}')(
-        input_layer)
-    x = layers.Conv1D(kernel_size=2, padding='causal', filters=32, dilation_rate=2, name=f'cnn2_postcode_ly1_{pc}')(x)
-    x = layers.Conv1D(kernel_size=2, padding='causal', filters=64, dilation_rate=4, name=f'cnn3_postcode_ly2_{pc}')(x)
-    x = layers.Conv1D(kernel_size=2, padding='causal', filters=64, dilation_rate=8, name=f'cnn3_postcode_ly3_{pc}')(x)
-    x = layers.BatchNormalization()(x)
-    x = layers.Activation("relu")(x)
+    # x = layers.Conv1D(kernel_size=2, padding='causal', filters=32, dilation_rate=1, name=f'cnn1_postcode_{pc}')(
+    #     input_layer)
+    # x = layers.Conv1D(kernel_size=2, padding='causal', filters=32, dilation_rate=2, name=f'cnn2_postcode_ly1_{pc}')(x)
+    # x = layers.Conv1D(kernel_size=2, padding='causal', filters=64, dilation_rate=4, name=f'cnn3_postcode_ly2_{pc}')(x)
+    # x = layers.Conv1D(kernel_size=2, padding='causal', filters=64, dilation_rate=8, name=f'cnn3_postcode_ly3_{pc}')(x)
+    # x = layers.BatchNormalization()(x)
+    # x = layers.Activation("relu")(x)
     # x = layers.Dropout(0.5)(x)
     # x = layers.Flatten(name=f'flatten_postcode_{pc}')(x)
-    x = layers.Dense(14, name=f'dense_postcode_{pc}')(x)
-    # x = layers.Dense(14, name=f'dense_postcode_{pc}')(input_layer)
+    # x = layers.Dense(14, name=f'dense_postcode_{pc}')(x)
+    x = layers.Dense(14, name=f'dense_postcode_{pc}')(input_layer)
     model = keras.Model(input_layer, x)
     return model
 
