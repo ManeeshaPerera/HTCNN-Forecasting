@@ -51,51 +51,51 @@ def create_combine_network():
     pc_6281 = create_network(6281)
     pc_6284 = create_network(6284)
 
-    # grid_network = create_grid_network()
+    grid_network = create_grid_network()
 
-    # combinedInput = layers.concatenate(
-    #     [grid_network.output, pc_6010.output, pc_6014.output, pc_6011.output, pc_6280.output, pc_6281.output,
-    #      pc_6284.output])
     combinedInput = layers.concatenate(
-        [pc_6010.output, pc_6014.output, pc_6011.output, pc_6280.output, pc_6281.output,
+        [grid_network.output, pc_6010.output, pc_6014.output, pc_6011.output, pc_6280.output, pc_6281.output,
          pc_6284.output])
+    # combinedInput = layers.concatenate(
+    #     [pc_6010.output, pc_6014.output, pc_6011.output, pc_6280.output, pc_6281.output,
+    #      pc_6284.output])
     x = layers.LayerNormalization()(combinedInput)
-    # x = layers.Conv1D(kernel_size=2, padding='causal', filters=32, dilation_rate=1)(x)
-    # x = layers.Conv1D(kernel_size=2, padding='causal', filters=32, dilation_rate=2)(x)
-    # x = layers.Conv1D(kernel_size=2, padding='causal', filters=32, dilation_rate=4)(x)
-    # x = layers.Conv1D(kernel_size=2, padding='causal', filters=32, dilation_rate=8)(x)
-    # x = layers.Conv1D(kernel_size=2, padding='causal', filters=32, dilation_rate=16)(x)
-    # x = layers.BatchNormalization()(x)
-    # x = layers.Activation("relu")(x)
+    x = layers.Conv1D(kernel_size=2, padding='causal', filters=32, dilation_rate=1)(x)
+    x = layers.Conv1D(kernel_size=2, padding='causal', filters=32, dilation_rate=2)(x)
+    x = layers.Conv1D(kernel_size=2, padding='causal', filters=32, dilation_rate=4)(x)
+    x = layers.Conv1D(kernel_size=2, padding='causal', filters=32, dilation_rate=8)(x)
+    x = layers.Conv1D(kernel_size=2, padding='causal', filters=32, dilation_rate=16)(x)
+    x = layers.BatchNormalization()(x)
+    x = layers.Activation("relu")(x)
 
-    cnn_layer = 6
-    dilation_rate = 2
-    dilation_rates = [dilation_rate ** i for i in range(cnn_layer)]
-    padding = 'causal'
-    use_skip_connections = False
-    return_sequences = True
-    dropout_rate = 0.05
-    name = 'tcn'
-    kernel_initializer = 'he_normal'
-    activation = 'relu'
-    opt = 'adam'
-    use_batch_norm = False
-    use_layer_norm = False
-    use_weight_norm = True
-
-    x = tcn.TCN(nb_filters=32, kernel_size=2, nb_stacks=cnn_layer, dilations=dilation_rates, padding=padding,
-                use_skip_connections=use_skip_connections, dropout_rate=dropout_rate, return_sequences=return_sequences,
-                activation=activation, kernel_initializer=kernel_initializer, use_batch_norm=use_batch_norm,
-                use_layer_norm=use_layer_norm,
-                use_weight_norm=use_weight_norm, name=name)(x)
+    # cnn_layer = 6
+    # dilation_rate = 2
+    # dilation_rates = [dilation_rate ** i for i in range(cnn_layer)]
+    # padding = 'causal'
+    # use_skip_connections = False
+    # return_sequences = True
+    # dropout_rate = 0.05
+    # name = 'tcn'
+    # kernel_initializer = 'he_normal'
+    # activation = 'relu'
+    # opt = 'adam'
+    # use_batch_norm = False
+    # use_layer_norm = False
+    # use_weight_norm = True
+    #
+    # x = tcn.TCN(nb_filters=32, kernel_size=2, nb_stacks=cnn_layer, dilations=dilation_rates, padding=padding,
+    #             use_skip_connections=use_skip_connections, dropout_rate=dropout_rate, return_sequences=return_sequences,
+    #             activation=activation, kernel_initializer=kernel_initializer, use_batch_norm=use_batch_norm,
+    #             use_layer_norm=use_layer_norm,
+    #             use_weight_norm=use_weight_norm, name=name)(x)
     x = layers.Flatten(name='flatten_combined')(x)
-    x = layers.Dense(14, activation="relu")(x)
-    # hf_model = keras.Model(
-    #     inputs=[grid_network.input, pc_6010.input, pc_6014.input, pc_6011.input, pc_6280.input, pc_6281.input,
-    #             pc_6284.input], outputs=x)
+    x = layers.Dense(14, activation='linear')(x)
     hf_model = keras.Model(
-        inputs=[pc_6010.input, pc_6014.input, pc_6011.input, pc_6280.input, pc_6281.input,
+        inputs=[grid_network.input, pc_6010.input, pc_6014.input, pc_6011.input, pc_6280.input, pc_6281.input,
                 pc_6284.input], outputs=x)
+    # hf_model = keras.Model(
+    #     inputs=[pc_6010.input, pc_6014.input, pc_6011.input, pc_6280.input, pc_6281.input,
+    #             pc_6284.input], outputs=x)
 
     hf_model.compile(loss=tf.losses.MeanSquaredError(),
                      optimizer=tf.optimizers.Adam(0.0001),

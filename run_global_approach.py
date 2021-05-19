@@ -100,27 +100,27 @@ def run_combine_model(lookback):
 
     model = create_combine_network()
     callback = tf.keras.callbacks.EarlyStopping(monitor='val_loss', patience=50)
-    # history = model.fit({'input_grid': data_grid, 'input_postcode_6010': data_pc1, 'input_postcode_6014': data_pc2,
-    #                      'input_postcode_6011': data_pc3, 'input_postcode_6280': data_pc4,
-    #                      'input_postcode_6281': data_pc5,
-    #                      'input_postcode_6284': data_pc6},
-    #                     label_grid, batch_size=128, epochs=2000, validation_data=(
-    #         {'input_grid': data_grid_val, 'input_postcode_6010': data_pc1_val, 'input_postcode_6014': data_pc2_val,
-    #          'input_postcode_6011': data_pc3_val, 'input_postcode_6280': data_pc4_val,
-    #          'input_postcode_6281': data_pc5_val,
-    #          'input_postcode_6284': data_pc6_val},
-    #         label_grid_val), callbacks=[callback])
-
-    history = model.fit({'input_postcode_6010': data_pc1, 'input_postcode_6014': data_pc2,
+    history = model.fit({'input_grid': data_grid, 'input_postcode_6010': data_pc1, 'input_postcode_6014': data_pc2,
                          'input_postcode_6011': data_pc3, 'input_postcode_6280': data_pc4,
                          'input_postcode_6281': data_pc5,
                          'input_postcode_6284': data_pc6},
                         label_grid, batch_size=128, epochs=2000, validation_data=(
-            {'input_postcode_6010': data_pc1_val, 'input_postcode_6014': data_pc2_val,
+            {'input_grid': data_grid_val, 'input_postcode_6010': data_pc1_val, 'input_postcode_6014': data_pc2_val,
              'input_postcode_6011': data_pc3_val, 'input_postcode_6280': data_pc4_val,
              'input_postcode_6281': data_pc5_val,
              'input_postcode_6284': data_pc6_val},
             label_grid_val), callbacks=[callback])
+
+    # history = model.fit({'input_postcode_6010': data_pc1, 'input_postcode_6014': data_pc2,
+    #                      'input_postcode_6011': data_pc3, 'input_postcode_6280': data_pc4,
+    #                      'input_postcode_6281': data_pc5,
+    #                      'input_postcode_6284': data_pc6},
+    #                     label_grid, batch_size=128, epochs=2000, validation_data=(
+    #         {'input_postcode_6010': data_pc1_val, 'input_postcode_6014': data_pc2_val,
+    #          'input_postcode_6011': data_pc3_val, 'input_postcode_6280': data_pc4_val,
+    #          'input_postcode_6281': data_pc5_val,
+    #          'input_postcode_6284': data_pc6_val},
+    #         label_grid_val), callbacks=[callback])
 
     # Forecast
     data = pd.read_csv(f'ts_data/grid.csv', index_col=[0])
@@ -134,15 +134,15 @@ def run_combine_model(lookback):
     scaler.fit(train[['power']].values)
 
     fc_array = []
-    # fc = model.predict({'input_grid': data_grid_test, 'input_postcode_6010': data_pc1_test,
-    #                     'input_postcode_6014': data_pc2_test, 'input_postcode_6011': data_pc3_test,
-    #                     'input_postcode_6280': data_pc4_test, 'input_postcode_6281': data_pc5_test,
-    #                     'input_postcode_6284': data_pc6_test})
+    fc = model.predict({'input_grid': data_grid_test, 'input_postcode_6010': data_pc1_test,
+                        'input_postcode_6014': data_pc2_test, 'input_postcode_6011': data_pc3_test,
+                        'input_postcode_6280': data_pc4_test, 'input_postcode_6281': data_pc5_test,
+                        'input_postcode_6284': data_pc6_test})
 
-    fc = model.predict({'input_postcode_6010': data_pc1_test,
-                                           'input_postcode_6014': data_pc2_test, 'input_postcode_6011': data_pc3_test,
-                                           'input_postcode_6280': data_pc4_test, 'input_postcode_6281': data_pc5_test,
-                                           'input_postcode_6284': data_pc6_test})
+    # fc = model.predict({'input_postcode_6010': data_pc1_test,
+    #                                        'input_postcode_6014': data_pc2_test, 'input_postcode_6011': data_pc3_test,
+    #                                        'input_postcode_6280': data_pc4_test, 'input_postcode_6281': data_pc5_test,
+    #                                        'input_postcode_6284': data_pc6_test})
 
     for sample in range(0, len(fc), 14):
         fc_sample = fc[sample]
@@ -156,7 +156,7 @@ def run_combine_model(lookback):
 
 
 forecasts, history = run_combine_model(7)
-dir_path = 'combined_nn_results/new_models/model8'
+dir_path = 'combined_nn_results/new_models/model9'
 if not os.path.exists(dir_path):
     os.makedirs(dir_path)
 
