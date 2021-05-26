@@ -10,13 +10,13 @@ import pickle5 as pickle
 import tensorflow as tf
 
 
-def create_window_data(file_index, lookback):
+def create_window_data(file_index, lookback=1):
     filename = constants.TS[file_index]
 
     horizon = 14  # day ahead forecast
-    data = pd.read_csv(f'ts_data/{filename}.csv', index_col=[0])
+    data = pd.read_csv(f'ts_data/new/{filename}.csv', index_col=[0])
     print(filename)
-    # 14 hours in to 7 days
+    # 14 hours into 1 - with the new data the days are added as features
     look_back = 14 * lookback
 
     # train, val, test split
@@ -59,14 +59,14 @@ def create_numpy_arrays(window_data, require_labels=False):
         return data_input
 
 
-def run_combine_model(lookback):
-    window_grid = create_window_data(0, lookback)
-    window_pc_6010 = create_window_data(7, lookback)
-    window_pc_6014 = create_window_data(8, lookback)
-    window_pc_6011 = create_window_data(9, lookback)
-    window_pc_6280 = create_window_data(10, lookback)
-    window_pc_6281 = create_window_data(11, lookback)
-    window_pc_6284 = create_window_data(12, lookback)
+def run_combine_model():
+    window_grid = create_window_data(0)
+    window_pc_6010 = create_window_data(7)
+    window_pc_6014 = create_window_data(8)
+    window_pc_6011 = create_window_data(9)
+    window_pc_6280 = create_window_data(10)
+    window_pc_6281 = create_window_data(11)
+    window_pc_6284 = create_window_data(12)
 
     window_array = [window_pc_6010, window_pc_6014, window_pc_6011, window_pc_6280, window_pc_6281, window_pc_6284]
 
@@ -123,6 +123,7 @@ def run_combine_model(lookback):
             label_grid_val), callbacks=[callback])
 
     # Forecast
+    lookback = 1
     data = pd.read_csv(f'ts_data/grid.csv', index_col=[0])
     look_back = 14 * lookback
 
@@ -155,8 +156,9 @@ def run_combine_model(lookback):
     return df, history
 
 
-forecasts, history = run_combine_model(7)
-dir_path = 'combined_nn_results/refined_models/model5'
+forecasts, history = run_combine_model()
+# starting from model 6 it's new data
+dir_path = 'combined_nn_results/refined_models/model6'
 if not os.path.exists(dir_path):
     os.makedirs(dir_path)
 

@@ -6,7 +6,7 @@ import src.CNN_architectures.temporal_conv as tcn
 
 
 def create_network(pc):
-    input_layer = keras.Input(shape=(14 * 7, 106), name=f'input_postcode_{pc}')
+    input_layer = keras.Input(shape=(14 * 1, 14), name=f'input_postcode_{pc}')
     # x = layers.Conv1D(kernel_size=2, padding='causal', filters=32, dilation_rate=1, name=f'cnn1_postcode_{pc}')(
     #     input_layer)
     # x = layers.Conv1D(kernel_size=2, padding='causal', filters=32, dilation_rate=2, name=f'cnn2_postcode_ly1_{pc}')(x)
@@ -24,7 +24,7 @@ def create_network(pc):
 
 
 def create_grid_network():
-    input_grid = keras.Input(shape=(14 * 7, 1), name='input_grid')
+    input_grid = keras.Input(shape=(14 * 1, 14), name='input_grid')
     # y = layers.Conv1D(kernel_size=2, padding='causal', filters=32, dilation_rate=1, name='cnn1_grid')(input_grid)
     # y = layers.BatchNormalization()(y)
     # y = layers.Activation("relu")(y)
