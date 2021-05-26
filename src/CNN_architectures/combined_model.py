@@ -69,11 +69,11 @@ def create_combine_network():
     x = layers.LayerNormalization()(combinedInput)
     x = layers.Conv1D(kernel_size=2, padding='causal', filters=32, dilation_rate=1)(x)
     x = layers.Conv1D(kernel_size=2, padding='causal', filters=32, dilation_rate=2)(x)
-    x = layers.Conv1D(kernel_size=2, padding='causal', filters=32, dilation_rate=4)(x)
-    x = layers.Conv1D(kernel_size=2, padding='causal', filters=64, dilation_rate=8)(x)
-    x = layers.Conv1D(kernel_size=2, padding='causal', filters=64, dilation_rate=16)(x)
-    x = layers.BatchNormalization()(x)
-    x = layers.Activation("relu")(x)
+    # x = layers.Conv1D(kernel_size=2, padding='causal', filters=32, dilation_rate=4)(x)
+    # x = layers.Conv1D(kernel_size=2, padding='causal', filters=64, dilation_rate=8)(x)
+    # x = layers.Conv1D(kernel_size=2, padding='causal', filters=64, dilation_rate=16)(x)
+    # x = layers.BatchNormalization()(x)
+    # x = layers.Activation("relu")(x)
 
     # cnn_layer = 6
     # dilation_rate = 2

@@ -158,7 +158,7 @@ def run_combine_model():
 
 forecasts, history = run_combine_model()
 # starting from model 6 it's new data
-dir_path = 'combined_nn_results/refined_models/model6'
+dir_path = 'combined_nn_results/refined_models/model7'
 if not os.path.exists(dir_path):
     os.makedirs(dir_path)
 
