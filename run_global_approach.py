@@ -122,6 +122,12 @@ def run_combine_model():
              'input_postcode_6284': data_pc6_val},
             label_grid_val), callbacks=[callback])
 
+    # save the model
+    saved_models = 'combined_nn_results/refined_models/saved_models'
+    if not os.path.exists(dir_path):
+        os.makedirs(dir_path)
+    model.save(f'{saved_models}/model8')
+
     # Forecast
     lookback = 1
     data = pd.read_csv(f'ts_data/grid.csv', index_col=[0])
@@ -158,7 +164,7 @@ def run_combine_model():
 
 forecasts, history = run_combine_model()
 # starting from model 6 it's new data
-dir_path = 'combined_nn_results/refined_models/model7'
+dir_path = 'combined_nn_results/refined_models/model8'
 if not os.path.exists(dir_path):
     os.makedirs(dir_path)
 

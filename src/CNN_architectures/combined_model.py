@@ -24,7 +24,7 @@ def create_network(pc):
 
 
 def create_grid_network():
-    input_grid = keras.Input(shape=(14 * 1, 14), name='input_grid')
+    input_grid = keras.Input(shape=(14 * 1, 7), name='input_grid')
     # y = layers.Conv1D(kernel_size=2, padding='causal', filters=32, dilation_rate=1, name='cnn1_grid')(input_grid)
     # y = layers.BatchNormalization()(y)
     # y = layers.Activation("relu")(y)
@@ -67,8 +67,8 @@ def create_combine_network():
         [pc_6010, pc_6014, pc_6011, pc_6280, pc_6281,
          pc_6284])
     x = layers.LayerNormalization()(combinedInput)
-    x = layers.Conv1D(kernel_size=2, padding='causal', filters=32, dilation_rate=1)(x)
-    x = layers.Conv1D(kernel_size=2, padding='causal', filters=32, dilation_rate=2)(x)
+    x = layers.Conv1D(kernel_size=2, padding='causal', filters=32, dilation_rate=1, activation='relu')(x)
+    x = layers.Conv1D(kernel_size=2, padding='causal', filters=32, dilation_rate=2, activation='relu')(x)
     # x = layers.Conv1D(kernel_size=2, padding='causal', filters=32, dilation_rate=4)(x)
     # x = layers.Conv1D(kernel_size=2, padding='causal', filters=64, dilation_rate=8)(x)
     # x = layers.Conv1D(kernel_size=2, padding='causal', filters=64, dilation_rate=16)(x)
