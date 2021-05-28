@@ -124,8 +124,8 @@ def run_combine_model():
 
     # save the model
     saved_models = 'combined_nn_results/refined_models/saved_models'
-    if not os.path.exists(dir_path):
-        os.makedirs(dir_path)
+    if not os.path.exists(saved_models):
+        os.makedirs(saved_models)
     model.save(f'{saved_models}/model8')
 
     # Forecast
