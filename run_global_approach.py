@@ -126,7 +126,7 @@ def run_combine_model():
     saved_models = 'combined_nn_results/refined_models/saved_models'
     if not os.path.exists(saved_models):
         os.makedirs(saved_models)
-    model.save(f'{saved_models}/model9')
+    model.save(f'{saved_models}/model10')
 
     # Forecast
     lookback = 1
@@ -164,7 +164,7 @@ def run_combine_model():
 
 forecasts, history = run_combine_model()
 # starting from model 6 it's new data
-dir_path = 'combined_nn_results/refined_models/model9'
+dir_path = 'combined_nn_results/refined_models/model10'
 if not os.path.exists(dir_path):
     os.makedirs(dir_path)
 
