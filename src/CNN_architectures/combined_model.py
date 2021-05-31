@@ -7,8 +7,9 @@ import src.CNN_architectures.temporal_conv as tcn
 
 def create_network(pc):
     input_layer = keras.Input(shape=(14 * 1, 14), name=f'input_postcode_{pc}')
-    # x = layers.Conv1D(kernel_size=2, padding='causal', filters=32, dilation_rate=1, name=f'cnn1_postcode_{pc}')(
-    #     input_layer)
+    x = layers.Conv1D(kernel_size=4, padding='same', filters=32, name=f'cnn1_postcode_{pc}')(
+        input_layer)
+    x = layers.MaxPooling1D(padding='same', strides=1)(x)
     # x = layers.Conv1D(kernel_size=2, padding='causal', filters=32, dilation_rate=2, name=f'cnn2_postcode_ly1_{pc}')(x)
     # x = layers.Conv1D(kernel_size=2, padding='causal', filters=64, dilation_rate=4, name=f'cnn3_postcode_ly2_{pc}')(x)
     # x = layers.Conv1D(kernel_size=2, padding='causal', filters=64, dilation_rate=8, name=f'cnn3_postcode_ly3_{pc}')(x)
@@ -18,9 +19,9 @@ def create_network(pc):
     # x = layers.Flatten(name=f'flatten_postcode_{pc}')(x)
     # x = layers.Dense(14, name=f'dense_postcode_{pc}')(x)
     # x = layers.Dense(14, name=f'dense_postcode_{pc}')(input_layer)
-    # model = keras.Model(input_layer, x)
-    # return model
-    return input_layer
+    model = keras.Model(input_layer, x)
+    return model
+    # return input_layer
 
 
 def create_grid_network():
@@ -64,11 +65,13 @@ def create_combine_network():
     #      pc_6284.output])
 
     combinedInput = layers.concatenate(
-        [pc_6010, pc_6014, pc_6011, pc_6280, pc_6281,
-         pc_6284])
-    x = layers.LayerNormalization()(combinedInput)
-    x = layers.Conv1D(kernel_size=2, padding='causal', filters=32, dilation_rate=1, activation='relu')(x)
-    x = layers.Conv1D(kernel_size=2, padding='causal', filters=32, dilation_rate=2, activation='relu')(x)
+        [pc_6010.output, pc_6014.output, pc_6011.output, pc_6280.output, pc_6281.output,
+         pc_6284.output])
+    x = layers.Conv1D(kernel_size=4, filters=32)(combinedInput)
+    x = layers.MaxPooling1D(padding='same')(x)
+    # x = layers.LayerNormalization()(combinedInput)
+    # x = layers.Conv1D(kernel_size=2, padding='causal', filters=32, dilation_rate=1, activation='relu')(x)
+    # x = layers.Conv1D(kernel_size=2, padding='causal', filters=32, dilation_rate=2, activation='relu')(x)
     # x = layers.Conv1D(kernel_size=2, padding='causal', filters=32, dilation_rate=4)(x)
     # x = layers.Conv1D(kernel_size=2, padding='causal', filters=64, dilation_rate=8)(x)
     # x = layers.Conv1D(kernel_size=2, padding='causal', filters=64, dilation_rate=16)(x)
@@ -100,12 +103,12 @@ def create_combine_network():
     # hf_model = keras.Model(
     #     inputs=[grid_network.input, pc_6010.input, pc_6014.input, pc_6011.input, pc_6280.input, pc_6281.input,
     #             pc_6284.input], outputs=x)
-    # hf_model = keras.Model(
-    #     inputs=[pc_6010.input, pc_6014.input, pc_6011.input, pc_6280.input, pc_6281.input,
-    #             pc_6284.input], outputs=x)
     hf_model = keras.Model(
-        inputs=[pc_6010, pc_6014, pc_6011, pc_6280, pc_6281,
-                pc_6284], outputs=x)
+        inputs=[pc_6010.input, pc_6014.input, pc_6011.input, pc_6280.input, pc_6281.input,
+                pc_6284.input], outputs=x)
+    # hf_model = keras.Model(
+    #     inputs=[pc_6010, pc_6014, pc_6011, pc_6280, pc_6281,
+    #             pc_6284], outputs=x)
 
     hf_model.compile(loss=tf.losses.MeanSquaredError(),
                      optimizer=tf.optimizers.Adam(0.0001),
