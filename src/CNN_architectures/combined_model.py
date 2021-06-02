@@ -71,8 +71,8 @@ def create_combine_network():
         [pc_6010, pc_6014, pc_6011, pc_6280, pc_6281,
          pc_6284])
     x = layers.LayerNormalization()(combinedInput)
-    x = layers.Conv1D(kernel_size=2, padding='causal', filters=32, dilation_rate=1)(x)
-    x = layers.Conv1D(kernel_size=2, padding='causal', filters=32, dilation_rate=2)(x)
+    x = layers.Conv1D(kernel_size=4, padding='same', filters=32, dilation_rate=1)(x)
+    x = layers.Conv1D(kernel_size=4, padding='same', filters=32, dilation_rate=2)(x)
     x = layers.Flatten(name='flatten_pc')(x)
     x = layers.Dense(14, activation='linear')(x)
 
