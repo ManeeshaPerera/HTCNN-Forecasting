@@ -58,10 +58,15 @@ def create_combine_network():
     pc_6281 = create_network(6281)
     pc_6284 = create_network(6284)
 
-    input_grid = keras.Input(shape=(14 * 1, 7), name='input_grid')
-    grid_network = tf.keras.models.load_model('combined_nn_results/refined_models/saved_models/grid_model')
+    # input_grid = keras.Input(shape=(14 * 1, 7), name='input_grid')
+    # grid_network = tf.keras.models.load_model('combined_nn_results/refined_models/saved_models/grid_model')
     # grid_network.trainable = False
-    y = grid_network(input_grid)
+    # y = grid_network(input_grid)
+    grid_network = create_grid_network()
+    grid_x = layers.Conv1D(kernel_size=2, padding='causal', filters=32, dilation_rate=1, name="grid_conv1")(
+        grid_network)
+    grid_x = layers.Conv1D(kernel_size=2, padding='causal', filters=32, dilation_rate=2, name="grid_conv2")(
+        grid_x)
 
     #
     # combinedInput = layers.concatenate(
@@ -71,17 +76,21 @@ def create_combine_network():
         [pc_6010, pc_6014, pc_6011, pc_6280, pc_6281,
          pc_6284])
     x = layers.LayerNormalization()(combinedInput)
-    x = layers.Conv1D(kernel_size=4, padding='causal', filters=32, dilation_rate=1, name="pc_conv1")(x)
-    x = layers.Conv1D(kernel_size=4, padding='causal', filters=32, dilation_rate=2, name="pc_conv2")(x)
-    x = layers.Flatten(name='flatten_pc')(x)
-    x = layers.Dense(14, activation='linear', name="pc_dense")(x)
+    x = layers.Conv1D(kernel_size=2, padding='causal', filters=32, dilation_rate=1, name="pc_conv1")(x)
+    x = layers.Conv1D(kernel_size=2, padding='causal', filters=32, dilation_rate=2, name="pc_conv2")(x)
+    # x = layers.Flatten(name='flatten_pc')(x)
+    # x = layers.Dense(14, activation='linear', name="pc_dense")(x)
 
-    concat_output = layers.concatenate([y, x])
+    concat_output = layers.concatenate([grid_x, x])
     z = layers.LayerNormalization()(concat_output)
-    final_out = layers.Dense(14, activation='linear', name="pc_grid_dense")(z)
-    res_out = layers.add([x, final_out])
-    out = layers.BatchNormalization()(res_out)
 
+    pc_grid_conv = layers.Conv1D(kernel_size=2, padding='causal', filters=32, dilation_rate=1, name="grid_pc_conv1")(z)
+    pc_grid_conv = layers.Conv1D(kernel_size=2, padding='causal', filters=64, dilation_rate=1, name="grid_pc_conv2")(pc_grid_conv)
+    res_out = layers.add([z, pc_grid_conv])
+    out = layers.Flatten(name='flatten_pc')(res_out)
+    final_out = layers.Dense(14, activation='linear', name="pc_grid_dense")(out)
+    # res_out = layers.add([x, final_out])
+    # out = layers.BatchNormalization()(res_out)
 
     # combinedInput = layers.concatenate(
     #     [grid_network, pc_6010.output, pc_6014.output, pc_6011.output, pc_6280.output, pc_6281.output,
@@ -129,8 +138,8 @@ def create_combine_network():
     #     inputs=[grid_network.input, pc_6010.input, pc_6014.input, pc_6011.input, pc_6280.input, pc_6281.input,
     #             pc_6284.input], outputs=x)
     hf_model = keras.Model(
-        inputs=[input_grid, pc_6010, pc_6014, pc_6011, pc_6280, pc_6281,
-                pc_6284], outputs=out)
+        inputs=[grid_network, pc_6010, pc_6014, pc_6011, pc_6280, pc_6281,
+                pc_6284], outputs=final_out)
     # hf_model = keras.Model(
     #     inputs=[pc_6010, pc_6014, pc_6011, pc_6280, pc_6281,
     #             pc_6284], outputs=x)
