@@ -7,9 +7,9 @@ import src.CNN_architectures.temporal_conv as tcn
 
 def create_network(pc):
     input_layer = keras.Input(shape=(14 * 1, 14), name=f'input_postcode_{pc}')
-    x = layers.Conv1D(kernel_size=4, padding='same', filters=32, name=f'cnn1_postcode_{pc}')(
-        input_layer)
-    x = layers.MaxPooling1D(padding='same', strides=1)(x)
+    # x = layers.Conv1D(kernel_size=4, padding='same', filters=32, name=f'cnn1_postcode_{pc}')(
+    #     input_layer)
+    # x = layers.MaxPooling1D(padding='same', strides=1)(x)
     # x = layers.Conv1D(kernel_size=4, padding='same', filters=32, name=f'cnn2_postcode_{pc}')(
     #     x)
     # x = layers.MaxPooling1D(padding='same', strides=1)(x)
@@ -22,8 +22,8 @@ def create_network(pc):
     # x = layers.Flatten(name=f'flatten_postcode_{pc}')(x)
     # x = layers.Dense(14, name=f'dense_postcode_{pc}')(x)
     # x = layers.Dense(14, name=f'dense_postcode_{pc}')(input_layer)
-    model = keras.Model(input_layer, x)
-    return model
+    # model = keras.Model(input_layer, x)
+    return input_layer
     # return input_layer
 
 
@@ -51,31 +51,45 @@ def create_grid_network():
 def create_combine_network():
     # let's first create a network for each post code
     # 6010, 6014, 6011, 6280, 6281, 6284
-    # pc_6010 = create_network(6010)
-    # pc_6014 = create_network(6014)
-    # pc_6011 = create_network(6011)
-    # pc_6280 = create_network(6280)
-    # pc_6281 = create_network(6281)
-    # pc_6284 = create_network(6284)
+    pc_6010 = create_network(6010)
+    pc_6014 = create_network(6014)
+    pc_6011 = create_network(6011)
+    pc_6280 = create_network(6280)
+    pc_6281 = create_network(6281)
+    pc_6284 = create_network(6284)
 
-    grid_network = create_grid_network()
+    input_grid = keras.Input(shape=(14 * 1, 7), name='input_grid')
+    grid_network = tf.keras.models.load_model('combined_nn_results/refined_models/saved_models/grid_model')
+    grid_network.trainable = False
+    y = grid_network(input_grid, training=False)
+
     #
     # combinedInput = layers.concatenate(
     #     [grid_network.output, pc_6010.output, pc_6014.output, pc_6011.output, pc_6280.output, pc_6281.output,
     #      pc_6284.output])
-    # combinedInput = layers.concatenate(
-    #     [pc_6010.output, pc_6014.output, pc_6011.output, pc_6280.output, pc_6281.output,
-    #      pc_6284.output])
+    combinedInput = layers.concatenate(
+        [pc_6010, pc_6014, pc_6011, pc_6280, pc_6281,
+         pc_6284])
+    x = layers.Conv1D(kernel_size=4, filters=32)(combinedInput)
+    x = layers.Conv1D(kernel_size=4, filters=32)(x)
+    x = layers.MaxPooling1D(padding='same')(x)
+    x = layers.Flatten(name='flatten_pc')(x)
+    x = layers.Dense(14, activation='linear')(x)
+
+    concat_output = layers.concatenate([y, x])
+    final_out = layers.Dense(14, activation='linear')(concat_output)
+
+
 
     # combinedInput = layers.concatenate(
     #     [grid_network, pc_6010.output, pc_6014.output, pc_6011.output, pc_6280.output, pc_6281.output,
     #      pc_6284.output])
 
-    combinedInput = grid_network
-    x = layers.Conv1D(kernel_size=4, filters=32)(combinedInput)
+    # combinedInput = grid_network
+    # x = layers.Conv1D(kernel_size=4, filters=32)(combinedInput)
     # x = layers.MaxPooling1D(padding='same')(x)
-    x = layers.Conv1D(kernel_size=4, filters=32)(x)
-    x = layers.MaxPooling1D(padding='same')(x)
+    # x = layers.Conv1D(kernel_size=4, filters=32)(x)
+    # x = layers.MaxPooling1D(padding='same')(x)
     # x = layers.Conv1D(kernel_size=4, filters=32)(x)
     # x = layers.MaxPooling1D(padding='same')(x)
     # x = layers.LayerNormalization()(combinedInput)
@@ -107,20 +121,20 @@ def create_combine_network():
     #             activation=activation, kernel_initializer=kernel_initializer, use_batch_norm=use_batch_norm,
     #             use_layer_norm=use_layer_norm,
     #             use_weight_norm=use_weight_norm, name=name)(x)
-    x = layers.Flatten(name='flatten_combined')(x)
-    x = layers.Dense(14, activation='linear')(x)
+    # x = layers.Flatten(name='flatten_combined')(x)
+    # x = layers.Dense(14, activation='linear')(x)
     # hf_model = keras.Model(
     #     inputs=[grid_network.input, pc_6010.input, pc_6014.input, pc_6011.input, pc_6280.input, pc_6281.input,
     #             pc_6284.input], outputs=x)
-    # hf_model = keras.Model(
-    #     inputs=[grid_network, pc_6010.input, pc_6014.input, pc_6011.input, pc_6280.input, pc_6281.input,
-    #             pc_6284.input], outputs=x)
+    hf_model = keras.Model(
+        inputs=[input_grid, pc_6010, pc_6014, pc_6011, pc_6280, pc_6281,
+                pc_6284], outputs=final_out)
     # hf_model = keras.Model(
     #     inputs=[pc_6010, pc_6014, pc_6011, pc_6280, pc_6281,
     #             pc_6284], outputs=x)
 
-    hf_model = keras.Model(
-        inputs=grid_network, outputs=x)
+    # hf_model = keras.Model(
+    #     inputs=grid_network, outputs=x)
 
     hf_model.compile(loss=tf.losses.MeanSquaredError(),
                      optimizer=tf.optimizers.Adam(0.0001),
