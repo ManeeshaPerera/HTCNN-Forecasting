@@ -51,12 +51,12 @@ def create_grid_network():
 def create_combine_network():
     # let's first create a network for each post code
     # 6010, 6014, 6011, 6280, 6281, 6284
-    pc_6010 = create_network(6010)
-    pc_6014 = create_network(6014)
-    pc_6011 = create_network(6011)
-    pc_6280 = create_network(6280)
-    pc_6281 = create_network(6281)
-    pc_6284 = create_network(6284)
+    # pc_6010 = create_network(6010)
+    # pc_6014 = create_network(6014)
+    # pc_6011 = create_network(6011)
+    # pc_6280 = create_network(6280)
+    # pc_6281 = create_network(6281)
+    # pc_6284 = create_network(6284)
 
     grid_network = create_grid_network()
     #
@@ -67,9 +67,11 @@ def create_combine_network():
     #     [pc_6010.output, pc_6014.output, pc_6011.output, pc_6280.output, pc_6281.output,
     #      pc_6284.output])
 
-    combinedInput = layers.concatenate(
-        [grid_network, pc_6010.output, pc_6014.output, pc_6011.output, pc_6280.output, pc_6281.output,
-         pc_6284.output])
+    # combinedInput = layers.concatenate(
+    #     [grid_network, pc_6010.output, pc_6014.output, pc_6011.output, pc_6280.output, pc_6281.output,
+    #      pc_6284.output])
+
+    combinedInput = grid_network
     x = layers.Conv1D(kernel_size=4, filters=32)(combinedInput)
     # x = layers.MaxPooling1D(padding='same')(x)
     x = layers.Conv1D(kernel_size=4, filters=32)(x)
@@ -110,12 +112,15 @@ def create_combine_network():
     # hf_model = keras.Model(
     #     inputs=[grid_network.input, pc_6010.input, pc_6014.input, pc_6011.input, pc_6280.input, pc_6281.input,
     #             pc_6284.input], outputs=x)
-    hf_model = keras.Model(
-        inputs=[grid_network, pc_6010.input, pc_6014.input, pc_6011.input, pc_6280.input, pc_6281.input,
-                pc_6284.input], outputs=x)
+    # hf_model = keras.Model(
+    #     inputs=[grid_network, pc_6010.input, pc_6014.input, pc_6011.input, pc_6280.input, pc_6281.input,
+    #             pc_6284.input], outputs=x)
     # hf_model = keras.Model(
     #     inputs=[pc_6010, pc_6014, pc_6011, pc_6280, pc_6281,
     #             pc_6284], outputs=x)
+
+    hf_model = keras.Model(
+        inputs=grid_network, outputs=x)
 
     hf_model.compile(loss=tf.losses.MeanSquaredError(),
                      optimizer=tf.optimizers.Adam(0.0001),
