@@ -140,7 +140,7 @@ def run_combine_model():
     #         label_grid_val), callbacks=[callback])
 
     # save the model
-    saved_models = 'combined_nn_results/refined_models/residual_model'
+    saved_models = 'combined_nn_results/refined_models/residual_model2'
     if not os.path.exists(saved_models):
         os.makedirs(saved_models)
     model.save(f'{saved_models}/grid_model')
@@ -183,7 +183,7 @@ def run_combine_model():
 
 forecasts, history = run_combine_model()
 # starting from model 6 it's new data
-dir_path = 'combined_nn_results/refined_models/residual_model'
+dir_path = 'combined_nn_results/refined_models/residual_model2'
 if not os.path.exists(dir_path):
     os.makedirs(dir_path)
 
