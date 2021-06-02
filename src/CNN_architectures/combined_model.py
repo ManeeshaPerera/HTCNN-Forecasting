@@ -58,10 +58,10 @@ def create_combine_network():
     pc_6281 = create_network(6281)
     pc_6284 = create_network(6284)
 
-    input_grid = keras.Input(shape=(14 * 1, 7), name='input_grid')
-    grid_network = tf.keras.models.load_model('combined_nn_results/refined_models/saved_models/grid_model')
-    grid_network.trainable = False
-    y = grid_network(input_grid, training=False)
+    # input_grid = keras.Input(shape=(14 * 1, 7), name='input_grid')
+    # grid_network = tf.keras.models.load_model('combined_nn_results/refined_models/saved_models/grid_model')
+    # grid_network.trainable = False
+    # y = grid_network(input_grid, training=False)
 
     #
     # combinedInput = layers.concatenate(
@@ -71,14 +71,13 @@ def create_combine_network():
         [pc_6010, pc_6014, pc_6011, pc_6280, pc_6281,
          pc_6284])
     x = layers.LayerNormalization()(combinedInput)
-    x = layers.Conv1D(kernel_size=4, padding='same', filters=32, dilation_rate=1)(x)
-    x = layers.Conv1D(kernel_size=4, padding='same', filters=32, dilation_rate=2)(x)
+    x = layers.Conv1D(kernel_size=4, padding='casual', filters=32, dilation_rate=1)(x)
+    x = layers.Conv1D(kernel_size=4, padding='causal', filters=32, dilation_rate=2)(x)
     x = layers.Flatten(name='flatten_pc')(x)
     x = layers.Dense(14, activation='linear')(x)
 
-    concat_output = layers.concatenate([y, x])
-    final_out = layers.Dense(14, activation='linear')(concat_output)
-
+    # concat_output = layers.concatenate([y, x])
+    # final_out = layers.Dense(14, activation='linear')(concat_output)
 
 
     # combinedInput = layers.concatenate(
@@ -127,8 +126,8 @@ def create_combine_network():
     #     inputs=[grid_network.input, pc_6010.input, pc_6014.input, pc_6011.input, pc_6280.input, pc_6281.input,
     #             pc_6284.input], outputs=x)
     hf_model = keras.Model(
-        inputs=[input_grid, pc_6010, pc_6014, pc_6011, pc_6280, pc_6281,
-                pc_6284], outputs=final_out)
+        inputs=[pc_6010, pc_6014, pc_6011, pc_6280, pc_6281,
+                pc_6284], outputs=x)
     # hf_model = keras.Model(
     #     inputs=[pc_6010, pc_6014, pc_6011, pc_6280, pc_6281,
     #             pc_6284], outputs=x)
