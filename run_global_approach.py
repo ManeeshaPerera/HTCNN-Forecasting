@@ -11,7 +11,8 @@ import tensorflow as tf
 from src.CNN_architectures.combined_cnn_models import local_and_full_convolution_approach, \
     local_and_full_convolution_approach_alternative1, local_and_full_convolution_approach_alternative2, \
     frozen_branch_approach, last_residual_approach, local_conv_with_grid_approach, \
-    local_conv_with_grid_with_TCN_approach, last_residual_approach_with_TCN, postcode_only_TCN
+    local_conv_with_grid_with_TCN_approach, last_residual_approach_with_TCN, postcode_only_TCN, \
+    local_conv_with_grid_conv_TCN_approach
 
 
 def create_window_data(file_index, lookback=1):
@@ -266,9 +267,9 @@ APPROACHES = {'local_full_conv': 1, 'local_full_conv_alt': 2, 'local_full_conv_a
               'residual_block': 5}
 
 model_save_path = 'combined_nn_results/refined_models/saved_models'
-model_name = 'postcode_only_TCN'
+model_name = 'local_conv_with_grid_conv_TCN_approach'
 
-forecasts, history = run_combine_model(postcode_only_TCN, model_save_path, model_name)
+forecasts, history = run_combine_model(local_conv_with_grid_conv_TCN_approach, model_save_path, model_name)
 # starting from model 6 it's new data
 dir_path = f'combined_nn_results/refined_models/{model_name}'
 if not os.path.exists(dir_path):
