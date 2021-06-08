@@ -4,6 +4,7 @@ from sklearn.preprocessing import StandardScaler
 import src.utils as utils
 import constants
 import os
+import sys
 from src.CNN_architectures.combined_model import create_combine_network
 import numpy as np
 import pickle5 as pickle
@@ -12,7 +13,8 @@ from src.CNN_architectures.combined_cnn_models import local_and_full_convolution
     local_and_full_convolution_approach_alternative1, local_and_full_convolution_approach_alternative2, \
     frozen_branch_approach, last_residual_approach, local_conv_with_grid_approach, \
     local_conv_with_grid_with_TCN_approach, last_residual_approach_with_TCN, postcode_only_TCN, \
-    local_conv_with_grid_conv_TCN_approach
+    local_conv_with_grid_conv_TCN_approach, pc_and_grid_input_together, grid_added_at_each_TCN_together, \
+    grid_conv_added_at_each_TCN_together
 
 
 def create_window_data(file_index, lookback=1):
@@ -135,7 +137,7 @@ def run_combine_model(approach, path, model_name, add_grid=True):
 
     # Forecast
     lookback = 1
-    data = pd.read_csv(f'ts_data/grid.csv', index_col=[0])
+    data = pd.read_csv(f'ts_data/new/grid.csv', index_col=[0])
     look_back = 14 * lookback
 
     # train, val, test split
@@ -266,10 +268,17 @@ def run_combine_model(approach, path, model_name, add_grid=True):
 APPROACHES = {'local_full_conv': 1, 'local_full_conv_alt': 2, 'local_full_conv_alt2': 3, 'frozen_block': 4,
               'residual_block': 5}
 
-model_save_path = 'combined_nn_results/refined_models/saved_models'
-model_name = 'local_conv_with_grid_conv_TCN_approach'
+FUNC_NAMES = {'0': {'func': pc_and_grid_input_together, 'model_name': 'pc_and_grid_input_together'},
+              '1': {'func': grid_added_at_each_TCN_together, 'model_name': 'grid_added_at_each_TCN_together'},
+              '2': {'func': grid_conv_added_at_each_TCN_together, 'model_name': 'grid_conv_added_at_each_TCN_together'}}
 
-forecasts, history = run_combine_model(local_conv_with_grid_conv_TCN_approach, model_save_path, model_name)
+model_func_name = sys.argv[1]
+model_save_path = 'combined_nn_results/refined_models/saved_models'
+model_name = FUNC_NAMES[model_func_name]['model_name']
+function_run = FUNC_NAMES[model_func_name]['func']
+print(model_name)
+
+forecasts, history = run_combine_model(function_run, model_save_path, model_name)
 # starting from model 6 it's new data
 dir_path = f'combined_nn_results/refined_models/{model_name}'
 if not os.path.exists(dir_path):
