@@ -276,7 +276,7 @@ APPROACHES = {'local_full_conv': 1, 'local_full_conv_alt': 2, 'local_full_conv_a
 model_save_path = 'combined_nn_results/refined_models/saved_models'
 # model_name = FUNC_NAMES[model_func_name]['model_name']
 # function_run = FUNC_NAMES[model_func_name]['func']
-model_name = 'last_residual_approach_with_TCN_skip_connectionTrue'
+model_name = 'last_residual_approach_with_TCN_skip_connectionTrueMoreLayers'
 function_run = last_residual_approach_with_TCN
 print(model_name)
 

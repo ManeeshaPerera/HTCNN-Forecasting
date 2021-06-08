@@ -336,7 +336,7 @@ def last_residual_approach_with_TCN():
     concatenation_pc = layers.concatenate([pc_6010, pc_6014, pc_6011, pc_6280, pc_6281, pc_6284],
                                           name='postcode_concat')
     pc_normalization = layers.LayerNormalization()(concatenation_pc)
-    cnn_layer = 6
+    cnn_layer = 10
     dilation_rate = 2
     dilation_rates = [dilation_rate ** i for i in range(cnn_layer)]
     padding = 'causal'
@@ -362,7 +362,7 @@ def last_residual_approach_with_TCN():
     concat_grid_conv_pc_conv_normal = layers.LayerNormalization()(concat_grid_conv_pc_conv)
 
     # Convolution
-    cnn_layer_full = 6
+    cnn_layer_full = 10
     dilation_rate_full = 2
     dilation_rates_full = [dilation_rate_full ** i for i in range(cnn_layer_full)]
     tcn_full = tcn.TCN(nb_filters=32, kernel_size=2, nb_stacks=cnn_layer_full, dilations=dilation_rates_full,
