@@ -268,14 +268,16 @@ def run_combine_model(approach, path, model_name, add_grid=True):
 APPROACHES = {'local_full_conv': 1, 'local_full_conv_alt': 2, 'local_full_conv_alt2': 3, 'frozen_block': 4,
               'residual_block': 5}
 
-FUNC_NAMES = {'0': {'func': pc_and_grid_input_together, 'model_name': 'pc_and_grid_input_together'},
-              '1': {'func': grid_added_at_each_TCN_together, 'model_name': 'grid_added_at_each_TCN_together'},
-              '2': {'func': grid_conv_added_at_each_TCN_together, 'model_name': 'grid_conv_added_at_each_TCN_together'}}
+# FUNC_NAMES = {'0': {'func': pc_and_grid_input_together, 'model_name': 'pc_and_grid_input_together'},
+#               '1': {'func': grid_added_at_each_TCN_together, 'model_name': 'grid_added_at_each_TCN_together'},
+#               '2': {'func': grid_conv_added_at_each_TCN_together, 'model_name': 'grid_conv_added_at_each_TCN_together'}}
 
-model_func_name = sys.argv[1]
+# model_func_name = sys.argv[1]
 model_save_path = 'combined_nn_results/refined_models/saved_models'
-model_name = FUNC_NAMES[model_func_name]['model_name']
-function_run = FUNC_NAMES[model_func_name]['func']
+# model_name = FUNC_NAMES[model_func_name]['model_name']
+# function_run = FUNC_NAMES[model_func_name]['func']
+model_name = 'last_residual_approach_with_TCN_skip_connectionTrue'
+function_run = last_residual_approach_with_TCN
 print(model_name)
 
 forecasts, history = run_combine_model(function_run, model_save_path, model_name)

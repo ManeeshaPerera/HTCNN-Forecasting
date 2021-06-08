@@ -340,7 +340,7 @@ def last_residual_approach_with_TCN():
     dilation_rate = 2
     dilation_rates = [dilation_rate ** i for i in range(cnn_layer)]
     padding = 'causal'
-    use_skip_connections = False
+    use_skip_connections = True
     return_sequences = True
     dropout_rate = 0.05
     kernel_initializer = 'he_normal'
