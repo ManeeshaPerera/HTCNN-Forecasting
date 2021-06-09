@@ -268,21 +268,25 @@ def run_combine_model(approach, path, model_name, add_grid=True):
 APPROACHES = {'local_full_conv': 1, 'local_full_conv_alt': 2, 'local_full_conv_alt2': 3, 'frozen_block': 4,
               'residual_block': 5}
 
-# FUNC_NAMES = {'0': {'func': pc_and_grid_input_together, 'model_name': 'pc_and_grid_input_together'},
-#               '1': {'func': grid_added_at_each_TCN_together, 'model_name': 'grid_added_at_each_TCN_together'},
-#               '2': {'func': grid_conv_added_at_each_TCN_together, 'model_name': 'grid_conv_added_at_each_TCN_together'}}
+FUNC_NAMES = {'0': {'func': last_residual_approach_with_TCN, 'model_name': 'last_residual_approach_with_TCN'},
+              '1': {'func': postcode_only_TCN, 'model_name': 'postcode_only_TCN'},
+              '2': {'func': local_conv_with_grid_conv_TCN_approach,
+                    'model_name': 'local_conv_with_grid_conv_TCN_approach'},
+              '3': {'func': pc_and_grid_input_together, 'model_name': 'pc_and_grid_input_together'},
+              '4': {'func': grid_added_at_each_TCN_together, 'model_name': 'grid_added_at_each_TCN_together'},
+              '5': {'func': grid_conv_added_at_each_TCN_together, 'model_name': 'grid_conv_added_at_each_TCN_together'}}
 
-# model_func_name = sys.argv[1]
-model_save_path = 'combined_nn_results/refined_models/saved_models'
-# model_name = FUNC_NAMES[model_func_name]['model_name']
-# function_run = FUNC_NAMES[model_func_name]['func']
-model_name = 'last_residual_approach_with_TCN_skip_connectionTrueMoreLayers'
-function_run = last_residual_approach_with_TCN
+model_func_name = sys.argv[1]
+model_save_path = 'combined_nn_results/refined_models/without_skip/saved_models'
+model_name = FUNC_NAMES[model_func_name]['model_name']
+function_run = FUNC_NAMES[model_func_name]['func']
+# model_name = 'last_residual_approach_with_TCN_skip_connectionTrueMoreLayers'
+# function_run = last_residual_approach_with_TCN
 print(model_name)
 
 forecasts, history = run_combine_model(function_run, model_save_path, model_name)
 # starting from model 6 it's new data
-dir_path = f'combined_nn_results/refined_models/{model_name}'
+dir_path = f'combined_nn_results/refined_models/without_skip/{model_name}'
 if not os.path.exists(dir_path):
     os.makedirs(dir_path)
 

@@ -336,11 +336,11 @@ def last_residual_approach_with_TCN():
     concatenation_pc = layers.concatenate([pc_6010, pc_6014, pc_6011, pc_6280, pc_6281, pc_6284],
                                           name='postcode_concat')
     pc_normalization = layers.LayerNormalization()(concatenation_pc)
-    cnn_layer = 10
+    cnn_layer = 6
     dilation_rate = 2
     dilation_rates = [dilation_rate ** i for i in range(cnn_layer)]
     padding = 'causal'
-    use_skip_connections = True
+    use_skip_connections = False
     return_sequences = True
     dropout_rate = 0.05
     kernel_initializer = 'he_normal'
@@ -362,7 +362,7 @@ def last_residual_approach_with_TCN():
     concat_grid_conv_pc_conv_normal = layers.LayerNormalization()(concat_grid_conv_pc_conv)
 
     # Convolution
-    cnn_layer_full = 10
+    cnn_layer_full = 6
     dilation_rate_full = 2
     dilation_rates_full = [dilation_rate_full ** i for i in range(cnn_layer_full)]
     tcn_full = tcn.TCN(nb_filters=32, kernel_size=2, nb_stacks=cnn_layer_full, dilations=dilation_rates_full,
@@ -409,7 +409,7 @@ def postcode_only_TCN():
 
     tcn_pc = tcn.TCN(nb_filters=32, kernel_size=2, nb_stacks=cnn_layer, dilations=dilation_rates,
                      padding='causal',
-                     use_skip_connections=True, dropout_rate=0.05,
+                     use_skip_connections=False, dropout_rate=0.05,
                      return_sequences=True,
                      activation='relu', kernel_initializer='he_normal',
                      use_batch_norm=False,
@@ -439,7 +439,7 @@ def local_conv_with_grid_conv_TCN_approach():
         input_postcode = keras.Input(shape=(14 * 1, 14), name=f'input_postcode_{pc}')
         tcn_pc_output = tcn.TCN(nb_filters=32, kernel_size=2, nb_stacks=cnn_layer, dilations=dilation_rates,
                                 padding='causal',
-                                use_skip_connections=True, dropout_rate=0.05,
+                                use_skip_connections=False, dropout_rate=0.05,
                                 return_sequences=True,
                                 activation='relu', kernel_initializer='he_normal',
                                 use_batch_norm=False,
@@ -462,7 +462,7 @@ def local_conv_with_grid_conv_TCN_approach():
     dilation_rates = [dilation_rate ** i for i in range(cnn_layer)]
     tcn_grid = tcn.TCN(nb_filters=32, kernel_size=2, nb_stacks=cnn_layer, dilations=dilation_rates,
                        padding='causal',
-                       use_skip_connections=True, dropout_rate=0.05,
+                       use_skip_connections=False, dropout_rate=0.05,
                        return_sequences=True,
                        activation='relu', kernel_initializer='he_normal',
                        use_batch_norm=False,
@@ -476,7 +476,7 @@ def local_conv_with_grid_conv_TCN_approach():
         dilation_rates = [dilation_rate ** i for i in range(cnn_layer)]
         tcn_pc_grid = tcn.TCN(nb_filters=32, kernel_size=2, nb_stacks=cnn_layer, dilations=dilation_rates,
                               padding='causal',
-                              use_skip_connections=True, dropout_rate=0.05,
+                              use_skip_connections=False, dropout_rate=0.05,
                               return_sequences=True,
                               activation='relu', kernel_initializer='he_normal',
                               use_batch_norm=False,
@@ -509,14 +509,14 @@ def local_conv_with_grid_conv_TCN_approach():
 
 def pc_and_grid_input_together():
     def local_convolution_TCN(pc_ts, grid_ts, pc):
-        cnn_layer = 4
+        cnn_layer = 6
         dilation_rate = 2
         dilation_rates = [dilation_rate ** i for i in range(cnn_layer)]
         concat_each_pc_grid = layers.concatenate([pc_ts, grid_ts], name=f'concat_{pc}_grid')
 
         tcn_pc_grid_output = tcn.TCN(nb_filters=32, kernel_size=2, nb_stacks=cnn_layer, dilations=dilation_rates,
                                      padding='causal',
-                                     use_skip_connections=True, dropout_rate=0.05,
+                                     use_skip_connections=False, dropout_rate=0.05,
                                      return_sequences=True,
                                      activation='relu', kernel_initializer='he_normal',
                                      use_batch_norm=False,
@@ -559,7 +559,7 @@ def grid_added_at_each_TCN_together():
     def get_tcn_layer(dilation_rate, pc, layer_num, input_to_layer):
         return tcn.TCN(nb_filters=32, kernel_size=2, nb_stacks=2, dilations=dilation_rate,
                        padding='causal',
-                       use_skip_connections=True, dropout_rate=0.05,
+                       use_skip_connections=False, dropout_rate=0.05,
                        return_sequences=True,
                        activation='relu', kernel_initializer='he_normal',
                        use_batch_norm=False,
@@ -567,7 +567,7 @@ def grid_added_at_each_TCN_together():
                        use_weight_norm=True, name=f'TCN_{layer_num}_{pc}_grid')(input_to_layer)
 
     def local_convolution_TCN(pc_ts, grid_ts, pc):
-        cnn_layer = 4
+        cnn_layer = 6
         dilation_rate = 2
         dilation_rates = [dilation_rate ** i for i in range(cnn_layer)]
         concat_each_pc_grid = layers.concatenate([pc_ts, grid_ts], name=f'concat_{pc}_grid')
@@ -617,7 +617,7 @@ def grid_conv_added_at_each_TCN_together():
     def get_tcn_layer(dilation_rate, pc, layer_num, input_to_layer):
         return tcn.TCN(nb_filters=32, kernel_size=2, nb_stacks=2, dilations=dilation_rate,
                        padding='causal',
-                       use_skip_connections=True, dropout_rate=0.05,
+                       use_skip_connections=False, dropout_rate=0.05,
                        return_sequences=True,
                        activation='relu', kernel_initializer='he_normal',
                        use_batch_norm=False,
@@ -625,7 +625,7 @@ def grid_conv_added_at_each_TCN_together():
                        use_weight_norm=True, name=f'TCN_{layer_num}_{pc}_grid')(input_to_layer)
 
     def local_convolution_TCN(pc_ts, grid_conv_values, pc):
-        cnn_layer = 4
+        cnn_layer = 6
         dilation_rate = 2
         dilation_rates = [dilation_rate ** i for i in range(cnn_layer)]
 
@@ -656,7 +656,7 @@ def grid_conv_added_at_each_TCN_together():
     dilation_rates = [dilation_rate ** i for i in range(cnn_layer)]
     tcn_grid = tcn.TCN(nb_filters=32, kernel_size=2, nb_stacks=cnn_layer, dilations=dilation_rates,
                        padding='causal',
-                       use_skip_connections=True, dropout_rate=0.05,
+                       use_skip_connections=False, dropout_rate=0.05,
                        return_sequences=True,
                        activation='relu', kernel_initializer='he_normal',
                        use_batch_norm=False,
