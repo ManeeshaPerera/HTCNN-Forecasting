@@ -15,6 +15,26 @@ from src.CNN_architectures.combined_cnn_models import local_and_full_convolution
     local_conv_with_grid_with_TCN_approach, last_residual_approach_with_TCN, postcode_only_TCN, \
     local_conv_with_grid_conv_TCN_approach, pc_and_grid_input_together, grid_added_at_each_TCN_together, \
     grid_conv_added_at_each_TCN_together
+import random
+
+SEED = 1234
+def set_seeds(seed=SEED):
+    os.environ['PYTHONHASHSEED'] = str(seed)
+    random.seed(seed)
+    tf.random.set_seed(seed)
+    np.random.seed(seed)
+
+def set_global_determinism(seed=SEED):
+    set_seeds(seed=seed)
+
+    os.environ['TF_DETERMINISTIC_OPS'] = '1'
+    os.environ['TF_CUDNN_DETERMINISTIC'] = '1'
+
+    tf.config.threading.set_inter_op_parallelism_threads(1)
+    tf.config.threading.set_intra_op_parallelism_threads(1)
+
+# Call the above function with seed value
+set_global_determinism(seed=SEED)
 
 
 def create_window_data(file_index, lookback=1):
@@ -161,112 +181,6 @@ def run_combine_model(approach, path, model_name, add_grid=True):
     df = pd.concat([dataframe_store, fc_df], axis=1)
     return df, history
 
-    # data_grid, label_grid = create_numpy_arrays(grid, require_labels=True)
-    # data_pc1 = create_numpy_arrays(pc_1)
-    # data_pc2 = create_numpy_arrays(pc_2)
-    # data_pc3 = create_numpy_arrays(pc_3)
-    # data_pc4 = create_numpy_arrays(pc_4)
-    # data_pc5 = create_numpy_arrays(pc_5)
-    # data_pc6 = create_numpy_arrays(pc_6)
-    #
-    # data_grid_val, label_grid_val = create_numpy_arrays(grid_val, require_labels=True)
-    # data_pc1_val = create_numpy_arrays(pc_1_val)
-    # data_pc2_val = create_numpy_arrays(pc_2_val)
-    # data_pc3_val = create_numpy_arrays(pc_3_val)
-    # data_pc4_val = create_numpy_arrays(pc_4_val)
-    # data_pc5_val = create_numpy_arrays(pc_5_val)
-    # data_pc6_val = create_numpy_arrays(pc_6_val)
-    #
-    # data_grid_test, label_grid_test = create_numpy_arrays(grid_test, require_labels=True)
-    # data_pc1_test = create_numpy_arrays(pc_1_test)
-    # data_pc2_test = create_numpy_arrays(pc_2_test)
-    # data_pc3_test = create_numpy_arrays(pc_3_test)
-    # data_pc4_test = create_numpy_arrays(pc_4_test)
-    # data_pc5_test = create_numpy_arrays(pc_5_test)
-    # data_pc6_test = create_numpy_arrays(pc_6_test)
-
-    # test_dic = {'input_postcode_6010': data_pc1_test,
-    #             'input_postcode_6014': data_pc2_test, 'input_postcode_6011': data_pc3_test,
-    #             'input_postcode_6280': data_pc4_test, 'input_postcode_6281': data_pc5_test,
-    #             'input_postcode_6284': data_pc6_test}
-    #
-    # with open('combined_nn_results/refined_models/test_data_pc', 'wb') as file_test_pc:
-    #     pickle.dump(test_dic, file_test_pc)
-
-    # model = create_combine_network()
-    # callback = tf.keras.callbacks.EarlyStopping(monitor='val_loss', patience=100)
-
-    # history = model.fit({'input_grid': data_grid},
-    #                     label_grid, batch_size=128, epochs=2000, validation_data=(
-    #         {'input_grid': data_grid_val},
-    #         label_grid_val), callbacks=[callback])
-
-    # history = model.fit({'input_grid': data_grid, 'input_postcode_6010': data_pc1, 'input_postcode_6014': data_pc2,
-    #                      'input_postcode_6011': data_pc3, 'input_postcode_6280': data_pc4,
-    #                      'input_postcode_6281': data_pc5,
-    #                      'input_postcode_6284': data_pc6},
-    #                     label_grid, batch_size=128, epochs=2000, validation_data=(
-    #         {'input_grid': data_grid_val, 'input_postcode_6010': data_pc1_val, 'input_postcode_6014': data_pc2_val,
-    #          'input_postcode_6011': data_pc3_val, 'input_postcode_6280': data_pc4_val,
-    #          'input_postcode_6281': data_pc5_val,
-    #          'input_postcode_6284': data_pc6_val},
-    #         label_grid_val), callbacks=[callback])
-
-    # history = model.fit({'input_postcode_6010': data_pc1, 'input_postcode_6014': data_pc2,
-    #                      'input_postcode_6011': data_pc3, 'input_postcode_6280': data_pc4,
-    #                      'input_postcode_6281': data_pc5,
-    #                      'input_postcode_6284': data_pc6},
-    #                     label_grid, batch_size=128, epochs=2000, validation_data=(
-    #         {'input_postcode_6010': data_pc1_val, 'input_postcode_6014': data_pc2_val,
-    #          'input_postcode_6011': data_pc3_val, 'input_postcode_6280': data_pc4_val,
-    #          'input_postcode_6281': data_pc5_val,
-    #          'input_postcode_6284': data_pc6_val},
-    #         label_grid_val), callbacks=[callback])
-
-    # save the model
-    # saved_models = 'combined_nn_results/refined_models/saved_models'
-    # if not os.path.exists(saved_models):
-    #     os.makedirs(saved_models)
-    # model.save(f'{saved_models}/residual_block2')
-    #
-    # # Forecast
-    # lookback = 1
-    # data = pd.read_csv(f'ts_data/grid.csv', index_col=[0])
-    # look_back = 14 * lookback
-    #
-    # # train, val, test split
-    # train, val, test = utils.split_hourly_data(data, look_back)
-    # dataframe_store = test[look_back:][['power']]
-    #
-    # scaler = StandardScaler()
-    # scaler.fit(train[['power']].values)
-    #
-    # fc_array = []
-    # # fc = model.predict({'input_grid': data_grid_test})
-    #
-    # fc = model.predict({'input_grid': data_grid_test, 'input_postcode_6010': data_pc1_test,
-    #                     'input_postcode_6014': data_pc2_test, 'input_postcode_6011': data_pc3_test,
-    #                     'input_postcode_6280': data_pc4_test, 'input_postcode_6281': data_pc5_test,
-    #                     'input_postcode_6284': data_pc6_test})
-    #
-    # # fc = model.predict({'input_postcode_6010': data_pc1_test,
-    # #                     'input_postcode_6014': data_pc2_test, 'input_postcode_6011': data_pc3_test,
-    # #                     'input_postcode_6280': data_pc4_test, 'input_postcode_6281': data_pc5_test,
-    # #                     'input_postcode_6284': data_pc6_test})
-    #
-    # for sample in range(0, len(fc), 14):
-    #     fc_sample = fc[sample]
-    #     fc_sample = scaler.inverse_transform(fc_sample)
-    #     fc_array.extend(fc_sample)
-    #
-    # fc_df = pd.DataFrame(fc_array, index=data[-14 * constants.TEST_DAYS:].index, columns=['fc'])
-    # fc_df[fc_df < 0] = 0
-    # df = pd.concat([dataframe_store, fc_df], axis=1)
-    # return df, history
-
-
-APPROACHES = {'local_full_conv': 1, 'local_full_conv_alt': 2, 'local_full_conv_alt2': 3, 'frozen_block': 4,
-              'residual_block': 5}
 
 FUNC_NAMES = {'0': {'func': last_residual_approach_with_TCN, 'model_name': 'last_residual_approach_with_TCN'},
               '1': {'func': postcode_only_TCN, 'model_name': 'postcode_only_TCN'},
@@ -276,21 +190,43 @@ FUNC_NAMES = {'0': {'func': last_residual_approach_with_TCN, 'model_name': 'last
               '4': {'func': grid_added_at_each_TCN_together, 'model_name': 'grid_added_at_each_TCN_together'},
               '5': {'func': grid_conv_added_at_each_TCN_together, 'model_name': 'grid_conv_added_at_each_TCN_together'}}
 
+final_test_models = {'0': {'func': postcode_only_TCN, 'model_name': 'postcode_only_TCN'},
+                     '1': {'func': last_residual_approach_with_TCN, 'model_name': 'last_residual_approach_with_TCN'},
+                     '2': {'func': grid_conv_added_at_each_TCN_together,
+                           'model_name': 'grid_conv_added_at_each_TCN_together'},
+                     '3': {'func': pc_and_grid_input_together, 'model_name': 'pc_and_grid_input_together'}}
+
 model_func_name = sys.argv[1]
-model_save_path = 'combined_nn_results/refined_models/without_skip/saved_models'
-model_name = FUNC_NAMES[model_func_name]['model_name']
-function_run = FUNC_NAMES[model_func_name]['func']
+model_save_path = 'combined_nn_results/refined_models/multiple_runs/saved_models'
+model_name = final_test_models[model_func_name]['model_name']
+function_run = final_test_models[model_func_name]['func']
+
 # model_name = 'last_residual_approach_with_TCN_skip_connectionTrueMoreLayers'
 # function_run = last_residual_approach_with_TCN
 print(model_name)
 
-forecasts, history = run_combine_model(function_run, model_save_path, model_name)
-# starting from model 6 it's new data
-dir_path = f'combined_nn_results/refined_models/without_skip/{model_name}'
-if not os.path.exists(dir_path):
-    os.makedirs(dir_path)
+final_results = []
 
-forecasts.to_csv(f'{dir_path}/grid.csv')
+for run in range(0, 2):
+    model_new_name = f'{model_name}/{run}'  # this will save the models with the run info added as folder name
+    forecasts, history = run_combine_model(function_run, model_save_path, model_new_name)
+    forecasts = forecasts.rename(columns={'fc': f'fc_{run}'})
+    if run == 0:
+        final_results.append(forecasts)
+    else:
+        final_results.append(forecasts.iloc[:, 1:])
 
-with open(f'{dir_path}/training_loss_grid_iteration', 'wb') as file_loss:
-    pickle.dump(history.history, file_loss)
+    dir_path = f'combined_nn_results/refined_models/multiple_runs/{model_new_name}'
+    if not os.path.exists(dir_path):
+        os.makedirs(dir_path)
+
+    with open(f'{dir_path}/training_loss_grid_iteration', 'wb') as file_loss:
+        pickle.dump(history.history, file_loss)
+
+# concat results of all runs and get average and median
+final_df = pd.concat(final_results, axis=1)
+final_df['average_fc'] = final_df.iloc[:, 1:].mean(axis=1)
+final_df['median_fc'] = final_df.iloc[:, 1:].median(axis=1)
+
+dir_path_save = f'combined_nn_results/refined_models/multiple_runs/{model_name}'
+final_df.to_csv(f'{dir_path_save}/grid.csv')
