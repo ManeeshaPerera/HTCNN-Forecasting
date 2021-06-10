@@ -1,4 +1,9 @@
-SEED = 1234
+import sys
+model_func_name = sys.argv[1]
+run = int(sys.argv[2])
+
+import constants
+SEED = constants.SEEDS[run]
 import numpy as np
 
 np.random.seed(SEED)
@@ -17,9 +22,8 @@ import pandas as pd
 from src.WindowGenerator.window_generator import WindowGenerator
 from sklearn.preprocessing import StandardScaler
 import src.utils as utils
-import constants
 import pickle5 as pickle
-import sys
+
 
 from src.CNN_architectures.combined_model import create_combine_network
 
@@ -210,52 +214,49 @@ final_test_models = {'0': {'func': postcode_only_TCN, 'model_name': 'postcode_on
                            'model_name': 'grid_conv_added_at_each_TCN_together'},
                      '3': {'func': pc_and_grid_input_together, 'model_name': 'pc_and_grid_input_together'}}
 
-model_func_name = sys.argv[1]
+
 model_save_path = 'combined_nn_results/refined_models/multiple_runs/saved_models'
 model_name = final_test_models[model_func_name]['model_name']
 function_run = final_test_models[model_func_name]['func']
 
-# model_name = 'local_and_full_convolution_approach_alternative1'
-# function_run = local_and_full_convolution_approach_alternative1
 print(model_name)
 
-# run = 1
-# model_new_name = f'{model_name}/{run}'  # this will save the models with the run info added as folder name
-# forecasts, history = run_combine_model(function_run, model_save_path, model_new_name)
-# forecasts = forecasts.rename(columns={'fc': f'fc_{run}'})
+model_new_name = f'{model_name}/{run}'  # this will save the models with the run info added as folder name
+forecasts, history = run_combine_model(function_run, model_save_path, model_new_name)
+forecasts = forecasts.rename(columns={'fc': f'fc_{run}'})
+
+dir_path = f'combined_nn_results/refined_models/multiple_runs/{model_new_name}'
+if not os.path.exists(dir_path):
+    os.makedirs(dir_path)
+
+forecasts.to_csv(f'{dir_path}/grid.csv')
+
+with open(f'{dir_path}/training_loss_grid_iteration', 'wb') as file_loss:
+    pickle.dump(history.history, file_loss)
+
+# final_results = []
 #
-# dir_path = f'combined_nn_results/refined_models/multiple_runs/{model_new_name}'
-# if not os.path.exists(dir_path):
-#     os.makedirs(dir_path)
+# for run in range(0, 2):
+#     tf.random.set_seed(SEED)
+#     model_new_name = f'{model_name}/{run}'  # this will save the models with the run info added as folder name
+#     forecasts, history = run_combine_model(function_run, model_save_path, model_new_name)
+#     forecasts = forecasts.rename(columns={'fc': f'fc_{run}'})
+#     if run == 0:
+#         final_results.append(forecasts)
+#     else:
+#         final_results.append(forecasts.iloc[:, 1:])
 #
-# forecasts.to_csv(f'{dir_path}/grid.csv')
+#     dir_path = f'combined_nn_results/refined_models/multiple_runs/{model_new_name}'
+#     if not os.path.exists(dir_path):
+#         os.makedirs(dir_path)
 #
-# with open(f'{dir_path}/training_loss_grid_iteration', 'wb') as file_loss:
-#     pickle.dump(history.history, file_loss)
+#     with open(f'{dir_path}/training_loss_grid_iteration', 'wb') as file_loss:
+#         pickle.dump(history.history, file_loss)
+#
+# # concat results of all runs and get average and median
+# final_df = pd.concat(final_results, axis=1)
+# final_df['average_fc'] = final_df.iloc[:, 1:].mean(axis=1)
+# final_df['median_fc'] = final_df.iloc[:, 1:].median(axis=1)
 
-final_results = []
-
-for run in range(0, 2):
-    tf.random.set_seed(SEED)
-    model_new_name = f'{model_name}/{run}'  # this will save the models with the run info added as folder name
-    forecasts, history = run_combine_model(function_run, model_save_path, model_new_name)
-    forecasts = forecasts.rename(columns={'fc': f'fc_{run}'})
-    if run == 0:
-        final_results.append(forecasts)
-    else:
-        final_results.append(forecasts.iloc[:, 1:])
-
-    dir_path = f'combined_nn_results/refined_models/multiple_runs/{model_new_name}'
-    if not os.path.exists(dir_path):
-        os.makedirs(dir_path)
-
-    with open(f'{dir_path}/training_loss_grid_iteration', 'wb') as file_loss:
-        pickle.dump(history.history, file_loss)
-
-# concat results of all runs and get average and median
-final_df = pd.concat(final_results, axis=1)
-final_df['average_fc'] = final_df.iloc[:, 1:].mean(axis=1)
-final_df['median_fc'] = final_df.iloc[:, 1:].median(axis=1)
-
-dir_path_save = f'combined_nn_results/refined_models/multiple_runs/{model_name}'
-final_df.to_csv(f'{dir_path_save}/grid.csv')
+# dir_path_save = f'combined_nn_results/refined_models/multiple_runs/{model_name}'
+# final_df.to_csv(f'{dir_path_save}/grid.csv')

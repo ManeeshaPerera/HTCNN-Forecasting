@@ -1,14 +1,5 @@
-SEED = 1234
 import numpy as np
-np.random.seed(SEED)
 import tensorflow as tf
-tf.random.set_seed(SEED)
-import os
-os.environ['PYTHONHASHSEED'] = str(SEED)
-os.environ['TF_DETERMINISTIC_OPS'] = '1'
-os.environ['TF_CUDNN_DETERMINISTIC'] = '1'
-tf.config.threading.set_inter_op_parallelism_threads(1)
-tf.config.threading.set_intra_op_parallelism_threads(1)
 
 class WindowGenerator:
     def __init__(self, input_width, label_width, shift,
@@ -92,7 +83,7 @@ class WindowGenerator:
             sequence_length=self.total_window_size,
             sequence_stride=1,
             shuffle=False,
-            batch_size=1, seed=SEED)
+            batch_size=1,)
         ds = ds.map(self.split_window, deterministic=True)
         return ds
 
@@ -105,7 +96,7 @@ class WindowGenerator:
             sequence_length=self.total_window_size,
             sequence_stride=1,
             shuffle=False,
-            batch_size=1, seed=SEED)
+            batch_size=1,)
         ds = ds.map(self.split_window, deterministic=True)
 
         # all six postcodes
