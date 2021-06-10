@@ -1,6 +1,11 @@
 # CODE EXTRACTED FROM THE FOLLOWING PYTHON PROJECT AND EDITED
 # https://github.com/philipperemy/keras-tcn/blob/master/tcn/tcn.py
 
+SEED = 1234
+import numpy as np
+np.random.seed(SEED)
+import tensorflow as tf
+
 
 import inspect
 from typing import List
@@ -9,30 +14,31 @@ from tensorflow.keras import backend as K, Model, Input, optimizers
 from tensorflow.keras import layers
 from tensorflow.keras.layers import Activation, SpatialDropout1D, Lambda, Flatten
 from tensorflow.keras.layers import Layer, Conv1D, Dense, BatchNormalization, LayerNormalization
-
-import tensorflow as tf
-import os
-import random
-import numpy as np
-
-SEED = 1234
-def set_seeds(seed=SEED):
-    os.environ['PYTHONHASHSEED'] = str(seed)
-    random.seed(seed)
-    tf.random.set_seed(seed)
-    np.random.seed(seed)
-
-def set_global_determinism(seed=SEED):
-    set_seeds(seed=seed)
-
-    os.environ['TF_DETERMINISTIC_OPS'] = '1'
-    os.environ['TF_CUDNN_DETERMINISTIC'] = '1'
-
-    tf.config.threading.set_inter_op_parallelism_threads(1)
-    tf.config.threading.set_intra_op_parallelism_threads(1)
-
-# Call the above function with seed value
-set_global_determinism(seed=SEED)
+tf.random.set_seed(SEED)
+# import tensorflow as tf
+# import os
+# import random
+# import numpy as np
+#
+# SEED = 1234
+# def set_seeds(seed=SEED):
+#     os.environ['PYTHONHASHSEED'] = str(seed)
+#     random.seed(seed)
+#     tf.random.set_seed(seed)
+#     np.random.seed(seed)
+#
+# def set_global_determinism(seed=SEED):
+#     set_seeds(seed=seed)
+#
+#     os.environ['TF_DETERMINISTIC_OPS'] = '1'
+#     os.environ['TF_CUDNN_DETERMINISTIC'] = '1'
+#
+#     tf.config.threading.set_inter_op_parallelism_threads(1)
+#     tf.config.threading.set_intra_op_parallelism_threads(1)
+#
+# # tf.keras.backend.clear_session()
+# # Call the above function with seed value
+# set_global_determinism(seed=SEED)
 
 
 def is_power_of_two(num: int):

@@ -1,40 +1,54 @@
+SEED = 1234
+import numpy as np
+
+np.random.seed(SEED)
+import tensorflow as tf
+
+tf.random.set_seed(SEED)
+import os
+
+os.environ['PYTHONHASHSEED'] = str(SEED)
+os.environ['TF_DETERMINISTIC_OPS'] = '1'
+os.environ['TF_CUDNN_DETERMINISTIC'] = '1'
+tf.config.threading.set_inter_op_parallelism_threads(1)
+tf.config.threading.set_intra_op_parallelism_threads(1)
+
 import pandas as pd
 from src.WindowGenerator.window_generator import WindowGenerator
 from sklearn.preprocessing import StandardScaler
 import src.utils as utils
 import constants
-import os
-import sys
-from src.CNN_architectures.combined_model import create_combine_network
-import numpy as np
 import pickle5 as pickle
-import tensorflow as tf
+import sys
+
+from src.CNN_architectures.combined_model import create_combine_network
+
 from src.CNN_architectures.combined_cnn_models import local_and_full_convolution_approach, \
     local_and_full_convolution_approach_alternative1, local_and_full_convolution_approach_alternative2, \
     frozen_branch_approach, last_residual_approach, local_conv_with_grid_approach, \
     local_conv_with_grid_with_TCN_approach, last_residual_approach_with_TCN, postcode_only_TCN, \
     local_conv_with_grid_conv_TCN_approach, pc_and_grid_input_together, grid_added_at_each_TCN_together, \
     grid_conv_added_at_each_TCN_together
-import random
 
-SEED = 1234
-def set_seeds(seed=SEED):
-    os.environ['PYTHONHASHSEED'] = str(seed)
-    random.seed(seed)
-    tf.random.set_seed(seed)
-    np.random.seed(seed)
 
-def set_global_determinism(seed=SEED):
-    set_seeds(seed=seed)
-
-    os.environ['TF_DETERMINISTIC_OPS'] = '1'
-    os.environ['TF_CUDNN_DETERMINISTIC'] = '1'
-
-    tf.config.threading.set_inter_op_parallelism_threads(1)
-    tf.config.threading.set_intra_op_parallelism_threads(1)
-
-# Call the above function with seed value
-set_global_determinism(seed=SEED)
+# def set_seeds(seed=SEED):
+#     os.environ['PYTHONHASHSEED'] = str(seed)
+#     random.seed(seed)
+#     tf.random.set_seed(seed)
+#     np.random.seed(seed)
+#
+# def set_global_determinism(seed=SEED):
+#     set_seeds(seed=seed)
+#
+#     os.environ['TF_DETERMINISTIC_OPS'] = '1'
+#     os.environ['TF_CUDNN_DETERMINISTIC'] = '1'
+#
+#     tf.config.threading.set_inter_op_parallelism_threads(1)
+#     tf.config.threading.set_intra_op_parallelism_threads(1)
+#
+# # tf.keras.backend.clear_session()
+# # Call the above function with seed value
+# set_global_determinism(seed=SEED)
 
 
 def create_window_data(file_index, lookback=1):
@@ -147,9 +161,9 @@ def run_combine_model(approach, path, model_name, add_grid=True):
         test_dic['input_grid'] = data_grid_test
 
     model = approach()
-    callback = tf.keras.callbacks.EarlyStopping(monitor='val_loss', patience=100)
-    history = model.fit(train_dic, label_grid, batch_size=128, epochs=2000, validation_data=(val_dic, label_grid_val),
-                        callbacks=[callback])
+    callback = tf.keras.callbacks.EarlyStopping(monitor='val_loss', patience=2)
+    history = model.fit(train_dic, label_grid, batch_size=128, epochs=10, validation_data=(val_dic, label_grid_val),
+                        callbacks=[callback], shuffle=False)
 
     if not os.path.exists(path):
         os.makedirs(path)
@@ -201,13 +215,28 @@ model_save_path = 'combined_nn_results/refined_models/multiple_runs/saved_models
 model_name = final_test_models[model_func_name]['model_name']
 function_run = final_test_models[model_func_name]['func']
 
-# model_name = 'last_residual_approach_with_TCN_skip_connectionTrueMoreLayers'
-# function_run = last_residual_approach_with_TCN
+# model_name = 'local_and_full_convolution_approach_alternative1'
+# function_run = local_and_full_convolution_approach_alternative1
 print(model_name)
+
+# run = 1
+# model_new_name = f'{model_name}/{run}'  # this will save the models with the run info added as folder name
+# forecasts, history = run_combine_model(function_run, model_save_path, model_new_name)
+# forecasts = forecasts.rename(columns={'fc': f'fc_{run}'})
+#
+# dir_path = f'combined_nn_results/refined_models/multiple_runs/{model_new_name}'
+# if not os.path.exists(dir_path):
+#     os.makedirs(dir_path)
+#
+# forecasts.to_csv(f'{dir_path}/grid.csv')
+#
+# with open(f'{dir_path}/training_loss_grid_iteration', 'wb') as file_loss:
+#     pickle.dump(history.history, file_loss)
 
 final_results = []
 
 for run in range(0, 2):
+    tf.random.set_seed(SEED)
     model_new_name = f'{model_name}/{run}'  # this will save the models with the run info added as folder name
     forecasts, history = run_combine_model(function_run, model_save_path, model_new_name)
     forecasts = forecasts.rename(columns={'fc': f'fc_{run}'})

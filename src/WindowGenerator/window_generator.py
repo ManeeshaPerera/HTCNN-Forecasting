@@ -1,28 +1,14 @@
-import numpy as np
-import tensorflow as tf
-import os
-
-import random
-
 SEED = 1234
-def set_seeds(seed=SEED):
-    os.environ['PYTHONHASHSEED'] = str(seed)
-    random.seed(seed)
-    tf.random.set_seed(seed)
-    np.random.seed(seed)
-
-def set_global_determinism(seed=SEED):
-    set_seeds(seed=seed)
-
-    os.environ['TF_DETERMINISTIC_OPS'] = '1'
-    os.environ['TF_CUDNN_DETERMINISTIC'] = '1'
-
-    tf.config.threading.set_inter_op_parallelism_threads(1)
-    tf.config.threading.set_intra_op_parallelism_threads(1)
-
-# Call the above function with seed value
-set_global_determinism(seed=SEED)
-
+import numpy as np
+np.random.seed(SEED)
+import tensorflow as tf
+tf.random.set_seed(SEED)
+import os
+os.environ['PYTHONHASHSEED'] = str(SEED)
+os.environ['TF_DETERMINISTIC_OPS'] = '1'
+os.environ['TF_CUDNN_DETERMINISTIC'] = '1'
+tf.config.threading.set_inter_op_parallelism_threads(1)
+tf.config.threading.set_intra_op_parallelism_threads(1)
 
 class WindowGenerator:
     def __init__(self, input_width, label_width, shift,
@@ -106,8 +92,8 @@ class WindowGenerator:
             sequence_length=self.total_window_size,
             sequence_stride=1,
             shuffle=False,
-            batch_size=1, )
-        ds = ds.map(self.split_window)
+            batch_size=1, seed=SEED)
+        ds = ds.map(self.split_window, deterministic=True)
         return ds
 
     def make_dataset_combine(self, data, window_array, train_val_test, batch_size):
@@ -119,8 +105,8 @@ class WindowGenerator:
             sequence_length=self.total_window_size,
             sequence_stride=1,
             shuffle=False,
-            batch_size=1, )
-        ds = ds.map(self.split_window)
+            batch_size=1, seed=SEED)
+        ds = ds.map(self.split_window, deterministic=True)
 
         # all six postcodes
         ds1 = self.map_data(window_array[0], train_val_test)

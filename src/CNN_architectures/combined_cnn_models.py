@@ -1,31 +1,39 @@
+SEED = 1234
 import numpy as np
+np.random.seed(SEED)
 import tensorflow as tf
+tf.random.set_seed(SEED)
+import os
+os.environ['PYTHONHASHSEED'] = str(SEED)
+os.environ['TF_DETERMINISTIC_OPS'] = '1'
+os.environ['TF_CUDNN_DETERMINISTIC'] = '1'
+
 from tensorflow import keras
 from tensorflow.keras import layers
 import src.CNN_architectures.temporal_conv as tcn
-
-import os
-import random
-
-SEED = 1234
-def set_seeds(seed=SEED):
-    os.environ['PYTHONHASHSEED'] = str(seed)
-    random.seed(seed)
-    tf.random.set_seed(seed)
-    np.random.seed(seed)
-
-def set_global_determinism(seed=SEED):
-    set_seeds(seed=seed)
-
-    os.environ['TF_DETERMINISTIC_OPS'] = '1'
-    os.environ['TF_CUDNN_DETERMINISTIC'] = '1'
-
-    tf.config.threading.set_inter_op_parallelism_threads(1)
-    tf.config.threading.set_intra_op_parallelism_threads(1)
-
-tf.keras.backend.clear_session()
-# Call the above function with seed value
-set_global_determinism(seed=SEED)
+tf.random.set_seed(SEED)
+# import os
+# import random
+#
+# SEED = 1234
+# def set_seeds(seed=SEED):
+#     os.environ['PYTHONHASHSEED'] = str(seed)
+#     random.seed(seed)
+#     tf.random.set_seed(seed)
+#     np.random.seed(seed)
+#
+# def set_global_determinism(seed=SEED):
+#     set_seeds(seed=seed)
+#
+#     os.environ['TF_DETERMINISTIC_OPS'] = '1'
+#     os.environ['TF_CUDNN_DETERMINISTIC'] = '1'
+#
+#     tf.config.threading.set_inter_op_parallelism_threads(1)
+#     tf.config.threading.set_intra_op_parallelism_threads(1)
+#
+# # tf.keras.backend.clear_session()
+# # Call the above function with seed value
+# set_global_determinism(seed=SEED)
 
 # LOCAL AND FULL CONVOLUTION PIPELINE
 
