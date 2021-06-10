@@ -225,7 +225,7 @@ print("run: ", run)
 
 model_new_name = f'{model_name}/{run}'  # this will save the models with the run info added as folder name
 forecasts, history = run_combine_model(function_run, model_save_path, model_new_name)
-forecasts = forecasts.rename(columns={'fc': f'fc_{run}'})
+# forecasts = forecasts.rename(columns={'fc': f'fc_{run}'})
 
 dir_path = f'combined_nn_results/refined_models/multiple_runs/{model_new_name}'
 if not os.path.exists(dir_path):
