@@ -1,8 +1,10 @@
 import sys
+
 model_func_name = sys.argv[1]
 run = int(sys.argv[2])
 
 import constants
+
 SEED = constants.SEEDS[run]
 import numpy as np
 
@@ -24,35 +26,10 @@ from sklearn.preprocessing import StandardScaler
 import src.utils as utils
 import pickle5 as pickle
 
-
-from src.CNN_architectures.combined_model import create_combine_network
-
-from src.CNN_architectures.combined_cnn_models import local_and_full_convolution_approach, \
-    local_and_full_convolution_approach_alternative1, local_and_full_convolution_approach_alternative2, \
-    frozen_branch_approach, last_residual_approach, local_conv_with_grid_approach, \
-    local_conv_with_grid_with_TCN_approach, last_residual_approach_with_TCN, postcode_only_TCN, \
+from src.CNN_architectures.combined_cnn_models import local_conv_with_grid_with_TCN_approach, \
+    last_residual_approach_with_TCN, postcode_only_TCN, \
     local_conv_with_grid_conv_TCN_approach, pc_and_grid_input_together, grid_added_at_each_TCN_together, \
-    grid_conv_added_at_each_TCN_together
-
-
-# def set_seeds(seed=SEED):
-#     os.environ['PYTHONHASHSEED'] = str(seed)
-#     random.seed(seed)
-#     tf.random.set_seed(seed)
-#     np.random.seed(seed)
-#
-# def set_global_determinism(seed=SEED):
-#     set_seeds(seed=seed)
-#
-#     os.environ['TF_DETERMINISTIC_OPS'] = '1'
-#     os.environ['TF_CUDNN_DETERMINISTIC'] = '1'
-#
-#     tf.config.threading.set_inter_op_parallelism_threads(1)
-#     tf.config.threading.set_intra_op_parallelism_threads(1)
-#
-# # tf.keras.backend.clear_session()
-# # Call the above function with seed value
-# set_global_determinism(seed=SEED)
+    grid_conv_added_at_each_TCN_together, local_and_global_conv_approach_with_TCN, frozen_branch_approach_TCN
 
 
 def create_window_data(file_index, lookback=1):
@@ -165,8 +142,8 @@ def run_combine_model(approach, path, model_name, add_grid=True):
         test_dic['input_grid'] = data_grid_test
 
     model = approach()
-    callback = tf.keras.callbacks.EarlyStopping(monitor='val_loss', patience=2)
-    history = model.fit(train_dic, label_grid, batch_size=128, epochs=10, validation_data=(val_dic, label_grid_val),
+    callback = tf.keras.callbacks.EarlyStopping(monitor='val_loss', patience=100)
+    history = model.fit(train_dic, label_grid, batch_size=128, epochs=2000, validation_data=(val_dic, label_grid_val),
                         callbacks=[callback], shuffle=False)
 
     if not os.path.exists(path):
@@ -200,20 +177,19 @@ def run_combine_model(approach, path, model_name, add_grid=True):
     return df, history
 
 
-FUNC_NAMES = {'0': {'func': last_residual_approach_with_TCN, 'model_name': 'last_residual_approach_with_TCN'},
-              '1': {'func': postcode_only_TCN, 'model_name': 'postcode_only_TCN'},
-              '2': {'func': local_conv_with_grid_conv_TCN_approach,
-                    'model_name': 'local_conv_with_grid_conv_TCN_approach'},
-              '3': {'func': pc_and_grid_input_together, 'model_name': 'pc_and_grid_input_together'},
-              '4': {'func': grid_added_at_each_TCN_together, 'model_name': 'grid_added_at_each_TCN_together'},
-              '5': {'func': grid_conv_added_at_each_TCN_together, 'model_name': 'grid_conv_added_at_each_TCN_together'}}
-
 final_test_models = {'0': {'func': postcode_only_TCN, 'model_name': 'postcode_only_TCN'},
                      '1': {'func': last_residual_approach_with_TCN, 'model_name': 'last_residual_approach_with_TCN'},
-                     '2': {'func': grid_conv_added_at_each_TCN_together,
+                     '2': {'func': local_and_global_conv_approach_with_TCN,
+                           'model_name': 'local_and_global_conv_approach_with_TCN'},
+                     '3': {'func': local_conv_with_grid_with_TCN_approach,
+                           'model_name': 'local_conv_with_grid_with_TCN_approach'},
+                     '4': {'func': local_conv_with_grid_conv_TCN_approach,
+                           'model_name': 'local_conv_with_grid_conv_TCN_approach'},
+                     '5': {'func': pc_and_grid_input_together, 'model_name': 'pc_and_grid_input_together'},
+                     '6': {'func': grid_added_at_each_TCN_together, 'model_name': 'grid_added_at_each_TCN_together'},
+                     '7': {'func': grid_conv_added_at_each_TCN_together,
                            'model_name': 'grid_conv_added_at_each_TCN_together'},
-                     '3': {'func': pc_and_grid_input_together, 'model_name': 'pc_and_grid_input_together'}}
-
+                     '8': {'func': frozen_branch_approach_TCN, 'model_name': 'frozen_branch_approach_TCN'}}
 
 model_save_path = 'combined_nn_results/refined_models/multiple_runs/saved_models'
 model_name = final_test_models[model_func_name]['model_name']

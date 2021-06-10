@@ -698,11 +698,11 @@ def grid_only_network():
                        use_layer_norm=False,
                        use_weight_norm=True, name='TCN_grid')(grid_input)
     flatten_grid = layers.Flatten(name='flatten_grid')(tcn_grid)
-    full_connected_layer = layers.Dense(14, activation='linear', name="prediction_layer")(flatten_grid)
+    full_connected_layer = layers.Dense(14, activation='linear', name="prediction_layer_grid")(flatten_grid)
     grid_only_network_model = keras.Model(grid_input, full_connected_layer)
-    grid_only_network_model.compile(loss=tf.losses.MeanSquaredError(),
-                                    optimizer=tf.optimizers.Adam(0.0001),
-                                    metrics=[tf.metrics.MeanAbsoluteError()])
+    # grid_only_network_model.compile(loss=tf.losses.MeanSquaredError(),
+    #                                 optimizer=tf.optimizers.Adam(0.0001),
+    #                                 metrics=[tf.metrics.MeanAbsoluteError()])
     return grid_only_network_model
 
 def local_and_global_conv_approach_with_TCN():
@@ -779,7 +779,7 @@ def frozen_branch_approach_TCN():
     pc_6281 = keras.Input(shape=(14 * 1, 14), name='input_postcode_6281')
     pc_6284 = keras.Input(shape=(14 * 1, 14), name='input_postcode_6284')
 
-    input_grid = keras.Input(shape=(14 * 1, 7), name='input_grid')
+    # input_grid = keras.Input(shape=(14 * 1, 7), name='input_grid')
 
     # postcode convolutions
     concatenation_pc = layers.concatenate([pc_6010, pc_6014, pc_6011, pc_6280, pc_6281, pc_6284],
@@ -809,16 +809,16 @@ def frozen_branch_approach_TCN():
     full_connected_layer_pc = layers.Dense(14, activation='linear', name="prediction_layer_pc")(flatten_pc)
 
     # LOAD PRETRAINED GRID MODEL
-    input_grid = keras.Input(shape=(14 * 1, 7), name='input_grid')
-    grid_network = tf.keras.models.load_model('combined_nn_results/refined_models/multiple_runs/saved_models/0')
-    grid_network.trainable = False
-    grid_model = grid_network(input_grid, training=False)
+    # input_grid = keras.Input(shape=(14 * 1, 7), name='input_grid')
+    # grid_network = tf.keras.models.load_model('combined_nn_results/refined_models/multiple_runs/saved_models/0')
+    # grid_network.trainable = False
+    grid_model = grid_only_network()
 
-    concatenation = layers.concatenate([grid_model, full_connected_layer_pc])
+    concatenation = layers.concatenate([grid_model.output, full_connected_layer_pc])
     prediction_layer = layers.Dense(14, activation='linear', name="prediction_layer")(concatenation)
 
     frozen_branch_approach_TCN_model = keras.Model(
-        inputs=[input_grid, pc_6010, pc_6014, pc_6011, pc_6280, pc_6281,
+        inputs=[grid_model.input, pc_6010, pc_6014, pc_6011, pc_6280, pc_6281,
                 pc_6284], outputs=prediction_layer)
 
     frozen_branch_approach_TCN_model.compile(loss=tf.losses.MeanSquaredError(),
