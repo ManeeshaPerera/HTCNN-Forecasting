@@ -139,7 +139,7 @@ class ResidualBlock(Layer):
                         pass  # done above.
 
                 self._build_layer(Activation(self.activation))
-                self._build_layer(SpatialDropout1D(rate=self.dropout_rate))
+                self._build_layer(SpatialDropout1D(rate=self.dropout_rate, seed=SEED))
 
             if self.nb_filters != input_shape[-1]:
                 # 1x1 conv to match the shapes (channel dimension).

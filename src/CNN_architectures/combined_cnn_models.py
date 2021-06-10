@@ -23,6 +23,7 @@ def set_global_determinism(seed=SEED):
     tf.config.threading.set_inter_op_parallelism_threads(1)
     tf.config.threading.set_intra_op_parallelism_threads(1)
 
+tf.keras.backend.clear_session()
 # Call the above function with seed value
 set_global_determinism(seed=SEED)
 
@@ -705,3 +706,146 @@ def grid_conv_added_at_each_TCN_together():
                                                        optimizer=tf.optimizers.Adam(0.0001),
                                                        metrics=[tf.metrics.MeanAbsoluteError()])
     return grid_conv_added_at_each_TCN_together_model
+
+
+def grid_only_network():
+    grid_input = keras.Input(shape=(14 * 1, 7), name='input_grid')
+    cnn_layer = 4
+    dilation_rate = 2
+    dilation_rates = [dilation_rate ** i for i in range(cnn_layer)]
+    tcn_grid = tcn.TCN(nb_filters=32, kernel_size=2, nb_stacks=cnn_layer, dilations=dilation_rates,
+                       padding='causal',
+                       use_skip_connections=False, dropout_rate=0.05,
+                       return_sequences=True,
+                       activation='relu', kernel_initializer='he_normal',
+                       use_batch_norm=False,
+                       use_layer_norm=False,
+                       use_weight_norm=True, name='TCN_grid')(grid_input)
+    flatten_grid = layers.Flatten(name='flatten_grid')(tcn_grid)
+    full_connected_layer = layers.Dense(14, activation='linear', name="prediction_layer")(flatten_grid)
+    grid_only_network_model = keras.Model(grid_input, full_connected_layer)
+    grid_only_network_model.compile(loss=tf.losses.MeanSquaredError(),
+                                    optimizer=tf.optimizers.Adam(0.0001),
+                                    metrics=[tf.metrics.MeanAbsoluteError()])
+    return grid_only_network_model
+
+def local_and_global_conv_approach_with_TCN():
+    pc_6010 = keras.Input(shape=(14 * 1, 14), name='input_postcode_6010')
+    pc_6014 = keras.Input(shape=(14 * 1, 14), name='input_postcode_6014')
+    pc_6011 = keras.Input(shape=(14 * 1, 14), name='input_postcode_6011')
+    pc_6280 = keras.Input(shape=(14 * 1, 14), name='input_postcode_6280')
+    pc_6281 = keras.Input(shape=(14 * 1, 14), name='input_postcode_6281')
+    pc_6284 = keras.Input(shape=(14 * 1, 14), name='input_postcode_6284')
+
+    input_grid = keras.Input(shape=(14 * 1, 7), name='input_grid')
+
+    # postcode convolutions
+    concatenation_pc = layers.concatenate([pc_6010, pc_6014, pc_6011, pc_6280, pc_6281, pc_6284],
+                                          name='postcode_concat')
+    pc_normalization = layers.LayerNormalization()(concatenation_pc)
+    cnn_layer = 6
+    dilation_rate = 2
+    dilation_rates = [dilation_rate ** i for i in range(cnn_layer)]
+    padding = 'causal'
+    use_skip_connections = False
+    return_sequences = True
+    dropout_rate = 0.05
+    kernel_initializer = 'he_normal'
+    activation = 'relu'
+    use_batch_norm = False
+    use_layer_norm = False
+    use_weight_norm = True
+    tcn_pc_grid = tcn.TCN(nb_filters=32, kernel_size=2, nb_stacks=cnn_layer, dilations=dilation_rates,
+                          padding=padding,
+                          use_skip_connections=use_skip_connections, dropout_rate=dropout_rate,
+                          return_sequences=return_sequences,
+                          activation=activation, kernel_initializer=kernel_initializer,
+                          use_batch_norm=use_batch_norm,
+                          use_layer_norm=use_layer_norm,
+                          use_weight_norm=use_weight_norm, name='pc_TCN')(pc_normalization)
+
+    # concatenation
+    concat_grid_conv_pc_conv = layers.concatenate([input_grid, tcn_pc_grid], name='grid_pcTCN_concat')
+    concat_grid_conv_pc_conv_normal = layers.LayerNormalization()(concat_grid_conv_pc_conv)
+
+    # Convolution
+    cnn_layer_full = 6
+    dilation_rate_full = 2
+    dilation_rates_full = [dilation_rate_full ** i for i in range(cnn_layer_full)]
+    tcn_full = tcn.TCN(nb_filters=32, kernel_size=2, nb_stacks=cnn_layer_full, dilations=dilation_rates_full,
+                       padding=padding,
+                       use_skip_connections=use_skip_connections, dropout_rate=dropout_rate,
+                       return_sequences=return_sequences,
+                       activation=activation, kernel_initializer=kernel_initializer,
+                       use_batch_norm=use_batch_norm,
+                       use_layer_norm=use_layer_norm,
+                       use_weight_norm=use_weight_norm, name='full_TCN')(concat_grid_conv_pc_conv_normal)
+
+    # Fully Connected Layer
+    flatten_layer = layers.Flatten(name='flatten_all')(tcn_full)
+    prediction_layer = layers.Dense(14, activation='linear', name="prediction_layer")(flatten_layer)
+
+    local_and_global_conv_approach_with_TCN_model = keras.Model(
+        inputs=[input_grid, pc_6010, pc_6014, pc_6011, pc_6280, pc_6281,
+                pc_6284], outputs=prediction_layer)
+
+    local_and_global_conv_approach_with_TCN_model.compile(loss=tf.losses.MeanSquaredError(),
+                                    optimizer=tf.optimizers.Adam(0.0001),
+                                    metrics=[tf.metrics.MeanAbsoluteError()])
+    return local_and_global_conv_approach_with_TCN_model
+
+
+def frozen_branch_approach_TCN():
+    pc_6010 = keras.Input(shape=(14 * 1, 14), name='input_postcode_6010')
+    pc_6014 = keras.Input(shape=(14 * 1, 14), name='input_postcode_6014')
+    pc_6011 = keras.Input(shape=(14 * 1, 14), name='input_postcode_6011')
+    pc_6280 = keras.Input(shape=(14 * 1, 14), name='input_postcode_6280')
+    pc_6281 = keras.Input(shape=(14 * 1, 14), name='input_postcode_6281')
+    pc_6284 = keras.Input(shape=(14 * 1, 14), name='input_postcode_6284')
+
+    input_grid = keras.Input(shape=(14 * 1, 7), name='input_grid')
+
+    # postcode convolutions
+    concatenation_pc = layers.concatenate([pc_6010, pc_6014, pc_6011, pc_6280, pc_6281, pc_6284],
+                                          name='postcode_concat')
+    pc_normalization = layers.LayerNormalization()(concatenation_pc)
+    cnn_layer = 6
+    dilation_rate = 2
+    dilation_rates = [dilation_rate ** i for i in range(cnn_layer)]
+    padding = 'causal'
+    use_skip_connections = False
+    return_sequences = True
+    dropout_rate = 0.05
+    kernel_initializer = 'he_normal'
+    activation = 'relu'
+    use_batch_norm = False
+    use_layer_norm = False
+    use_weight_norm = True
+    tcn_pc_grid = tcn.TCN(nb_filters=32, kernel_size=2, nb_stacks=cnn_layer, dilations=dilation_rates,
+                          padding=padding,
+                          use_skip_connections=use_skip_connections, dropout_rate=dropout_rate,
+                          return_sequences=return_sequences,
+                          activation=activation, kernel_initializer=kernel_initializer,
+                          use_batch_norm=use_batch_norm,
+                          use_layer_norm=use_layer_norm,
+                          use_weight_norm=use_weight_norm, name='pc_TCN')(pc_normalization)
+    flatten_pc = layers.Flatten(name='flatten_pc')(tcn_pc_grid)
+    full_connected_layer_pc = layers.Dense(14, activation='linear', name="prediction_layer_pc")(flatten_pc)
+
+    # LOAD PRETRAINED GRID MODEL
+    input_grid = keras.Input(shape=(14 * 1, 7), name='input_grid')
+    grid_network = tf.keras.models.load_model('combined_nn_results/refined_models/multiple_runs/saved_models/0')
+    grid_network.trainable = False
+    grid_model = grid_network(input_grid, training=False)
+
+    concatenation = layers.concatenate([grid_model, full_connected_layer_pc])
+    prediction_layer = layers.Dense(14, activation='linear', name="prediction_layer")(concatenation)
+
+    frozen_branch_approach_TCN_model = keras.Model(
+        inputs=[input_grid, pc_6010, pc_6014, pc_6011, pc_6280, pc_6281,
+                pc_6284], outputs=prediction_layer)
+
+    frozen_branch_approach_TCN_model.compile(loss=tf.losses.MeanSquaredError(),
+                                optimizer=tf.optimizers.Adam(0.0001),
+                                metrics=[tf.metrics.MeanAbsoluteError()])
+    return frozen_branch_approach_TCN_model
