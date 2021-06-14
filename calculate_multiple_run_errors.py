@@ -53,7 +53,7 @@ final_test_models = {'0': 'postcode_only_TCN',
                      '7': 'grid_conv_added_at_each_TCN_together',
                      '8': 'frozen_branch_approach_TCN'}
 
-dir_path = 'combined_nn_results/refined_models/multiple_runs2/'
+dir_path = 'combined_nn_results/refined_models/multiple_runs2'
 
 error_list = []
 model_names = []
