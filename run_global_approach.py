@@ -42,17 +42,18 @@ def create_window_data(file_index, lookback=1):
     look_back = 14 * lookback
 
     # train, val, test split
-    # train, test = utils.split_hourly_data_test(data, look_back)
-    train, val, test = utils.split_hourly_data(data, look_back)
+    train, test = utils.split_hourly_data_test(data, look_back)
+    # train, val, test = utils.split_hourly_data(data, look_back)
 
     scaler = StandardScaler()
     scaler.fit(train.values)
     train_array = scaler.transform(train.values)
-    val_array = scaler.transform(val.values)
+    # val_array = scaler.transform(val.values)
     test_array = scaler.transform(test.values)
 
     train_df = pd.DataFrame(train_array, columns=data.columns)
-    val_df = pd.DataFrame(val_array, columns=data.columns)
+    # val_df = pd.DataFrame(val_array, columns=data.columns)
+    val_df = None
     test_df = pd.DataFrame(test_array, columns=data.columns)
     col_name = 'power'
 
@@ -104,17 +105,17 @@ def run_combine_model(approach, path, model_name, add_grid=True):
     window_array = [window_pc_6010, window_pc_6014, window_pc_6011, window_pc_6280, window_pc_6281, window_pc_6284]
 
     grid, pc_1, pc_2, pc_3, pc_4, pc_5, pc_6 = window_grid.train_combine(window_array)
-    grid_val, pc_1_val, pc_2_val, pc_3_val, pc_4_val, pc_5_val, pc_6_val = window_grid.val_combine(window_array)
+    # grid_val, pc_1_val, pc_2_val, pc_3_val, pc_4_val, pc_5_val, pc_6_val = window_grid.val_combine(window_array)
     grid_test, pc_1_test, pc_2_test, pc_3_test, pc_4_test, pc_5_test, pc_6_test = window_grid.test_combine(window_array)
 
     data_grid, label_grid, data_pc1, data_pc2, data_pc3, data_pc4, data_pc5, data_pc6 = get_samples(grid, pc_1, pc_2,
                                                                                                     pc_3, pc_4, pc_5,
                                                                                                     pc_6)
 
-    data_grid_val, label_grid_val, data_pc1_val, data_pc2_val, data_pc3_val, data_pc4_val, data_pc5_val, data_pc6_val = get_samples(
-        grid_val, pc_1_val, pc_2_val,
-        pc_3_val, pc_4_val, pc_5_val,
-        pc_6_val)
+    # data_grid_val, label_grid_val, data_pc1_val, data_pc2_val, data_pc3_val, data_pc4_val, data_pc5_val, data_pc6_val = get_samples(
+    #     grid_val, pc_1_val, pc_2_val,
+    #     pc_3_val, pc_4_val, pc_5_val,
+    #     pc_6_val)
 
     data_grid_test, label_grid_test, data_pc1_test, data_pc2_test, data_pc3_test, data_pc4_test, data_pc5_test, data_pc6_test = get_samples(
         grid_test, pc_1_test, pc_2_test,
@@ -125,10 +126,10 @@ def run_combine_model(approach, path, model_name, add_grid=True):
                  'input_postcode_6011': data_pc3, 'input_postcode_6280': data_pc4,
                  'input_postcode_6281': data_pc5,
                  'input_postcode_6284': data_pc6}
-    val_dic = {'input_postcode_6010': data_pc1_val, 'input_postcode_6014': data_pc2_val,
-               'input_postcode_6011': data_pc3_val, 'input_postcode_6280': data_pc4_val,
-               'input_postcode_6281': data_pc5_val,
-               'input_postcode_6284': data_pc6_val}
+    # val_dic = {'input_postcode_6010': data_pc1_val, 'input_postcode_6014': data_pc2_val,
+    #            'input_postcode_6011': data_pc3_val, 'input_postcode_6280': data_pc4_val,
+    #            'input_postcode_6281': data_pc5_val,
+    #            'input_postcode_6284': data_pc6_val}
 
     test_dic = {'input_postcode_6010': data_pc1_test,
                 'input_postcode_6014': data_pc2_test, 'input_postcode_6011': data_pc3_test,
@@ -138,12 +139,14 @@ def run_combine_model(approach, path, model_name, add_grid=True):
     # CREATE MODEL
     if add_grid:
         train_dic['input_grid'] = data_grid
-        val_dic['input_grid'] = data_grid_val
+        # val_dic['input_grid'] = data_grid_val
         test_dic['input_grid'] = data_grid_test
 
     model = approach()
-    callback = tf.keras.callbacks.EarlyStopping(monitor='val_loss', patience=100)
-    history = model.fit(train_dic, label_grid, batch_size=128, epochs=2000, validation_data=(val_dic, label_grid_val),
+    callback = tf.keras.callbacks.EarlyStopping(monitor='loss', patience=50)
+    # history = model.fit(train_dic, label_grid, batch_size=128, epochs=2000, validation_data=(val_dic, label_grid_val),
+    #                     callbacks=[callback], shuffle=False)
+    history = model.fit(train_dic, label_grid, batch_size=128, epochs=1000,
                         callbacks=[callback], shuffle=False)
 
     if not os.path.exists(path):
@@ -156,7 +159,8 @@ def run_combine_model(approach, path, model_name, add_grid=True):
     look_back = 14 * lookback
 
     # train, val, test split
-    train, val, test = utils.split_hourly_data(data, look_back)
+    # train, val, test = utils.split_hourly_data(data, look_back)
+    train, test = utils.split_hourly_data_test(data, look_back)
     dataframe_store = test[look_back:][['power']]
 
     scaler = StandardScaler()
@@ -191,7 +195,8 @@ final_test_models = {'0': {'func': postcode_only_TCN, 'model_name': 'postcode_on
                            'model_name': 'grid_conv_added_at_each_TCN_together'},
                      '8': {'func': frozen_branch_approach_TCN, 'model_name': 'frozen_branch_approach_TCN'}}
 
-model_save_path = 'combined_nn_results/refined_models/multiple_runs/saved_models'
+multiple_run = 'multiple_runs2'
+model_save_path = f'combined_nn_results/refined_models/{multiple_run}/saved_models'
 model_name = final_test_models[model_func_name]['model_name']
 function_run = final_test_models[model_func_name]['func']
 
@@ -203,7 +208,7 @@ model_new_name = f'{model_name}/{run}'  # this will save the models with the run
 forecasts, history = run_combine_model(function_run, model_save_path, model_new_name)
 # forecasts = forecasts.rename(columns={'fc': f'fc_{run}'})
 
-dir_path = f'combined_nn_results/refined_models/multiple_runs/{model_new_name}'
+dir_path = f'combined_nn_results/refined_models/{multiple_run}/{model_new_name}'
 if not os.path.exists(dir_path):
     os.makedirs(dir_path)
 
