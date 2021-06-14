@@ -50,8 +50,7 @@ final_test_models = {'0': 'postcode_only_TCN',
                      '1': 'last_residual_approach_with_TCN',
                      '2': 'local_and_global_conv_approach_with_TCN',
                      '6': 'grid_added_at_each_TCN_together',
-                     '7': 'grid_conv_added_at_each_TCN_together',
-                     '8': 'frozen_branch_approach_TCN'}
+                     '7': 'grid_conv_added_at_each_TCN_together'}
 
 dir_path = 'combined_nn_results/refined_models/multiple_runs2'
 
