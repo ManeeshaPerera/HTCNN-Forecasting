@@ -36,17 +36,24 @@ def get_multiple_runs_error(model_dir_path):
     return [model_mean, model_std, model_min, model_max, model_median]
 
 
+# final_test_models = {'0': 'postcode_only_TCN',
+#                      '1': 'last_residual_approach_with_TCN',
+#                      '2': 'local_and_global_conv_approach_with_TCN',
+#                      '3': 'local_conv_with_grid_with_TCN_approach',
+#                      '4': 'local_conv_with_grid_conv_TCN_approach',
+#                      '5': 'pc_and_grid_input_together',
+#                      '6': 'grid_added_at_each_TCN_together',
+#                      '7': 'grid_conv_added_at_each_TCN_together',
+#                      '8': 'frozen_branch_approach_TCN'}
+
 final_test_models = {'0': 'postcode_only_TCN',
                      '1': 'last_residual_approach_with_TCN',
                      '2': 'local_and_global_conv_approach_with_TCN',
-                     '3': 'local_conv_with_grid_with_TCN_approach',
-                     '4': 'local_conv_with_grid_conv_TCN_approach',
-                     '5': 'pc_and_grid_input_together',
                      '6': 'grid_added_at_each_TCN_together',
                      '7': 'grid_conv_added_at_each_TCN_together',
                      '8': 'frozen_branch_approach_TCN'}
 
-dir_path = 'combined_nn_results/refined_models/multiple_runs/'
+dir_path = 'combined_nn_results/refined_models/multiple_runs2/'
 
 error_list = []
 model_names = []
