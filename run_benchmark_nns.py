@@ -61,7 +61,7 @@ def create_window_data(file_index, lookback=1):
     return window_data
 
 
-def run_model(approach, window_ts, input_shape, time_series, path, model_name):
+def run_model(approach, window_ts, input_shape, time_series, path, model_name, file_index):
     model = approach(input_shape, time_series)
     callback = tf.keras.callbacks.EarlyStopping(monitor='loss', patience=50)
     history = model.fit(window_ts.train, batch_size=128, epochs=1000,
@@ -72,7 +72,9 @@ def run_model(approach, window_ts, input_shape, time_series, path, model_name):
 
     # Forecast
     lookback = 1
-    data = pd.read_csv(f'ts_data/new/grid.csv', index_col=[0])
+
+    filename = constants.TS[file_index]
+    data = pd.read_csv(f'ts_data/new/{filename}.csv', index_col=[0])
     look_back = 14 * lookback
 
     # train, val, test split
@@ -111,17 +113,20 @@ else:
 if model_func_name == '0':
     print('LSTM')
     print(run)
-    forecasts, history = run_model(lstm_model_approach, window_ts, input_shape, time_series, model_save_path, run)
+    forecasts, history = run_model(lstm_model_approach, window_ts, input_shape, time_series, model_save_path, run,
+                                   time_series)
 
 elif model_func_name == '1':
     print('CNN')
     print(run)
-    forecasts, history = run_model(conventional_CNN_approach, window_ts, input_shape, time_series, model_save_path, run)
+    forecasts, history = run_model(conventional_CNN_approach, window_ts, input_shape, time_series, model_save_path, run,
+                                   time_series)
 
 elif model_func_name == '2':
     print('TCN')
     print(run)
-    forecasts, history = run_model(conventional_TCN_approach, window_ts, input_shape, time_series, model_save_path, run)
+    forecasts, history = run_model(conventional_TCN_approach, window_ts, input_shape, time_series, model_save_path, run,
+                                   time_series)
 
 dir_path = f'{model_name}/{constants.TS[time_series]}/{run}'
 if not os.path.exists(dir_path):

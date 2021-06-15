@@ -11,6 +11,9 @@ dnn_results
 lstm_new_results
 cnn_new_results
 combined_nn_results
+conventional_lstm
+conventional_cnn
+conventional_tcn
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
