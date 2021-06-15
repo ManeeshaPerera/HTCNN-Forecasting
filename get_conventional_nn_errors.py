@@ -27,7 +27,7 @@ def calculate_grid_error(start, end, grid_model_path, dir_path, run):
     train_df = train[['power']]
 
     # let's take the power values from one dataframe
-    results_df = pd.read_csv(f'{grid_model_path}/grid.csv', index_col=[0])
+    results_df = pd.read_csv(f'{grid_model_path}/{run}/grid.csv', index_col=[0])
     test_sample = results_df['power'].values
 
     forecasts = sum_fc_results(ts_array, dir_path, run).values
