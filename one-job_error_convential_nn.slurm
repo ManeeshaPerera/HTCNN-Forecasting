@@ -14,7 +14,7 @@
 
 # Maximum number of tasks/CPU cores used by the job:
 #SBATCH --ntasks=1
-#SBATCH --cpus-per-task=2
+#SBATCH --cpus-per-task=1
 #SBATCH --mem=64G
 
 # The maximum running time of the job in days-hours:mins:sec
@@ -30,4 +30,4 @@ module load gcc/8.3.0 cuda/10.1.243 openmpi/3.1.4
 module load python/3.7.4
 
 # The job command(s):
-python get_conventional_nn_errors.py 0
+python get_conventional_nn_errors.py 1
