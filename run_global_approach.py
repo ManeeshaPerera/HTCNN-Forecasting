@@ -31,6 +31,10 @@ from src.CNN_architectures.combined_cnn_models import local_conv_with_grid_with_
     local_conv_with_grid_conv_TCN_approach, pc_and_grid_input_together, grid_added_at_each_TCN_together, \
     grid_conv_added_at_each_TCN_together, local_and_global_conv_approach_with_TCN, frozen_branch_approach_TCN
 
+from src.CNN_architectures.approachB import grid_conv_added_at_each_TCN_together_skip_connection_True, \
+    grid_conv_added_at_each_CNN_together, possibility_a_postcode_only_separate_paths, grid_level_branch, \
+    postcode_level_branch
+
 
 def create_window_data(file_index, lookback=1):
     filename = constants.TS[file_index]
@@ -181,21 +185,31 @@ def run_combine_model(approach, path, model_name, add_grid=True):
     return df, history
 
 
-final_test_models = {'0': {'func': postcode_only_TCN, 'model_name': 'postcode_only_TCN'},
-                     '1': {'func': last_residual_approach_with_TCN, 'model_name': 'last_residual_approach_with_TCN'},
-                     '2': {'func': local_and_global_conv_approach_with_TCN,
-                           'model_name': 'local_and_global_conv_approach_with_TCN'},
-                     '3': {'func': local_conv_with_grid_with_TCN_approach,
-                           'model_name': 'local_conv_with_grid_with_TCN_approach'},
-                     '4': {'func': local_conv_with_grid_conv_TCN_approach,
-                           'model_name': 'local_conv_with_grid_conv_TCN_approach'},
-                     '5': {'func': pc_and_grid_input_together, 'model_name': 'pc_and_grid_input_together'},
-                     '6': {'func': grid_added_at_each_TCN_together, 'model_name': 'grid_added_at_each_TCN_together'},
-                     '7': {'func': grid_conv_added_at_each_TCN_together,
-                           'model_name': 'grid_conv_added_at_each_TCN_together'},
-                     '8': {'func': frozen_branch_approach_TCN, 'model_name': 'frozen_branch_approach_TCN'}}
+# final_test_models = {'0': {'func': postcode_only_TCN, 'model_name': 'postcode_only_TCN'},
+#                      '1': {'func': last_residual_approach_with_TCN, 'model_name': 'last_residual_approach_with_TCN'},
+#                      '2': {'func': local_and_global_conv_approach_with_TCN,
+#                            'model_name': 'local_and_global_conv_approach_with_TCN'},
+#                      '3': {'func': local_conv_with_grid_with_TCN_approach,
+#                            'model_name': 'local_conv_with_grid_with_TCN_approach'},
+#                      '4': {'func': local_conv_with_grid_conv_TCN_approach,
+#                            'model_name': 'local_conv_with_grid_conv_TCN_approach'},
+#                      '5': {'func': pc_and_grid_input_together, 'model_name': 'pc_and_grid_input_together'},
+#                      '6': {'func': grid_added_at_each_TCN_together, 'model_name': 'grid_added_at_each_TCN_together'},
+#                      '7': {'func': grid_conv_added_at_each_TCN_together,
+#                            'model_name': 'grid_conv_added_at_each_TCN_together'},
+#                      '8': {'func': frozen_branch_approach_TCN, 'model_name': 'frozen_branch_approach_TCN'}}
 
-multiple_run = 'multiple_runs2'
+
+final_test_models = {'0': {'func': grid_conv_added_at_each_TCN_together_skip_connection_True,
+                           'model_name': 'grid_conv_added_at_each_TCN_together_skip_connection_True'},
+                     '1': {'func': grid_conv_added_at_each_CNN_together,
+                           'model_name': 'grid_conv_added_at_each_CNN_together'},
+                     '2': {'func': possibility_a_postcode_only_separate_paths,
+                           'model_name': 'possibility_a_postcode_only_separate_paths'},
+                     }
+
+# multiple_run = 'multiple_runs2'
+multiple_run = 'approachB'
 model_save_path = f'combined_nn_results/refined_models/{multiple_run}/saved_models'
 model_name = final_test_models[model_func_name]['model_name']
 function_run = final_test_models[model_func_name]['func']
@@ -206,7 +220,6 @@ print("run: ", run)
 
 model_new_name = f'{model_name}/{run}'  # this will save the models with the run info added as folder name
 forecasts, history = run_combine_model(function_run, model_save_path, model_new_name)
-# forecasts = forecasts.rename(columns={'fc': f'fc_{run}'})
 
 dir_path = f'combined_nn_results/refined_models/{multiple_run}/{model_new_name}'
 if not os.path.exists(dir_path):
@@ -216,30 +229,3 @@ forecasts.to_csv(f'{dir_path}/grid.csv')
 
 with open(f'{dir_path}/training_loss_grid_iteration', 'wb') as file_loss:
     pickle.dump(history.history, file_loss)
-
-# final_results = []
-#
-# for run in range(0, 2):
-#     tf.random.set_seed(SEED)
-#     model_new_name = f'{model_name}/{run}'  # this will save the models with the run info added as folder name
-#     forecasts, history = run_combine_model(function_run, model_save_path, model_new_name)
-#     forecasts = forecasts.rename(columns={'fc': f'fc_{run}'})
-#     if run == 0:
-#         final_results.append(forecasts)
-#     else:
-#         final_results.append(forecasts.iloc[:, 1:])
-#
-#     dir_path = f'combined_nn_results/refined_models/multiple_runs/{model_new_name}'
-#     if not os.path.exists(dir_path):
-#         os.makedirs(dir_path)
-#
-#     with open(f'{dir_path}/training_loss_grid_iteration', 'wb') as file_loss:
-#         pickle.dump(history.history, file_loss)
-#
-# # concat results of all runs and get average and median
-# final_df = pd.concat(final_results, axis=1)
-# final_df['average_fc'] = final_df.iloc[:, 1:].mean(axis=1)
-# final_df['median_fc'] = final_df.iloc[:, 1:].median(axis=1)
-
-# dir_path_save = f'combined_nn_results/refined_models/multiple_runs/{model_name}'
-# final_df.to_csv(f'{dir_path_save}/grid.csv')
