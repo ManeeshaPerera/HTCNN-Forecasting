@@ -192,7 +192,7 @@ final_test_models = {'0': {'func': grid_level_branch,
                      }
 
 # multiple_run = 'multiple_runs2'
-multiple_run = 'pre_trained_models'
+multiple_run = 'pre_trained_models/CNN'
 model_save_path = f'combined_nn_results/refined_models/{multiple_run}/{postcode}/saved_models'
 model_name = final_test_models[model_func_name]['model_name']
 function_run = final_test_models[model_func_name]['func']
