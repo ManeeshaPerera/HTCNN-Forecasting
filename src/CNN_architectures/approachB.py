@@ -363,7 +363,7 @@ def possibility_3_approachB():
     full_connected_layer = layers.Dense(14, activation='linear', name="prediction_layer")(flatten_out)
 
     possibility_3_approachB_model = keras.Model(
-        inputs=[grid_input, pc_6010, pc_6014, pc_6011, pc_6280, pc_6281,
+        inputs=[grid_cnn_output.input, pc_6010, pc_6014, pc_6011, pc_6280, pc_6281,
                 pc_6284], outputs=full_connected_layer)
 
     possibility_3_approachB_model.compile(loss=tf.losses.MeanSquaredError(),
