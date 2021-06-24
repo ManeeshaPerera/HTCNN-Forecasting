@@ -51,7 +51,7 @@ def postcode_level_branch_approachA():
 
     postcode_level_branch_model = keras.Model(
         inputs=[pc_6010, pc_6014, pc_6011, pc_6280, pc_6281,
-                pc_6284], outputs=full_connected_layer_pc)
+                pc_6284], outputs=full_connected_layer_pc, name='PC_ALL_MODEL')
 
     postcode_level_branch_model.compile(loss=tf.losses.MeanSquaredError(),
                                         optimizer=tf.optimizers.Adam(0.0001),

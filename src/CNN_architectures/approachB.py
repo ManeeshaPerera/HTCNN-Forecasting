@@ -217,7 +217,7 @@ def grid_level_branch():
     flatten_grid = layers.Flatten(name='flatten_grid')(max_pool_stage_2)
 
     full_connected_layer = layers.Dense(14, activation='linear', name="prediction_layer_grid")(flatten_grid)
-    grid_only_network_model = keras.Model(grid_input, full_connected_layer)
+    grid_only_network_model = keras.Model(grid_input, full_connected_layer, name='GRIDMODEL')
     grid_only_network_model.compile(loss=tf.losses.MeanSquaredError(),
                                     optimizer=tf.optimizers.Adam(0.0001),
                                     metrics=[tf.metrics.MeanAbsoluteError()])
@@ -278,7 +278,8 @@ def postcode_level_branch(pc):
 
     grid_input = keras.Input(shape=(14 * 1, 7), name='input_grid')
     # pass the grid input with Convolution
-    cnn_layer1_grid = layers.Conv1D(kernel_size=2, padding='causal', filters=32, name=f'cnn_layer1_grid_approachPC')(grid_input)
+    cnn_layer1_grid = layers.Conv1D(kernel_size=2, padding='causal', filters=32, name=f'cnn_layer1_grid_approachPC')(
+        grid_input)
     cnn_layer2_grid = layers.Conv1D(kernel_size=2, padding='causal', filters=32, name=f'cnn_layer2_grid_approachPC')(
         cnn_layer1_grid)
     max_pool_stage = layers.MaxPooling1D(padding='same', strides=1, name='max_pool_1_grid_approachPC')(cnn_layer2_grid)
@@ -286,7 +287,8 @@ def postcode_level_branch(pc):
         max_pool_stage)
     cnn_layer4_grid = layers.Conv1D(kernel_size=2, padding='causal', filters=32, name=f'cnn_layer4_grid_approachPC')(
         cnn_layer3_grid)
-    max_pool_stage_2 = layers.MaxPooling1D(padding='same', strides=1, name='max_pool_2_grid_approachPC')(cnn_layer4_grid)
+    max_pool_stage_2 = layers.MaxPooling1D(padding='same', strides=1, name='max_pool_2_grid_approachPC')(
+        cnn_layer4_grid)
 
     # pc_tcn_out = local_convolution_TCN(pc_data, tcn_grid, pc)
     pc_tcn_out = local_convolution_TCN(pc_data, max_pool_stage_2, pc)
@@ -294,7 +296,7 @@ def postcode_level_branch(pc):
     full_connected_layer = layers.Dense(14, activation='linear', name="prediction_layer_pc_grid")(flatten_out)
 
     postcode_level_branch_approach = keras.Model(
-        inputs=[grid_input, pc_data], outputs=full_connected_layer)
+        inputs=[grid_input, pc_data], outputs=full_connected_layer, name=f'{pc}_MODEL')
 
     postcode_level_branch_approach.compile(loss=tf.losses.MeanSquaredError(),
                                            optimizer=tf.optimizers.Adam(0.0001),
@@ -304,16 +306,22 @@ def postcode_level_branch(pc):
 
 def load_postcode_models(pc, input_grid, pc_data):
     # LOAD PRETRAINED PC MODEL
-    layer_name = f'TCN_{4}_{pc}_grid'
+    # layer_name = f'TCN_{4}_{pc}_grid'
+    layer_name = f'max_{4}_{pc}_grid'
     pc_model = tf.keras.models.load_model(
-        f'combined_nn_results/refined_models/pre_trained_models/{pc}/saved_models/postcode_level_branch/0')
+        f'combined_nn_results/refined_models/pre_trained_models/CNN/{pc}/saved_models/postcode_level_branch/0')
     pc_model.trainable = False
-    pc_model = pc_model([input_grid, pc_data], training=False)
 
-    # Extract the last CNN layer
-    pc_conv_output = keras.Model(pc_model.inputs, pc_model.get_layer(layer_name).outputs)
-    pc_model.trainable = False
-    return pc_conv_output
+    conv_output = pc_model.get_layer(layer_name).output
+    pc_model([input_grid, pc_data], training=False)
+
+    model = keras.Model(pc_model.input, outputs=conv_output)
+    return model
+
+    # intermediate_layer_model = keras.Model(inputs=[input_grid, pc_data],
+    #                                        outputs=pc_model.get_layer(layer_name).output)
+    # # Extract the last CNN layer
+    # return intermediate_layer_model
 
 
 def possibility_3_approachB():
@@ -337,13 +345,13 @@ def possibility_3_approachB():
     concat_features = layers.concatenate(
         [pc_6010_model.output, pc_6014_model.output, pc_6011_model.output, pc_6280_model.output, pc_6281_model.output,
          pc_6284_model.output],
-        name='concatenate_all')
-    flatten_out = layers.Flatten(name='flatten_all')(concat_features)
-    full_connected_layer = layers.Dense(14, activation='linear', name="prediction_layer")(flatten_out)
+        name='concatenate_all_conv_output')
+    flatten_out = layers.Flatten(name='flatten_all_conv_output')(concat_features)
+    full_connected_layer = layers.Dense(14, activation='linear', name="prediction_layer_conv_output_pc")(flatten_out)
 
     possibility_3_approachB_model = keras.Model(
-        inputs=[pc_6010, pc_6014, pc_6011, pc_6280, pc_6281,
-                pc_6284, grid_input], outputs=full_connected_layer)
+        inputs=[pc_6010_model.input, pc_6014_model.input, pc_6011_model.input, pc_6280_model.input, pc_6281_model.input,
+                pc_6284_model.input], outputs=full_connected_layer)
 
     possibility_3_approachB_model.compile(loss=tf.losses.MeanSquaredError(),
                                           optimizer=tf.optimizers.Adam(0.0001),
@@ -389,20 +397,19 @@ def possibility_2_approachB():
     grid_input = keras.Input(shape=(14 * 1, 7), name='input_grid')
     # LOAD PRETRAINED GRID MODEL
     grid_network = tf.keras.models.load_model(
-        'combined_nn_results/refined_models/pre_trained_models/grid/saved_models/grid_level_branch/0')
+        'combined_nn_results/refined_models/pre_trained_models/CNN/grid/saved_models/grid_level_branch/0')
     grid_network.trainable = False
-    grid_model = grid_network(grid_input, training=False)
+    conv_output = grid_network.get_layer('cnn_max_pool_layer2_grid').output
+    grid_network(grid_input, training=False)
 
-    # Extract the last CNN layer
-    grid_cnn_output = keras.Model(grid_model.inputs, grid_model.get_layer('TCN_grid').outputs)
-    grid_cnn_output.trainable = False
+    grid_cnn_output = keras.Model(grid_input.input, outputs=conv_output)
 
-    pc_6010_tcn_out = local_convolution_TCN(pc_6010, grid_cnn_output, 6010)
-    pc_6014_tcn_out = local_convolution_TCN(pc_6014, grid_cnn_output, 6014)
-    pc_6011_tcn_out = local_convolution_TCN(pc_6011, grid_cnn_output, 6011)
-    pc_6280_tcn_out = local_convolution_TCN(pc_6280, grid_cnn_output, 6280)
-    pc_6281_tcn_out = local_convolution_TCN(pc_6281, grid_cnn_output, 6281)
-    pc_6284_tcn_out = local_convolution_TCN(pc_6284, grid_cnn_output, 6284)
+    pc_6010_tcn_out = local_convolution_TCN(pc_6010, grid_cnn_output.output, 6010)
+    pc_6014_tcn_out = local_convolution_TCN(pc_6014, grid_cnn_output.output, 6014)
+    pc_6011_tcn_out = local_convolution_TCN(pc_6011, grid_cnn_output.output, 6011)
+    pc_6280_tcn_out = local_convolution_TCN(pc_6280, grid_cnn_output.output, 6280)
+    pc_6281_tcn_out = local_convolution_TCN(pc_6281, grid_cnn_output.output, 6281)
+    pc_6284_tcn_out = local_convolution_TCN(pc_6284, grid_cnn_output.output, 6284)
 
     concat_features = layers.concatenate(
         [pc_6010_tcn_out, pc_6014_tcn_out, pc_6011_tcn_out, pc_6280_tcn_out, pc_6281_tcn_out, pc_6284_tcn_out],
