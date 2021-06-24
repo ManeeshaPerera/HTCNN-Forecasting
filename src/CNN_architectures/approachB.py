@@ -208,12 +208,12 @@ def grid_level_branch():
     #                    use_layer_norm=False,
     #                    use_weight_norm=True, name='TCN_grid')(grid_input)
     # flatten_grid = layers.Flatten(name='flatten_grid')(tcn_grid)
-    cnn_layer1 = layers.Conv1D(kernel_size=2, padding='causal', filters=32, name=f'cnn_layer1')(grid_input)
-    cnn_layer2 = layers.Conv1D(kernel_size=2, padding='causal', filters=32, name=f'cnn_layer2')(cnn_layer1)
-    max_pool_stage = layers.MaxPooling1D(padding='same')(cnn_layer2)
-    cnn_layer3 = layers.Conv1D(kernel_size=2, padding='causal', filters=32, name=f'cnn_layer3')(max_pool_stage)
-    cnn_layer4 = layers.Conv1D(kernel_size=2, padding='causal', filters=32, name=f'cnn_layer4')(cnn_layer3)
-    max_pool_stage_2 = layers.MaxPooling1D(padding='same')(cnn_layer4)
+    cnn_layer1 = layers.Conv1D(kernel_size=2, padding='causal', filters=32, name=f'cnn_layer1_grid')(grid_input)
+    cnn_layer2 = layers.Conv1D(kernel_size=2, padding='causal', filters=32, name=f'cnn_layer2_grid')(cnn_layer1)
+    max_pool_stage = layers.MaxPooling1D(padding='same', name='cnn_max_pool_layer1_grid')(cnn_layer2)
+    cnn_layer3 = layers.Conv1D(kernel_size=2, padding='causal', filters=32, name=f'cnn_layer3_grid')(max_pool_stage)
+    cnn_layer4 = layers.Conv1D(kernel_size=2, padding='causal', filters=32, name=f'cnn_layer4_grid')(cnn_layer3)
+    max_pool_stage_2 = layers.MaxPooling1D(padding='same', name='cnn_max_pool_layer2_grid')(cnn_layer4)
     flatten_grid = layers.Flatten(name='flatten_grid')(max_pool_stage_2)
 
     full_connected_layer = layers.Dense(14, activation='linear', name="prediction_layer_grid")(flatten_grid)
@@ -278,20 +278,20 @@ def postcode_level_branch(pc):
 
     grid_input = keras.Input(shape=(14 * 1, 7), name='input_grid')
     # pass the grid input with Convolution
-    cnn_layer1_grid = layers.Conv1D(kernel_size=2, padding='causal', filters=32, name=f'cnn_layer1_grid')(grid_input)
-    cnn_layer2_grid = layers.Conv1D(kernel_size=2, padding='causal', filters=32, name=f'cnn_layer2_grid')(
+    cnn_layer1_grid = layers.Conv1D(kernel_size=2, padding='causal', filters=32, name=f'cnn_layer1_grid_approachPC')(grid_input)
+    cnn_layer2_grid = layers.Conv1D(kernel_size=2, padding='causal', filters=32, name=f'cnn_layer2_grid_approachPC')(
         cnn_layer1_grid)
-    max_pool_stage = layers.MaxPooling1D(padding='same', strides=1)(cnn_layer2_grid)
-    cnn_layer3_grid = layers.Conv1D(kernel_size=2, padding='causal', filters=32, name=f'cnn_layer3_grid')(
+    max_pool_stage = layers.MaxPooling1D(padding='same', strides=1, name='max_pool_1_grid_approachPC')(cnn_layer2_grid)
+    cnn_layer3_grid = layers.Conv1D(kernel_size=2, padding='causal', filters=32, name=f'cnn_layer3_grid_approachPC')(
         max_pool_stage)
-    cnn_layer4_grid = layers.Conv1D(kernel_size=2, padding='causal', filters=32, name=f'cnn_layer4_grid')(
+    cnn_layer4_grid = layers.Conv1D(kernel_size=2, padding='causal', filters=32, name=f'cnn_layer4_grid_approachPC')(
         cnn_layer3_grid)
-    max_pool_stage_2 = layers.MaxPooling1D(padding='same', strides=1)(cnn_layer4_grid)
+    max_pool_stage_2 = layers.MaxPooling1D(padding='same', strides=1, name='max_pool_2_grid_approachPC')(cnn_layer4_grid)
 
     # pc_tcn_out = local_convolution_TCN(pc_data, tcn_grid, pc)
     pc_tcn_out = local_convolution_TCN(pc_data, max_pool_stage_2, pc)
-    flatten_out = layers.Flatten(name='flatten_all')(pc_tcn_out)
-    full_connected_layer = layers.Dense(14, activation='linear', name="prediction_layer")(flatten_out)
+    flatten_out = layers.Flatten(name='flatten_all_pc_grid')(pc_tcn_out)
+    full_connected_layer = layers.Dense(14, activation='linear', name="prediction_layer_pc_grid")(flatten_out)
 
     postcode_level_branch_approach = keras.Model(
         inputs=[grid_input, pc_data], outputs=full_connected_layer)

@@ -16,7 +16,7 @@ def postcode_level_branch_approachA():
     # postcode convolutions
     concatenation_pc = layers.concatenate([pc_6010, pc_6014, pc_6011, pc_6280, pc_6281, pc_6284],
                                           name='postcode_concat')
-    pc_normalization = layers.LayerNormalization()(concatenation_pc)
+    pc_normalization = layers.LayerNormalization(name='postcode_concat_normalize')(concatenation_pc)
     # cnn_layer = 6
     # dilation_rate = 2
     # dilation_rates = [dilation_rate ** i for i in range(cnn_layer)]
@@ -38,16 +38,16 @@ def postcode_level_branch_approachA():
     #                       use_layer_norm=use_layer_norm,
     #                       use_weight_norm=use_weight_norm, name='pc_TCN')(pc_normalization)
 
-    cnn_layer1 = layers.Conv1D(kernel_size=2, padding='causal', filters=32, name=f'pc_cnn_layer1')(pc_normalization)
-    cnn_layer2 = layers.Conv1D(kernel_size=2, padding='causal', filters=32, name=f'pc_cnn_layer2')(cnn_layer1)
-    max_pool_stage = layers.MaxPooling1D(padding='same')(cnn_layer2)
-    cnn_layer3 = layers.Conv1D(kernel_size=2, padding='causal', filters=32, name=f'pc_cnn_layer3')(max_pool_stage)
-    cnn_layer4 = layers.Conv1D(kernel_size=2, padding='causal', filters=32, name=f'pc_cnn_layer4')(cnn_layer3)
-    max_pool_stage_2 = layers.MaxPooling1D(padding='same')(cnn_layer4)
-    flatten_pc = layers.Flatten(name='flatten_pc')(max_pool_stage_2)
+    cnn_layer1 = layers.Conv1D(kernel_size=2, padding='causal', filters=32, name=f'pc_all_cnn_layer1')(pc_normalization)
+    cnn_layer2 = layers.Conv1D(kernel_size=2, padding='causal', filters=32, name=f'pc_all_cnn_layer2')(cnn_layer1)
+    max_pool_stage = layers.MaxPooling1D(padding='same', name='pc_all_max_pool_1')(cnn_layer2)
+    cnn_layer3 = layers.Conv1D(kernel_size=2, padding='causal', filters=32, name=f'pc_all_cnn_layer3')(max_pool_stage)
+    cnn_layer4 = layers.Conv1D(kernel_size=2, padding='causal', filters=32, name=f'pc_all_cnn_layer4')(cnn_layer3)
+    max_pool_stage_2 = layers.MaxPooling1D(padding='same', name='pc_all_max_pool_1')(cnn_layer4)
+    flatten_pc = layers.Flatten(name='flatten_pc_all')(max_pool_stage_2)
 
     # flatten_pc = layers.Flatten(name='flatten_pc')(tcn_pc_grid)
-    full_connected_layer_pc = layers.Dense(14, activation='linear', name="prediction_layer_pc")(flatten_pc)
+    full_connected_layer_pc = layers.Dense(14, activation='linear', name="prediction_layer_pc_all")(flatten_pc)
 
     postcode_level_branch_model = keras.Model(
         inputs=[pc_6010, pc_6014, pc_6011, pc_6280, pc_6281,
@@ -97,15 +97,15 @@ def possibility_2_ApproachA():
     # LOAD PRETRAINED GRID MODEL
     input_grid = keras.Input(shape=(14 * 1, 7), name='input_grid')
     grid_network = tf.keras.models.load_model(
-        'combined_nn_results/refined_models/pre_trained_models/grid/saved_models/grid_level_branch/0')
+        'combined_nn_results/refined_models/pre_trained_models/CNN/grid/saved_models/grid_level_branch/0')
     grid_network.trainable = False
     grid_model = grid_network(input_grid, training=False)
 
-    concatenation = layers.concatenate([grid_model.output, full_connected_layer_pc])
+    concatenation = layers.concatenate([grid_model, full_connected_layer_pc])
     prediction_layer = layers.Dense(14, activation='linear', name="prediction_layer")(concatenation)
 
     possibility_2_ApproachA_model = keras.Model(
-        inputs=[grid_model.input, pc_6010, pc_6014, pc_6011, pc_6280, pc_6281,
+        inputs=[input_grid, pc_6010, pc_6014, pc_6011, pc_6280, pc_6281,
                 pc_6284], outputs=prediction_layer)
 
     possibility_2_ApproachA_model.compile(loss=tf.losses.MeanSquaredError(),
@@ -141,19 +141,15 @@ def possibility_3_ApproachA():
     pc_6281 = keras.Input(shape=(14 * 1, 14), name='input_postcode_6281')
     pc_6284 = keras.Input(shape=(14 * 1, 14), name='input_postcode_6284')
 
-    # postcode convolutions
-    concatenation_pc = layers.concatenate([pc_6010, pc_6014, pc_6011, pc_6280, pc_6281, pc_6284],
-                                          name='postcode_concat')
-    pc_normalization = layers.LayerNormalization()(concatenation_pc)
-
     # LOAD PRETRAINED PC MODEL
     pc_model = tf.keras.models.load_model(
-        'combined_nn_results/refined_models/pre_trained_models/all_pc/saved_models/postcode_level_branch_approachA/0')
+        'combined_nn_results/refined_models/pre_trained_models/CNN/all_pc/saved_models/postcode_level_branch_approachA/0')
     pc_model.trainable = False
-    pc_model = pc_model(pc_normalization, training=False)
+    pc_output = pc_model([pc_6010, pc_6014, pc_6011, pc_6280, pc_6281,
+                          pc_6284], training=False)
 
     grid_model = grid_only_network()
-    concatenation = layers.concatenate([grid_model.output, pc_model.output])
+    concatenation = layers.concatenate([grid_model.output, pc_output])
     prediction_layer = layers.Dense(14, activation='linear', name="prediction_layer")(concatenation)
 
     possibility_3_ApproachA_model = keras.Model(
@@ -174,29 +170,26 @@ def possibility_4_ApproachA():
     pc_6281 = keras.Input(shape=(14 * 1, 14), name='input_postcode_6281')
     pc_6284 = keras.Input(shape=(14 * 1, 14), name='input_postcode_6284')
 
-    # postcode convolutions
-    concatenation_pc = layers.concatenate([pc_6010, pc_6014, pc_6011, pc_6280, pc_6281, pc_6284],
-                                          name='postcode_concat')
-    pc_normalization = layers.LayerNormalization()(concatenation_pc)
 
     # LOAD PRETRAINED PC MODEL
     pc_model = tf.keras.models.load_model(
-        'combined_nn_results/refined_models/pre_trained_models/all_pc/saved_models/postcode_level_branch_approachA/0')
+        'combined_nn_results/refined_models/pre_trained_models/CNN/all_pc/saved_models/postcode_level_branch_approachA/0')
     pc_model.trainable = False
-    pc_model = pc_model(pc_normalization, training=False)
+    pc_output = pc_model([pc_6010, pc_6014, pc_6011, pc_6280, pc_6281,
+                          pc_6284], training=False)
 
     # LOAD PRETRAINED GRID MODEL
     input_grid = keras.Input(shape=(14 * 1, 7), name='input_grid')
     grid_network = tf.keras.models.load_model(
-        'combined_nn_results/refined_models/pre_trained_models/grid/saved_models/grid_level_branch/0')
+        'combined_nn_results/refined_models/pre_trained_models/CNN/grid/saved_models/grid_level_branch/0')
     grid_network.trainable = False
     grid_model = grid_network(input_grid, training=False)
 
-    concatenation = layers.concatenate([grid_model.output, pc_model.output])
+    concatenation = layers.concatenate([grid_model, pc_output])
     prediction_layer = layers.Dense(14, activation='linear', name="prediction_layer")(concatenation)
 
     possibility_4_ApproachA_model = keras.Model(
-        inputs=[grid_model.input, pc_6010, pc_6014, pc_6011, pc_6280, pc_6281,
+        inputs=[input_grid, pc_6010, pc_6014, pc_6011, pc_6280, pc_6281,
                 pc_6284], outputs=prediction_layer)
 
     possibility_4_ApproachA_model.compile(loss=tf.losses.MeanSquaredError(),
