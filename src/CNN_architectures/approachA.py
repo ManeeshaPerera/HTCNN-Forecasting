@@ -43,7 +43,7 @@ def postcode_level_branch_approachA():
     max_pool_stage = layers.MaxPooling1D(padding='same', name='pc_all_max_pool_1')(cnn_layer2)
     cnn_layer3 = layers.Conv1D(kernel_size=2, padding='causal', filters=32, name=f'pc_all_cnn_layer3')(max_pool_stage)
     cnn_layer4 = layers.Conv1D(kernel_size=2, padding='causal', filters=32, name=f'pc_all_cnn_layer4')(cnn_layer3)
-    max_pool_stage_2 = layers.MaxPooling1D(padding='same', name='pc_all_max_pool_1')(cnn_layer4)
+    max_pool_stage_2 = layers.MaxPooling1D(padding='same', name='pc_all_max_pool_2')(cnn_layer4)
     flatten_pc = layers.Flatten(name='flatten_pc_all')(max_pool_stage_2)
 
     # flatten_pc = layers.Flatten(name='flatten_pc')(tcn_pc_grid)
