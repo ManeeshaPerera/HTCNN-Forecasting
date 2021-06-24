@@ -51,12 +51,44 @@ def postcode_level_branch_approachA():
 
     postcode_level_branch_model = keras.Model(
         inputs=[pc_6010, pc_6014, pc_6011, pc_6280, pc_6281,
-                pc_6284], outputs=full_connected_layer_pc, name='PC_ALL_MODEL')
+                pc_6284], outputs=full_connected_layer_pc, name='PC_ALL_MODEL_APPROACH_A')
 
     postcode_level_branch_model.compile(loss=tf.losses.MeanSquaredError(),
                                         optimizer=tf.optimizers.Adam(0.0001),
                                         metrics=[tf.metrics.MeanAbsoluteError()])
     return postcode_level_branch_model
+
+
+def grid_level_branch_approachA():
+    grid_input = keras.Input(shape=(14 * 1, 7), name='input_grid')
+    # pass the grid input with Convolution
+    # cnn_layer = 4
+    # dilation_rate = 2
+    # dilation_rates = [dilation_rate ** i for i in range(cnn_layer)]
+    # tcn_grid = tcn.TCN(nb_filters=32, kernel_size=2, nb_stacks=cnn_layer, dilations=dilation_rates,
+    #                    padding='causal',
+    #                    use_skip_connections=False, dropout_rate=0.05,
+    #                    return_sequences=True,
+    #                    activation='relu', kernel_initializer='he_normal',
+    #                    use_batch_norm=False,
+    #                    use_layer_norm=False,
+    #                    use_weight_norm=True, name='TCN_grid')(grid_input)
+    # flatten_grid = layers.Flatten(name='flatten_grid')(tcn_grid)
+    cnn_layer1 = layers.Conv1D(kernel_size=2, padding='causal', filters=32, name=f'cnn_layer1_grid')(grid_input)
+    cnn_layer2 = layers.Conv1D(kernel_size=2, padding='causal', filters=32, name=f'cnn_layer2_grid')(cnn_layer1)
+    max_pool_stage = layers.MaxPooling1D(padding='same', name='cnn_max_pool_layer1_grid')(cnn_layer2)
+    cnn_layer3 = layers.Conv1D(kernel_size=2, padding='causal', filters=32, name=f'cnn_layer3_grid')(max_pool_stage)
+    cnn_layer4 = layers.Conv1D(kernel_size=2, padding='causal', filters=32, name=f'cnn_layer4_grid')(cnn_layer3)
+    max_pool_stage_2 = layers.MaxPooling1D(padding='same', name='cnn_max_pool_layer2_grid')(cnn_layer4)
+    flatten_grid = layers.Flatten(name='flatten_grid')(max_pool_stage_2)
+
+    full_connected_layer = layers.Dense(14, activation='linear', name="prediction_layer_grid")(flatten_grid)
+    grid_only_network_model = keras.Model(grid_input, full_connected_layer, name='GRID_MODEL_APPROACH_A')
+    grid_only_network_model.compile(loss=tf.losses.MeanSquaredError(),
+                                    optimizer=tf.optimizers.Adam(0.0001),
+                                    metrics=[tf.metrics.MeanAbsoluteError()])
+
+    return grid_only_network_model
 
 
 def possibility_2_ApproachA():
@@ -97,7 +129,7 @@ def possibility_2_ApproachA():
     # LOAD PRETRAINED GRID MODEL
     input_grid = keras.Input(shape=(14 * 1, 7), name='input_grid')
     grid_network = tf.keras.models.load_model(
-        'combined_nn_results/refined_models/pre_trained_models/CNN/grid/saved_models/grid_level_branch/0')
+        'combined_nn_results/refined_models/pre_trained_models/CNN/grid/saved_models/grid_level_branch_approachA/0')
     grid_network.trainable = False
     grid_model = grid_network(input_grid, training=False)
 
@@ -181,7 +213,7 @@ def possibility_4_ApproachA():
     # LOAD PRETRAINED GRID MODEL
     input_grid = keras.Input(shape=(14 * 1, 7), name='input_grid')
     grid_network = tf.keras.models.load_model(
-        'combined_nn_results/refined_models/pre_trained_models/CNN/grid/saved_models/grid_level_branch/0')
+        'combined_nn_results/refined_models/pre_trained_models/CNN/grid/saved_models/grid_level_branch_approachA/0')
     grid_network.trainable = False
     grid_model = grid_network(input_grid, training=False)
 
@@ -195,4 +227,4 @@ def possibility_4_ApproachA():
     possibility_4_ApproachA_model.compile(loss=tf.losses.MeanSquaredError(),
                                           optimizer=tf.optimizers.Adam(0.0001),
                                           metrics=[tf.metrics.MeanAbsoluteError()])
-    return possibility_4_ApproachA
+    return possibility_4_ApproachA_model

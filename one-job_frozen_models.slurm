@@ -32,10 +32,11 @@ module load tensorflow/2.3.1-python-3.7.4
 
 # The job command(s):
 python run_global_approach_frozen_branches.py 0 0 grid
-python run_global_approach_frozen_branches.py 1 0 6010
-python run_global_approach_frozen_branches.py 1 0 6014
-python run_global_approach_frozen_branches.py 1 0 6011
-python run_global_approach_frozen_branches.py 1 0 6280
-python run_global_approach_frozen_branches.py 1 0 6281
-python run_global_approach_frozen_branches.py 1 0 6284
+python run_global_approach_frozen_branches.py 1 0 grid
 python run_global_approach_frozen_branches.py 2 0 all_pc
+python run_global_approach_frozen_branches.py 3 0 6010
+python run_global_approach_frozen_branches.py 3 0 6014
+python run_global_approach_frozen_branches.py 3 0 6011
+python run_global_approach_frozen_branches.py 3 0 6280
+python run_global_approach_frozen_branches.py 3 0 6281
+python run_global_approach_frozen_branches.py 3 0 6284

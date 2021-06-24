@@ -27,9 +27,9 @@ from sklearn.preprocessing import StandardScaler
 import src.utils as utils
 import pickle5 as pickle
 
-from src.CNN_architectures.approachB import grid_level_branch, postcode_level_branch
+from src.CNN_architectures.approachB import grid_level_branch_approachB, postcode_level_branch_approachB
 
-from src.CNN_architectures.approachA import postcode_level_branch_approachA
+from src.CNN_architectures.approachA import grid_level_branch_approachA, postcode_level_branch_approachA
 
 def create_window_data(file_index, lookback=1):
     filename = constants.TS[file_index]
@@ -183,12 +183,14 @@ def run_combine_model(approach, path, model_name, add_grid=True, postcode=None):
     return df, history
 
 
-final_test_models = {'0': {'func': grid_level_branch,
-                           'model_name': 'grid_level_branch'},
-                     '1': {'func': postcode_level_branch,
-                           'model_name': 'postcode_level_branch'},
+final_test_models = {'0': {'func': grid_level_branch_approachA,
+                           'model_name': 'grid_level_branch_approachA'},
+                     '1': {'func': grid_level_branch_approachB,
+                           'model_name': 'grid_level_branch_approachB'},
                      '2': {'func': postcode_level_branch_approachA,
-                           'model_name': 'postcode_level_branch_approachA'}
+                           'model_name': 'postcode_level_branch_approachA'},
+                     '3': {'func': postcode_level_branch_approachB,
+                           'model_name': 'postcode_level_branch_approachB'}
                      }
 
 # multiple_run = 'multiple_runs2'

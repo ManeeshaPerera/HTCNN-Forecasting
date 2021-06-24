@@ -31,9 +31,12 @@ from src.CNN_architectures.combined_cnn_models import local_conv_with_grid_with_
     local_conv_with_grid_conv_TCN_approach, pc_and_grid_input_together, grid_added_at_each_TCN_together, \
     grid_conv_added_at_each_TCN_together, local_and_global_conv_approach_with_TCN, frozen_branch_approach_TCN
 
-from src.CNN_architectures.approachB import grid_conv_added_at_each_TCN_together_skip_connection_True, \
-    grid_conv_added_at_each_CNN_together, possibility_a_postcode_only_separate_paths, grid_level_branch, \
-    postcode_level_branch
+
+from src.CNN_architectures.approachA import possibility_2_ApproachA, possibility_3_ApproachA, possibility_4_ApproachA
+
+from src.CNN_architectures.approachB import possibility_2_ApproachB, possibility_3_approachB, possibility_4_approachB
+
+
 
 
 def create_window_data(file_index, lookback=1):
@@ -200,16 +203,37 @@ def run_combine_model(approach, path, model_name, add_grid=True):
 #                      '8': {'func': frozen_branch_approach_TCN, 'model_name': 'frozen_branch_approach_TCN'}}
 
 
-final_test_models = {'0': {'func': grid_conv_added_at_each_TCN_together_skip_connection_True,
-                           'model_name': 'grid_conv_added_at_each_TCN_together_skip_connection_True'},
-                     '1': {'func': grid_conv_added_at_each_CNN_together,
-                           'model_name': 'grid_conv_added_at_each_CNN_together'},
-                     '2': {'func': possibility_a_postcode_only_separate_paths,
-                           'model_name': 'possibility_a_postcode_only_separate_paths'},
+# final_test_models = {'0': {'func': grid_conv_added_at_each_TCN_together_skip_connection_True,
+#                            'model_name': 'grid_conv_added_at_each_TCN_together_skip_connection_True'},
+#                      '1': {'func': grid_conv_added_at_each_CNN_together,
+#                            'model_name': 'grid_conv_added_at_each_CNN_together'},
+#                      '2': {'func': possibility_a_postcode_only_separate_paths,
+#                            'model_name': 'possibility_a_postcode_only_separate_paths'},
+#                      }
+
+final_test_models = {'0': {'func': possibility_2_ApproachA,
+                           'model_name': 'possibility_2_ApproachA',
+                           'folder': 'approachA'},
+                     '1': {'func': possibility_3_ApproachA,
+                           'model_name': 'possibility_3_ApproachA',
+                           'folder': 'approachA'},
+                     '2': {'func': possibility_4_ApproachA,
+                           'model_name': 'possibility_4_ApproachA',
+                           'folder': 'approachA'},
+                     '3': {'func': possibility_2_ApproachB,
+                           'model_name': 'possibility_2_ApproachB',
+                           'folder': 'approachB'},
+                     '4': {'func': possibility_3_approachB,
+                           'model_name': 'possibility_3_approachB',
+                           'folder': 'approachB'},
+                     '5': {'func': possibility_4_approachB,
+                           'model_name': 'possibility_4_approachB',
+                           'folder': 'approachB'}
                      }
 
 # multiple_run = 'multiple_runs2'
-multiple_run = 'approachB'
+# multiple_run = 'approachB'
+multiple_run = final_test_models[model_func_name]['folder']
 model_save_path = f'combined_nn_results/refined_models/{multiple_run}/saved_models'
 model_name = final_test_models[model_func_name]['model_name']
 function_run = final_test_models[model_func_name]['func']
@@ -217,6 +241,7 @@ function_run = final_test_models[model_func_name]['func']
 print("model name:", model_name)
 print("seed: ", SEED)
 print("run: ", run)
+print("folder: ", multiple_run)
 
 model_new_name = f'{model_name}/{run}'  # this will save the models with the run info added as folder name
 forecasts, history = run_combine_model(function_run, model_save_path, model_new_name)
