@@ -47,14 +47,20 @@ def get_multiple_runs_error(model_dir_path):
 #                      '8': 'frozen_branch_approach_TCN'
 #                      }
 
-final_test_models = {'0': 'possibility_2_ApproachA',
-                     '1': 'possibility_3_ApproachA',
-                     '2': 'possibility_4_ApproachA',
+# final_test_models = {'0': 'possibility_2_ApproachA',
+#                      '1': 'possibility_3_ApproachA',
+#                      '2': 'possibility_4_ApproachA',
+#                      }
+
+final_test_models = {'0': 'possibility_2_ApproachB',
+                     '1': 'possibility_3_approachB',
+                     '2': 'grid_conv_added_at_each_TCN_together_skip_connection_True',
+                     '3': 'grid_conv_added_at_each_CNN_together'
                      }
 
 
 # dir_path = 'combined_nn_results/refined_models/multiple_runs2'
-dir_path = 'combined_nn_results/refined_models/approachA'
+dir_path = 'combined_nn_results/refined_models/approachB'
 
 error_list = []
 model_names = []
