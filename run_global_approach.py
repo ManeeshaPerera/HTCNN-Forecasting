@@ -31,12 +31,11 @@ from src.CNN_architectures.combined_cnn_models import local_conv_with_grid_with_
     local_conv_with_grid_conv_TCN_approach, pc_and_grid_input_together, grid_added_at_each_TCN_together, \
     grid_conv_added_at_each_TCN_together, local_and_global_conv_approach_with_TCN, frozen_branch_approach_TCN
 
-
 from src.CNN_architectures.approachA import possibility_2_ApproachA, possibility_3_ApproachA, possibility_4_ApproachA
 
-from src.CNN_architectures.approachB import possibility_2_ApproachB, possibility_3_approachB, possibility_4_approachB
-
-
+from src.CNN_architectures.approachB import possibility_2_ApproachB, possibility_3_approachB, possibility_4_approachB, \
+    grid_conv_added_at_each_TCN_together_various_possibilities, \
+    grid_conv_added_at_each_TCN_together_various_possibilities2
 
 
 def create_window_data(file_index, lookback=1):
@@ -211,26 +210,29 @@ def run_combine_model(approach, path, model_name, add_grid=True):
 #                            'model_name': 'possibility_a_postcode_only_separate_paths'},
 #                      }
 
-final_test_models = {'0': {'func': possibility_2_ApproachA,
-                           'model_name': 'possibility_2_ApproachA',
-                           'folder': 'approachA'},
-                     '1': {'func': possibility_3_ApproachA,
-                           'model_name': 'possibility_3_ApproachA',
-                           'folder': 'approachA'},
-                     '2': {'func': possibility_4_ApproachA,
-                           'model_name': 'possibility_4_ApproachA',
-                           'folder': 'approachA'},
-                     '3': {'func': possibility_2_ApproachB,
-                           'model_name': 'possibility_2_ApproachB',
+final_test_models = {'0': {'func': grid_conv_added_at_each_TCN_together_various_possibilities,
+                           'model_name': 'grid_conv_added_at_each_TCN_together_various_possibilities',
                            'folder': 'approachB'},
-                     '4': {'func': possibility_3_approachB,
-                           'model_name': 'possibility_3_approachB',
-                           'folder': 'approachB'},
-                     '5': {'func': possibility_4_approachB,
-                           'model_name': 'possibility_4_approachB',
+                     '1': {'func': grid_conv_added_at_each_TCN_together_various_possibilities2,
+                           'model_name': 'grid_conv_added_at_each_TCN_together_various_possibilities2',
                            'folder': 'approachB'}
+                     # '1': {'func': possibility_3_ApproachA,
+                     #       'model_name': 'possibility_3_ApproachA',
+                     #       'folder': 'approachA'},
+                     # '2': {'func': possibility_4_ApproachA,
+                     #       'model_name': 'possibility_4_ApproachA',
+                     #       'folder': 'approachA'},
+                     # '3': {'func': possibility_2_ApproachB,
+                     #       'model_name': 'possibility_2_ApproachB',
+                     #       'folder': 'approachB'},
+                     # '4': {'func': possibility_3_approachB,
+                     #       'model_name': 'possibility_3_approachB',
+                     #       'folder': 'approachB'},
+                     # '5': {'func': possibility_4_approachB,
+                     #       'model_name': 'possibility_4_approachB',
+                     #       'folder': 'approachB'}
                      }
-#I NEED TO CHECK '5' AGAIN
+# I NEED TO CHECK '5' AGAIN
 # multiple_run = 'multiple_runs2'
 # multiple_run = 'approachB'
 multiple_run = final_test_models[model_func_name]['folder']

@@ -423,3 +423,147 @@ def possibility_4_approachB():
     return possibility_4_approachB_model
 
 
+def grid_conv_added_at_each_TCN_together_various_possibilities():
+    def get_tcn_layer(dilation_rate, pc, layer_num, input_to_layer):
+        return tcn.TCN(nb_filters=32, kernel_size=2, nb_stacks=1, dilations=dilation_rate,
+                       padding='causal',
+                       use_skip_connections=False, dropout_rate=0.05,
+                       return_sequences=True,
+                       activation='relu', kernel_initializer='he_normal',
+                       use_batch_norm=False,
+                       use_layer_norm=False,
+                       use_weight_norm=True, name=f'TCN_{layer_num}_{pc}_grid')(input_to_layer)
+
+    def local_convolution_TCN(pc_ts, grid_conv_values, pc):
+        cnn_layers = 4
+        dilation_rate = 2
+        dilation_rates = [dilation_rate ** i for i in range(cnn_layers)]
+
+        concat_each_pc_grid = layers.concatenate([pc_ts, grid_conv_values], name=f'concat_{pc}_grid')
+
+        tcn_layer1 = get_tcn_layer([dilation_rates[0]], pc, 1, concat_each_pc_grid)
+        concat_grid_with_layer1 = layers.concatenate([tcn_layer1, grid_conv_values])
+        tcn_layer2 = get_tcn_layer([dilation_rates[1]], pc, 2, concat_grid_with_layer1)
+        concat_grid_with_layer2 = layers.concatenate([tcn_layer2, grid_conv_values])
+        tcn_layer3 = get_tcn_layer([dilation_rates[2]], pc, 3, concat_grid_with_layer2)
+        concat_grid_with_layer3 = layers.concatenate([tcn_layer3, grid_conv_values])
+        tcn_layer4 = get_tcn_layer([dilation_rates[3]], pc, 4, concat_grid_with_layer3)
+
+        return tcn_layer4
+
+    pc_6010 = keras.Input(shape=(14 * 1, 14), name='input_postcode_6010')
+    pc_6014 = keras.Input(shape=(14 * 1, 14), name='input_postcode_6014')
+    pc_6011 = keras.Input(shape=(14 * 1, 14), name='input_postcode_6011')
+    pc_6280 = keras.Input(shape=(14 * 1, 14), name='input_postcode_6280')
+    pc_6281 = keras.Input(shape=(14 * 1, 14), name='input_postcode_6281')
+    pc_6284 = keras.Input(shape=(14 * 1, 14), name='input_postcode_6284')
+
+    grid_input = keras.Input(shape=(14 * 1, 7), name='input_grid')
+    # pass the grid input with Convolution
+    cnn_layer = 4
+    dilation_rate = 2
+    dilation_rates = [dilation_rate ** i for i in range(cnn_layer)]
+    tcn_grid = tcn.TCN(nb_filters=32, kernel_size=2, nb_stacks=1, dilations=dilation_rates,
+                       padding='causal',
+                       use_skip_connections=False, dropout_rate=0.05,
+                       return_sequences=True,
+                       activation='relu', kernel_initializer='he_normal',
+                       use_batch_norm=False,
+                       use_layer_norm=False,
+                       use_weight_norm=True, name='TCN_grid')(grid_input)
+
+    pc_6010_tcn_out = local_convolution_TCN(pc_6010, tcn_grid, 6010)
+    pc_6014_tcn_out = local_convolution_TCN(pc_6014, tcn_grid, 6014)
+    pc_6011_tcn_out = local_convolution_TCN(pc_6011, tcn_grid, 6011)
+    pc_6280_tcn_out = local_convolution_TCN(pc_6280, tcn_grid, 6280)
+    pc_6281_tcn_out = local_convolution_TCN(pc_6281, tcn_grid, 6281)
+    pc_6284_tcn_out = local_convolution_TCN(pc_6284, tcn_grid, 6284)
+
+    concat_features = layers.concatenate(
+        [pc_6010_tcn_out, pc_6014_tcn_out, pc_6011_tcn_out, pc_6280_tcn_out, pc_6281_tcn_out, pc_6284_tcn_out],
+        name='concatenate_all')
+    flatten_out = layers.Flatten(name='flatten_all')(concat_features)
+    full_connected_layer = layers.Dense(14, activation='linear', name="prediction_layer")(flatten_out)
+
+    grid_conv_added_at_each_TCN_together_model = keras.Model(
+        inputs=[grid_input, pc_6010, pc_6014, pc_6011, pc_6280, pc_6281,
+                pc_6284], outputs=full_connected_layer)
+
+    grid_conv_added_at_each_TCN_together_model.compile(loss=tf.losses.MeanSquaredError(),
+                                                       optimizer=tf.optimizers.Adam(0.0001),
+                                                       metrics=[tf.metrics.MeanAbsoluteError()])
+    return grid_conv_added_at_each_TCN_together_model
+
+
+
+
+def grid_conv_added_at_each_TCN_together_various_possibilities2():
+    def get_tcn_layer(dilation_rate, pc, layer_num, input_to_layer):
+        return tcn.TCN(nb_filters=32, kernel_size=2, nb_stacks=1, dilations=dilation_rate,
+                       padding='causal',
+                       use_skip_connections=False, dropout_rate=0.05,
+                       return_sequences=True,
+                       activation='relu', kernel_initializer='he_normal',
+                       use_batch_norm=False,
+                       use_layer_norm=False,
+                       use_weight_norm=True, name=f'TCN_{layer_num}_{pc}_grid')(input_to_layer)
+
+    def local_convolution_TCN(pc_ts, grid_conv_values, pc):
+        cnn_layers = 4
+        dilation_rate = 2
+        dilation_rates = [dilation_rate ** i for i in range(cnn_layers)]
+
+        concat_each_pc_grid = layers.concatenate([pc_ts, grid_conv_values], name=f'concat_{pc}_grid')
+
+        tcn_layer1 = get_tcn_layer([dilation_rates[0]], pc, 1, concat_each_pc_grid)
+        concat_grid_with_layer1 = layers.concatenate([tcn_layer1, grid_conv_values])
+        tcn_layer2 = get_tcn_layer([dilation_rates[1]], pc, 2, concat_grid_with_layer1)
+        concat_grid_with_layer2 = layers.concatenate([tcn_layer2, grid_conv_values])
+        tcn_layer3 = get_tcn_layer([dilation_rates[2]], pc, 3, concat_grid_with_layer2)
+        concat_grid_with_layer3 = layers.concatenate([tcn_layer3, grid_conv_values])
+        tcn_layer4 = get_tcn_layer([dilation_rates[3]], pc, 4, concat_grid_with_layer3)
+
+        return tcn_layer4
+
+    pc_6010 = keras.Input(shape=(14 * 1, 14), name='input_postcode_6010')
+    pc_6014 = keras.Input(shape=(14 * 1, 14), name='input_postcode_6014')
+    pc_6011 = keras.Input(shape=(14 * 1, 14), name='input_postcode_6011')
+    pc_6280 = keras.Input(shape=(14 * 1, 14), name='input_postcode_6280')
+    pc_6281 = keras.Input(shape=(14 * 1, 14), name='input_postcode_6281')
+    pc_6284 = keras.Input(shape=(14 * 1, 14), name='input_postcode_6284')
+
+    grid_input = keras.Input(shape=(14 * 1, 7), name='input_grid')
+    # pass the grid input with Convolution
+    cnn_layer = 4
+    dilation_rate = 2
+    dilation_rates = [dilation_rate ** i for i in range(cnn_layer)]
+    tcn_grid = tcn.TCN(nb_filters=32, kernel_size=2, nb_stacks=2, dilations=dilation_rates,
+                       padding='causal',
+                       use_skip_connections=True, dropout_rate=0.05,
+                       return_sequences=True,
+                       activation='relu', kernel_initializer='he_normal',
+                       use_batch_norm=False,
+                       use_layer_norm=False,
+                       use_weight_norm=True, name='TCN_grid')(grid_input)
+
+    pc_6010_tcn_out = local_convolution_TCN(pc_6010, tcn_grid, 6010)
+    pc_6014_tcn_out = local_convolution_TCN(pc_6014, tcn_grid, 6014)
+    pc_6011_tcn_out = local_convolution_TCN(pc_6011, tcn_grid, 6011)
+    pc_6280_tcn_out = local_convolution_TCN(pc_6280, tcn_grid, 6280)
+    pc_6281_tcn_out = local_convolution_TCN(pc_6281, tcn_grid, 6281)
+    pc_6284_tcn_out = local_convolution_TCN(pc_6284, tcn_grid, 6284)
+
+    concat_features = layers.concatenate(
+        [pc_6010_tcn_out, pc_6014_tcn_out, pc_6011_tcn_out, pc_6280_tcn_out, pc_6281_tcn_out, pc_6284_tcn_out],
+        name='concatenate_all')
+    flatten_out = layers.Flatten(name='flatten_all')(concat_features)
+    full_connected_layer = layers.Dense(14, activation='linear', name="prediction_layer")(flatten_out)
+
+    grid_conv_added_at_each_TCN_together_model = keras.Model(
+        inputs=[grid_input, pc_6010, pc_6014, pc_6011, pc_6280, pc_6281,
+                pc_6284], outputs=full_connected_layer)
+
+    grid_conv_added_at_each_TCN_together_model.compile(loss=tf.losses.MeanSquaredError(),
+                                                       optimizer=tf.optimizers.Adam(0.0001),
+                                                       metrics=[tf.metrics.MeanAbsoluteError()])
+    return grid_conv_added_at_each_TCN_together_model
