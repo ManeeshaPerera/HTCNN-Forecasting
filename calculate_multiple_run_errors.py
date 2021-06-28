@@ -55,7 +55,9 @@ def get_multiple_runs_error(model_dir_path):
 final_test_models = {'0': 'possibility_2_ApproachB',
                      '1': 'possibility_3_approachB',
                      '2': 'grid_conv_added_at_each_TCN_together_skip_connection_True',
-                     '3': 'grid_conv_added_at_each_CNN_together'
+                     '3': 'grid_conv_added_at_each_CNN_together',
+                     '4': 'grid_conv_added_at_each_TCN_together_various_possibilities',
+                     '5': 'grid_conv_added_at_each_TCN_together_various_possibilities2'
                      }
 
 
