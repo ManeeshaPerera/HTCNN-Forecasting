@@ -14,6 +14,7 @@ combined_nn_results
 conventional_lstm
 conventional_cnn
 conventional_tcn
+all_ts_data
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
