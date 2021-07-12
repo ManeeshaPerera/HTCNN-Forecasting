@@ -85,8 +85,11 @@ def run_model(approach, window_ts, input_shape, time_series, path, model_name, f
     # Forecast
     lookback = 1
 
-    filename = constants.TS[file_index]
-    data = pd.read_csv(f'ts_data/new/{filename}.csv', index_col=[0])
+    # filename = constants.TS[file_index]
+
+    filename = constants.ALL_SWIS_TS[file_index]
+    # data = pd.read_csv(f'ts_data/new/{filename}.csv', index_col=[0])
+    data = pd.read_csv(f'swis_ts_data/ts_data/{filename}.csv', index_col=[0])
     # look_back = 14 * lookback
     look_back = 18 * lookback
 
@@ -121,7 +124,7 @@ models = {'0': 'conventional_lstm', '1': 'conventional_cnn', '2': 'conventional_
 model_name = models[model_func_name]
 # model_save_path = f'{model_name}/{constants.TS[time_series]}/saved_models'
 
-#change for SWIS
+# change for SWIS
 model_save_path = f'swis_conventional_nn_results/{model_name}/{constants.ALL_SWIS_TS[time_series]}/saved_models'
 
 window_ts = create_window_data(time_series)
@@ -131,12 +134,11 @@ window_ts = create_window_data(time_series)
 #     input_shape = (14 * 1, 7)
 
 
-#change for SWIS
+# change for SWIS
 if time_series == 0:
     input_shape = (18 * 1, 7)
 else:
     input_shape = (18 * 1, 14)
-
 
 if model_func_name == '0':
     print('LSTM')
@@ -158,7 +160,7 @@ elif model_func_name == '2':
 
 # dir_path = f'{model_name}/{constants.TS[time_series]}/{run}'
 
-#change for SWIS
+# change for SWIS
 dir_path = f'swis_conventional_nn_results/{model_name}/{constants.ALL_SWIS_TS[time_series]}/{run}'
 if not os.path.exists(dir_path):
     os.makedirs(dir_path)
