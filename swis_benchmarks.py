@@ -33,7 +33,7 @@ def change_data(pc_data):
 def run_arima(ts):
     print("running ts ==>", ts)
     exog = True
-    data = pd.read_csv(f'swis_ts_data/ts_data/{ts}.csv', index_col=0)[-18*50:]
+    data = pd.read_csv(f'swis_ts_data/ts_data/{ts}.csv', index_col=0)
     if ts == 'grid':
         exog = False
     else:
