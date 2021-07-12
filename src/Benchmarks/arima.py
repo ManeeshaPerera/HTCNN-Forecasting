@@ -39,6 +39,7 @@ class ARIMA(Benchmark):
 
             forecasts.extend(fc.tolist())
 
-        fc_df = self.test
-        fc_df['average_fc'] = forecasts
+        fc_df = self.test.copy()[[self.col]]
+        fc_df['fc'] = forecasts
+        fc_df[fc_df < 0] = 0
         return fc_df

@@ -26,6 +26,7 @@ class NaiveModel(Benchmark):
             forecasts.extend(new_fc.values.tolist())
 
         fc_df = self.test.copy()[[self.col]]
-        fc_df['average_fc'] = forecasts
+        # fc_df['average_fc'] = forecasts
+        fc_df['fc'] = forecasts
         return fc_df
 
