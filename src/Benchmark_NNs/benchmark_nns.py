@@ -10,7 +10,10 @@ def lstm_model_approach(input_shape, ts):
     lstm_layer1 = layers.LSTM(32, return_sequences=True, kernel_regularizer=regularizers.l2())(input_data)
     lstm_layer2 = layers.LSTM(32, return_sequences=True, kernel_regularizer=regularizers.l2())(lstm_layer1)
     lstm_layer3 = layers.LSTM(32, return_sequences=False, kernel_regularizer=regularizers.l2())(lstm_layer2)
-    fully_connect_layer = layers.Dense(14, activation='linear')(lstm_layer3)
+    # fully_connect_layer = layers.Dense(14, activation='linear')(lstm_layer3)
+
+    #change for swis - we need to forecast 18 points
+    fully_connect_layer = layers.Dense(18, activation='linear')(lstm_layer3)
     lstm_model = keras.Model(
         inputs=input_data, outputs=fully_connect_layer)
 
@@ -30,7 +33,10 @@ def conventional_CNN_approach(input_shape, ts):
     max_pool_stage_2 = layers.MaxPooling1D(padding='same')(cnn_layer4)
 
     flatten_out = layers.Flatten(name='flatten_layer')(max_pool_stage_2)
-    fully_connect_layer = layers.Dense(14, activation='linear')(flatten_out)
+    # fully_connect_layer = layers.Dense(14, activation='linear')(flatten_out)
+
+    #change for swis - we need to forecast 18 points
+    fully_connect_layer = layers.Dense(18, activation='linear')(flatten_out)
     conventional_CNN = keras.Model(
         inputs=input_data, outputs=fully_connect_layer)
 
@@ -55,7 +61,10 @@ def conventional_TCN_approach(input_shape, ts):
                          use_layer_norm=False,
                          use_weight_norm=True, name=f'TCN_{ts}')(input_data)
     flatten_out = layers.Flatten(name='flatten_layer')(tcn_output)
-    full_connected_layer = layers.Dense(14, activation='linear', name="prediction_layer")(flatten_out)
+
+    #change for swis - we need to forecast 18 points
+    # full_connected_layer = layers.Dense(14, activation='linear', name="prediction_layer")(flatten_out)
+    full_connected_layer = layers.Dense(18, activation='linear', name="prediction_layer")(flatten_out)
     tcn_model = keras.Model(input_data, full_connected_layer)
 
     tcn_model.compile(loss=tf.losses.MeanSquaredError(),

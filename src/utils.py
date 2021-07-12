@@ -137,3 +137,10 @@ def split_train_test_statmodels_swis(data):
     train = data[0:-18 * constants.TEST_DAYS]
 
     return train, test
+
+
+def split_hourly_data_test_SWIS(data, look_back):
+    test = data[-((18 * constants.TEST_DAYS) + look_back):]
+    train = data[0:-18 * constants.TEST_DAYS]
+
+    return train, test

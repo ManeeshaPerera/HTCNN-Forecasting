@@ -30,17 +30,29 @@ from src.Benchmark_NNs.benchmark_nns import lstm_model_approach, conventional_CN
 
 
 def create_window_data(file_index, lookback=1):
-    filename = constants.TS[file_index]
+    # filename = constants.TS[file_index]
 
-    horizon = 14  # day ahead forecast
-    data = pd.read_csv(f'ts_data/new/{filename}.csv', index_col=[0])
+    # Change for SWIS
+    filename = constants.ALL_SWIS_TS[file_index]
+
+    # horizon = 14  # day ahead forecast
+
+    # Change for SWIS
+    horizon = 18  # day ahead forecast
+    # data = pd.read_csv(f'ts_data/new/{filename}.csv', index_col=[0])
+    data = pd.read_csv(f'swis_ts_data/ts_data/{filename}.csv', index_col=[0])
+
     print(filename)
     # 14 hours into 1 - with the new data the days are added as features
-    look_back = 14 * lookback
+    # look_back = 14 * lookback
+    look_back = 18 * lookback
 
     # train, val, test split
-    train, test = utils.split_hourly_data_test(data, look_back)
+    # train, test = utils.split_hourly_data_test(data, look_back)
     # train, val, test = utils.split_hourly_data(data, look_back)
+
+    # Change for SWIS
+    train, test = utils.split_hourly_data_test_SWIS(data, look_back)
 
     scaler = StandardScaler()
     scaler.fit(train.values)
@@ -75,11 +87,14 @@ def run_model(approach, window_ts, input_shape, time_series, path, model_name, f
 
     filename = constants.TS[file_index]
     data = pd.read_csv(f'ts_data/new/{filename}.csv', index_col=[0])
-    look_back = 14 * lookback
+    # look_back = 14 * lookback
+    look_back = 18 * lookback
 
     # train, val, test split
     # train, val, test = utils.split_hourly_data(data, look_back)
-    train, test = utils.split_hourly_data_test(data, look_back)
+    # train, test = utils.split_hourly_data_test(data, look_back)
+
+    train, test = utils.split_hourly_data_test_SWIS(data, look_back)
     dataframe_store = test[look_back:][['power']]
 
     scaler = StandardScaler()
@@ -89,12 +104,14 @@ def run_model(approach, window_ts, input_shape, time_series, path, model_name, f
 
     fc = model.predict(window_ts.test)
 
-    for sample in range(0, len(fc), 14):
+    # for sample in range(0, len(fc), 14):
+    for sample in range(0, len(fc), 18):
         fc_sample = fc[sample]
         fc_sample = scaler.inverse_transform(fc_sample)
         fc_array.extend(fc_sample)
 
-    fc_df = pd.DataFrame(fc_array, index=data[-14 * constants.TEST_DAYS:].index, columns=['fc'])
+    # fc_df = pd.DataFrame(fc_array, index=data[-14 * constants.TEST_DAYS:].index, columns=['fc'])
+    fc_df = pd.DataFrame(fc_array, index=data[-18 * constants.TEST_DAYS:].index, columns=['fc'])
     fc_df[fc_df < 0] = 0
     df = pd.concat([dataframe_store, fc_df], axis=1)
     return df, history
@@ -102,13 +119,24 @@ def run_model(approach, window_ts, input_shape, time_series, path, model_name, f
 
 models = {'0': 'conventional_lstm', '1': 'conventional_cnn', '2': 'conventional_tcn'}
 model_name = models[model_func_name]
-model_save_path = f'{model_name}/{constants.TS[time_series]}/saved_models'
+# model_save_path = f'{model_name}/{constants.TS[time_series]}/saved_models'
+
+#change for SWIS
+model_save_path = f'swis_conventional_nn_results/{model_name}/{constants.ALL_SWIS_TS[time_series]}/saved_models'
 
 window_ts = create_window_data(time_series)
-if time_series > 6:
-    input_shape = (14 * 1, 14)
+# if time_series > 6:
+#     input_shape = (14 * 1, 14)
+# else:
+#     input_shape = (14 * 1, 7)
+
+
+#change for SWIS
+if time_series == 0:
+    input_shape = (18 * 1, 7)
 else:
-    input_shape = (14 * 1, 7)
+    input_shape = (18 * 1, 14)
+
 
 if model_func_name == '0':
     print('LSTM')
@@ -128,10 +156,14 @@ elif model_func_name == '2':
     forecasts, history = run_model(conventional_TCN_approach, window_ts, input_shape, time_series, model_save_path, run,
                                    time_series)
 
-dir_path = f'{model_name}/{constants.TS[time_series]}/{run}'
+# dir_path = f'{model_name}/{constants.TS[time_series]}/{run}'
+
+#change for SWIS
+dir_path = f'swis_conventional_nn_results/{model_name}/{constants.ALL_SWIS_TS[time_series]}/{run}'
 if not os.path.exists(dir_path):
     os.makedirs(dir_path)
 
+# we will save the file as grid.csv although it will have the forecasts of the particular time series
 forecasts.to_csv(f'{dir_path}/grid.csv')
 
 with open(f'{dir_path}/training_loss_grid_iteration', 'wb') as file_loss:

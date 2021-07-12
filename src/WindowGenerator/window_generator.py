@@ -109,6 +109,26 @@ class WindowGenerator:
 
         return ds, ds1, ds2, ds3, ds4, ds5, ds6
 
+    def make_dataset_combine_SWIS(self, data, window_dic, train_val_test, batch_size):
+        data_grid = np.array(data, dtype=np.float32)
+
+        ds = tf.keras.preprocessing.timeseries_dataset_from_array(
+            data=data_grid,
+            targets=None,
+            sequence_length=self.total_window_size,
+            sequence_stride=1,
+            shuffle=False,
+            batch_size=1,)
+        ds = ds.map(self.split_window, deterministic=True)
+
+        output_values = {'grid': ds}
+
+        # all postcodes
+        for pc, window_values in window_dic.items():
+            output_values[pc] = self.map_data(window_values, train_val_test)
+
+        return output_values
+
     @property
     def train(self):
         print("creating tf train dataset")
@@ -135,3 +155,15 @@ class WindowGenerator:
     def test_combine(self, window_array):
         print("creating tf test dataset")
         return self.make_dataset_combine(self.test_df, window_array, 'test', self.batch_size)
+
+    def train_combine_SWIS(self, window_array):
+        print("creating tf train dataset")
+        return self.make_dataset_combine_SWIS(self.train_df, window_array, 'train', self.batch_size)
+
+    def val_combin_SWIS(self, window_array):
+        print("creating tf val dataset")
+        return self.make_dataset_combine_SWIS(self.val_df, window_array, 'val', self.batch_size)
+
+    def test_combine_SWIS(self, window_array):
+        print("creating tf test dataset")
+        return self.make_dataset_combine_SWIS(self.test_df, window_array, 'test', self.batch_size)

@@ -16,6 +16,8 @@ conventional_cnn
 conventional_tcn
 all_ts_data
 swis_ts_data
+swis_conventional_nn_results
+swis_combined_nn_results
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
