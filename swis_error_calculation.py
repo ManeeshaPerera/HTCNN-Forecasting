@@ -11,8 +11,10 @@ def sum_fc_results(ts_array, model_path, run, model_name):
     for ts in ts_array:
         if model_name in stat_models:
             ts_fc = pd.read_csv(f'{model_path}/{ts}.csv', index_col=[0])[['fc']]
-        else:
+        elif model_name in conventional_nns:
             ts_fc = pd.read_csv(f'{model_path}/{ts}/{run}/grid.csv', index_col=[0])[['fc']]
+        else:
+            ts_fc = pd.read_csv(f'{model_path}/{run}/grid.csv', index_col=[0])[['fc']]
         dfs.append(ts_fc)
     concat_df = pd.concat(dfs, axis=1).sum(axis=1)
     return concat_df
@@ -53,6 +55,7 @@ models = {'0': {'name': 'naive', 'dir': 'benchmark_results/swis_benchmarks', 'ru
 
 stat_models = ['arima', 'naive']
 combined = ['SWIS_APPROACH_B']
+conventional_nns = ['conventional_lstm']
 model_number = sys.argv[1]
 MODEL_NAME = models[model_number]['name']
 PATH = models[model_number]['dir']
@@ -65,8 +68,10 @@ dir_path = f'{PATH}/{MODEL_NAME}'
 one_grid_path = f'{PATH}/{MODEL_NAME}'
 
 for RUN in range(0, RUN_RANGE):
-    if MODEL_NAME not in stat_models:
+    if MODEL_NAME in conventional_nns:
         one_grid_path = f'{PATH}/{MODEL_NAME}/grid/{RUN}'
+    elif MODEL_NAME in combined:
+        one_grid_path = f'{PATH}/{MODEL_NAME}/{RUN}'
     notcombined = True
     if MODEL_NAME in combined:
         notcombined = False
