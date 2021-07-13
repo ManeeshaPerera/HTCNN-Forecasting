@@ -48,7 +48,8 @@ def get_grid_error_per_run(grid_model_path, model_path, run, model_name):
 
 models = {'0': {'name': 'naive', 'dir': 'benchmark_results/swis_benchmarks', 'runs': 1},
           '1': {'name': 'arima', 'dir': 'benchmark_results/swis_benchmarks', 'runs': 1},
-          '2': {'name': 'conventional_lstm', 'dir': 'swis_conventional_nn_results', 'runs': 10}}
+          '2': {'name': 'conventional_lstm', 'dir': 'swis_conventional_nn_results', 'runs': 10},
+          '3': {'name': 'SWIS_APPROACH_B', 'dir': 'swis_combined_nn_results/approachA', 'runs': 10}}
 
 stat_models = ['arima', 'naive']
 model_number = sys.argv[1]
