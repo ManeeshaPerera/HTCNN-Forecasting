@@ -1,7 +1,7 @@
 import pandas as pd
 from src.Benchmarks.naive import NaiveModel
 import src.utils as util
-from constants import HORIZON_SWIS, SWIS_POSTCODES, ALL_SWIS_TS
+from constants import HORIZON_SWIS, SWIS_POSTCODES, ALL_SWIS_TS, ARIMA_FAILURES
 from src.Benchmarks.arima import ARIMA
 import sys
 
@@ -33,7 +33,7 @@ def change_data(pc_data):
 def run_arima(ts):
     print("running ts ==>", ts)
     exog = True
-    data = pd.read_csv(f'swis_ts_data/ts_data/{ts}.csv', index_col=0)
+    data = pd.read_csv(f'swis_ts_data/ts_data/{ts}.csv', index_col=0)[-18*100:]
     if ts == 'grid':
         exog = False
     else:
@@ -47,5 +47,6 @@ def run_arima(ts):
 
 
 file_index = int(sys.argv[1])
-time_series = str(ALL_SWIS_TS[file_index])
+# file_index = 46
+time_series = str(ARIMA_FAILURES[file_index])
 run_arima(time_series)
