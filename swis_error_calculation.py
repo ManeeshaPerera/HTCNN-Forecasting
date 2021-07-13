@@ -35,14 +35,14 @@ def calculate_grid_error(grid_model_path, dir_path, ts_array, run, model_name):
     return mean_err
 
 
-def get_grid_error_per_run(grid_model_path, model_path, run, model_name):
+def get_grid_error_per_run(grid_model_path, model_path, run, model_name, notcombined=True):
     level_rmse = []
     grid_rmse = calculate_grid_error(grid_model_path, model_path, [const.ALL_SWIS_TS[0]], run, model_name)
-    pc_rmse = calculate_grid_error(grid_model_path, model_path, const.SWIS_POSTCODES, run, model_name)
 
     level_rmse.append(grid_rmse)
-    level_rmse.append(pc_rmse)
-
+    if notcombined:
+        pc_rmse = calculate_grid_error(grid_model_path, model_path, const.SWIS_POSTCODES, run, model_name)
+        level_rmse.append(pc_rmse)
     return level_rmse
 
 
@@ -52,6 +52,7 @@ models = {'0': {'name': 'naive', 'dir': 'benchmark_results/swis_benchmarks', 'ru
           '3': {'name': 'SWIS_APPROACH_B', 'dir': 'swis_combined_nn_results/approachA', 'runs': 10}}
 
 stat_models = ['arima', 'naive']
+combined = ['SWIS_APPROACH_B']
 model_number = sys.argv[1]
 MODEL_NAME = models[model_number]['name']
 PATH = models[model_number]['dir']
@@ -63,13 +64,16 @@ all_errors = []
 dir_path = f'{PATH}/{MODEL_NAME}'
 one_grid_path = f'{PATH}/{MODEL_NAME}'
 
-
 for RUN in range(0, RUN_RANGE):
     if MODEL_NAME not in stat_models:
         one_grid_path = f'{PATH}/{MODEL_NAME}/grid/{RUN}'
-    rmse_run_list = get_grid_error_per_run(one_grid_path, dir_path, RUN, MODEL_NAME)
+    notcombined = True
+    if MODEL_NAME in combined:
+        notcombined = False
+    rmse_run_list = get_grid_error_per_run(one_grid_path, dir_path, RUN, MODEL_NAME, notcombined)
     all_errors.append([rmse_run_list[0], 'grid'])
-    all_errors.append([rmse_run_list[1], 'pc'])
+    if notcombined:
+        all_errors.append([rmse_run_list[1], 'pc'])
 
 all_error_df = pd.DataFrame(all_errors, columns=['NRMSE', 'Level'])
 
@@ -77,4 +81,3 @@ error_path = f'{dir_path}/errors/'
 if not os.path.exists(error_path):
     os.makedirs(error_path)
 all_error_df.to_csv(f'{error_path}/final_errors.csv')
-
