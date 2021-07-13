@@ -65,7 +65,7 @@ one_grid_path = f'{PATH}/{MODEL_NAME}'
 
 for RUN in range(0, RUN_RANGE):
     if MODEL_NAME not in stat_models:
-        one_grid_path = f'{PATH}/{MODEL_NAME}/{RUN}'
+        one_grid_path = f'{PATH}/{MODEL_NAME}/grid/{RUN}'
     rmse_run_list = get_grid_error_per_run(one_grid_path, dir_path, RUN, MODEL_NAME)
     all_errors.append([rmse_run_list[0], 'grid'])
     all_errors.append([rmse_run_list[1], 'pc'])
