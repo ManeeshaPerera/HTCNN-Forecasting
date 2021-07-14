@@ -29,7 +29,7 @@ from constants import ALL_SWIS_TS, SWIS_POSTCODES
 
 from src.CNN_architectures.approachA import SWIS_APPROACH_A
 
-from src.CNN_architectures.approachB import SWIS_APPROACH_B
+from src.CNN_architectures.approachB import SWIS_APPROACH_B, SWIS_APPROACH_B_with_fully_connected, SWIS_APPROACH_B_with_clustering
 
 
 def create_window_data(filename, lookback=1):
@@ -115,9 +115,9 @@ def run_combine_model(approach, path, model_name, add_grid=True):
     history = model.fit(train_dic, label_grid, batch_size=128, epochs=1000,
                         callbacks=[callback], shuffle=False)
 
-    if not os.path.exists(path):
-        os.makedirs(path)
-    model.save(f'{path}/{model_name}')
+    # if not os.path.exists(path):
+    #     os.makedirs(path)
+    # model.save(f'{path}/{model_name}')
 
     # Forecast
     lookback = 1
@@ -147,12 +147,23 @@ def run_combine_model(approach, path, model_name, add_grid=True):
 
 
 # SWIS MODELS
+# final_test_models = {'0': {'func': SWIS_APPROACH_B,
+#                            'model_name': 'SWIS_APPROACH_B',
+#                            'folder': 'approachB'},
+#                      '1': {'func': SWIS_APPROACH_A,
+#                            'model_name': 'SWIS_APPROACH_A',
+#                            'folder': 'approachA'}
+#                      }
+
 final_test_models = {'0': {'func': SWIS_APPROACH_B,
                            'model_name': 'SWIS_APPROACH_B',
                            'folder': 'approachB'},
-                     '1': {'func': SWIS_APPROACH_A,
-                           'model_name': 'SWIS_APPROACH_A',
-                           'folder': 'approachA'}
+                     '1': {'func': SWIS_APPROACH_B_with_fully_connected,
+                           'model_name': 'SWIS_APPROACH_B_with_fully_connected',
+                           'folder': 'approachB'},
+                     '2': {'func': SWIS_APPROACH_B_with_clustering,
+                           'model_name': 'SWIS_APPROACH_B_with_clustering',
+                           'folder': 'approachB'}
                      }
 
 multiple_run = final_test_models[model_func_name]['folder']

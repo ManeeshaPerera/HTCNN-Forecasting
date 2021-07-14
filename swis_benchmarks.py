@@ -20,7 +20,7 @@ def run_naive_approach():
 
 # run_naive_approach()
 
-# Let's check ARIMA Now - we need to adjust the data to run the arima model (our data is in the shape for DNN models so we will chnage this for ARIMA)
+# Let's check ARIMA Now - we need to adjust the data to run the arima model (our data is in the shape for DNN models so we will change this for ARIMA)
 # for grid data we have no issue
 def change_data(pc_data):
     power_data = pc_data.iloc[:, [0]]
