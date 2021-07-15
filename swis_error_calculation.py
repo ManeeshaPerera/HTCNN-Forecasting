@@ -54,10 +54,14 @@ models = {'0': {'name': 'naive', 'dir': 'benchmark_results/swis_benchmarks', 'ru
           '3': {'name': 'SWIS_APPROACH_A', 'dir': 'swis_combined_nn_results/approachA', 'runs': 10},
           '4': {'name': 'conventional_cnn', 'dir': 'swis_conventional_nn_results', 'runs': 10},
           '5': {'name': 'conventional_tcn', 'dir': 'swis_conventional_nn_results', 'runs': 10},
-          '6': {'name': 'SWIS_APPROACH_B_with_clustering', 'dir': 'swis_combined_nn_results/approachB', 'runs': 1}}
+          '6': {'name': 'SWIS_APPROACH_B_with_clustering', 'dir': 'swis_combined_nn_results/approachB', 'runs': 1},
+          '7': {'name': 'SWIS_APPROACH_B', 'dir': 'swis_combined_nn_results/approachB', 'runs': 1},
+          '8': {'name': 'SWIS_APPROACH_A_SKIP', 'dir': 'swis_combined_nn_results/approachA', 'runs': 1},
+          '9': {'name': 'SWIS_APPROACH_B_with_fully_connected', 'dir': 'swis_combined_nn_results/approachB', 'runs': 1}}
 
 stat_models = ['arima', 'naive']
-combined = ['SWIS_APPROACH_A', 'SWIS_APPROACH_B_with_clustering']
+combined = ['SWIS_APPROACH_A', 'SWIS_APPROACH_B', 'SWIS_APPROACH_B_with_clustering', 'SWIS_APPROACH_A_SKIP',
+            'SWIS_APPROACH_B_with_fully_connected']
 conventional_nns = ['conventional_lstm', 'conventional_cnn', 'conventional_tcn']
 model_number = sys.argv[1]
 MODEL_NAME = models[model_number]['name']
