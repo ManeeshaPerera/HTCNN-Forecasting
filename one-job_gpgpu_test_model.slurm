@@ -32,3 +32,12 @@ module load tensorflow/2.3.1-python-3.7.4
 
 # The job command(s):
 python run_global_approach_for_SWIS.py 2 0
+python run_global_approach_for_SWIS.py 2 1
+python run_global_approach_for_SWIS.py 2 2
+python run_global_approach_for_SWIS.py 2 3
+python run_global_approach_for_SWIS.py 2 4
+python run_global_approach_for_SWIS.py 2 5
+python run_global_approach_for_SWIS.py 2 6
+python run_global_approach_for_SWIS.py 2 7
+python run_global_approach_for_SWIS.py 2 8
+python run_global_approach_for_SWIS.py 2 9

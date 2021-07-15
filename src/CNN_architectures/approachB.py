@@ -220,7 +220,8 @@ def SWIS_APPROACH_B_with_clustering():
             pc_index = index_mapping[str(postcode_in_cluster)]
             input_concat.append(input_layers_pc[pc_index])
         if len(input_concat) > 1:
-            concat_layer = layers.concatenate(input_concat, name=f'cluster_{cluster}_concat')
+            concat_layer_cluster = layers.concatenate(input_concat, name=f'cluster_{cluster}_concat')
+            concat_layer = layers.LayerNormalization(name=f'cluster_{cluster}_normalise')(concat_layer_cluster)
         else:
             concat_layer = input_concat[0]
         tcn_pc_output = local_convolution_TCN(concat_layer, tcn_grid, cluster)
