@@ -51,11 +51,14 @@ def get_grid_error_per_run(grid_model_path, model_path, run, model_name, notcomb
 models = {'0': {'name': 'naive', 'dir': 'benchmark_results/swis_benchmarks', 'runs': 1},
           '1': {'name': 'arima', 'dir': 'benchmark_results/swis_benchmarks', 'runs': 1},
           '2': {'name': 'conventional_lstm', 'dir': 'swis_conventional_nn_results', 'runs': 10},
-          '3': {'name': 'SWIS_APPROACH_A', 'dir': 'swis_combined_nn_results/approachA', 'runs': 10}}
+          '3': {'name': 'SWIS_APPROACH_A', 'dir': 'swis_combined_nn_results/approachA', 'runs': 10},
+          '4': {'name': 'conventional_cnn', 'dir': 'swis_conventional_nn_results', 'runs': 10},
+          '5': {'name': 'conventional_tcn', 'dir': 'swis_conventional_nn_results', 'runs': 10},
+          '6': {'name': 'SWIS_APPROACH_B_with_clustering', 'dir': 'swis_combined_nn_results/approachB', 'runs': 1}}
 
 stat_models = ['arima', 'naive']
-combined = ['SWIS_APPROACH_A']
-conventional_nns = ['conventional_lstm']
+combined = ['SWIS_APPROACH_A', 'SWIS_APPROACH_B_with_clustering']
+conventional_nns = ['conventional_lstm', 'conventional_cnn', 'conventional_tcn']
 model_number = sys.argv[1]
 MODEL_NAME = models[model_number]['name']
 PATH = models[model_number]['dir']
