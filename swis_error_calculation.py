@@ -54,10 +54,17 @@ models = {'0': {'name': 'naive', 'dir': 'benchmark_results/swis_benchmarks', 'ru
           '3': {'name': 'SWIS_APPROACH_A', 'dir': 'swis_combined_nn_results/approachA', 'runs': 10},
           '4': {'name': 'conventional_cnn', 'dir': 'swis_conventional_nn_results', 'runs': 10},
           '5': {'name': 'conventional_tcn', 'dir': 'swis_conventional_nn_results', 'runs': 10},
-          '6': {'name': 'SWIS_APPROACH_B_with_clustering', 'dir': 'swis_combined_nn_results/approachB', 'runs': 1},
-          '7': {'name': 'SWIS_APPROACH_B', 'dir': 'swis_combined_nn_results/approachB', 'runs': 1},
+          '6': {'name': 'SWIS_APPROACH_B_with_clustering', 'dir': 'swis_combined_nn_results/approachB', 'runs': 10},
+          '7': {'name': 'SWIS_APPROACH_B', 'dir': 'swis_combined_nn_results/approachB', 'runs': 10},
           '8': {'name': 'SWIS_APPROACH_A_SKIP', 'dir': 'swis_combined_nn_results/approachA', 'runs': 10},
-          '9': {'name': 'SWIS_APPROACH_B_with_fully_connected', 'dir': 'swis_combined_nn_results/approachB', 'runs': 1}}
+          # '9': {'name': 'SWIS_APPROACH_B_with_fully_connected', 'dir': 'swis_combined_nn_results/approachB', 'runs': 1},
+          '9': {'name': 'SWIS_APPROACH_A_more_layer', 'dir': 'swis_combined_nn_results/approachA', 'runs': 10},
+          '10': {'name': 'SWIS_APPROACH_A_more_layer_without_norm', 'dir': 'swis_combined_nn_results/approachA',
+                 'runs': 10},
+          '11': {'name': 'SWIS_APPROACH_A_more_layer_with_simple_CNN', 'dir': 'swis_combined_nn_results/approachA',
+                 'runs': 10},
+          '12': {'name': 'SWIS_APPROACH_B_with_clustering2', 'dir': 'swis_combined_nn_results/approachB', 'runs': 10},
+          }
 
 stat_models = ['arima', 'naive']
 combined = ['SWIS_APPROACH_A', 'SWIS_APPROACH_B', 'SWIS_APPROACH_B_with_clustering', 'SWIS_APPROACH_A_SKIP',
@@ -93,3 +100,6 @@ error_path = f'{dir_path}/errors/'
 if not os.path.exists(error_path):
     os.makedirs(error_path)
 all_error_df.to_csv(f'{error_path}/final_errors.csv')
+mean_std_df = all_error_df.groupby(by='Level').agg({'NRMSE': ['mean', 'std']})
+# we are running the combined results - so I am storing it in that path for ease
+mean_std_df.to_csv(f'swis_combined_nn_results/{MODEL_NAME}_final_mean_std.csv')
