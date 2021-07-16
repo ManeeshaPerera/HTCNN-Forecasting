@@ -243,6 +243,95 @@ def SWIS_APPROACH_B_with_clustering():
     return SWIS_APPROACH_B_with_clustering_model
 
 
+def SWIS_APPROACH_B_with_clustering2():
+    clusters = pd.read_csv('swis_ts_data/cluster_pc.csv').rename(columns={'Unnamed: 0': 'pc'})
+    clusters = clusters.loc[clusters['pc'].isin(constants.SWIS_POSTCODES)]
+    cluster_numbers = clusters.groupby(by='cluster_num').count().index.tolist()
+
+    def get_tcn_layer(dilation_rate, pc, layer_num, input_to_layer):
+        return tcn.TCN(nb_filters=32, kernel_size=2, nb_stacks=2, dilations=dilation_rate,
+                       padding='causal',
+                       use_skip_connections=True, dropout_rate=0.05,
+                       return_sequences=True,
+                       activation='relu', kernel_initializer='he_normal',
+                       use_batch_norm=False,
+                       use_layer_norm=False,
+                       use_weight_norm=True, name=f'TCN_{layer_num}_{pc}_grid')(input_to_layer)
+
+    def local_convolution_TCN(pc_ts, grid_conv_values, pc):
+        cnn_layer = 6
+        dilation_rate = 2
+        dilation_rates = [dilation_rate ** i for i in range(cnn_layer)]
+
+        concat_each_pc_grid = layers.concatenate([pc_ts, grid_conv_values], name=f'concat_{pc}_grid')
+
+        tcn_layer1 = get_tcn_layer([dilation_rates[0]], pc, 1, concat_each_pc_grid)
+        concat_grid_with_layer1 = layers.concatenate([tcn_layer1, grid_conv_values])
+        tcn_layer2 = get_tcn_layer([dilation_rates[1]], pc, 2, concat_grid_with_layer1)
+        concat_grid_with_layer2 = layers.concatenate([tcn_layer2, grid_conv_values])
+        tcn_layer3 = get_tcn_layer([dilation_rates[2]], pc, 3, concat_grid_with_layer2)
+        concat_grid_with_layer3 = layers.concatenate([tcn_layer3, grid_conv_values])
+        tcn_layer4 = get_tcn_layer([dilation_rates[3]], pc, 4, concat_grid_with_layer3)
+
+        return tcn_layer4
+
+    input_layers_pc = []
+    index_mapping = {}
+    grid_input = keras.Input(shape=(18 * 1, 7), name='input_grid')
+
+    count_index = 0
+    for ts in SWIS_POSTCODES:
+        input_layer = keras.Input(shape=(18 * 1, 14), name=f'input_postcode_{ts}')
+        input_layers_pc.append(input_layer)
+        index_mapping[str(ts)] = count_index
+        count_index += 1
+
+    # pass the grid input with Convolution
+    cnn_layer = 4
+    dilation_rate = 2
+    dilation_rates = [dilation_rate ** i for i in range(cnn_layer)]
+    tcn_grid = tcn.TCN(nb_filters=32, kernel_size=2, nb_stacks=cnn_layer, dilations=dilation_rates,
+                       padding='causal',
+                       use_skip_connections=True, dropout_rate=0.05,
+                       return_sequences=True,
+                       activation='relu', kernel_initializer='he_normal',
+                       use_batch_norm=False,
+                       use_layer_norm=False,
+                       use_weight_norm=True, name='TCN_grid')(grid_input)
+
+    tcn_outputs = []
+
+    for cluster in cluster_numbers:
+        # we have 20 clusters here when the postcodes are clustered
+        pc_array_per_cluster = clusters.loc[clusters['cluster_num'] == cluster]['pc'].values.tolist()
+        input_concat = []
+        for postcode_in_cluster in pc_array_per_cluster:
+            pc_index = index_mapping[str(postcode_in_cluster)]
+            input_concat.append(input_layers_pc[pc_index])
+        if len(input_concat) > 1:
+            concat_layer = layers.concatenate(input_concat, name=f'cluster_{cluster}_concat')
+            # concat_layer = layers.LayerNormalization(name=f'cluster_{cluster}_normalise')(concat_layer_cluster)
+        else:
+            concat_layer = input_concat[0]
+        tcn_pc_output = local_convolution_TCN(concat_layer, tcn_grid, cluster)
+        tcn_outputs.append(tcn_pc_output)
+
+    concat_features = layers.concatenate(
+        tcn_outputs,
+        name='concatenate_all')
+    flatten_out = layers.Flatten(name='flatten_all')(concat_features)
+    full_connected_layer = layers.Dense(18, activation='linear', name="prediction_layer")(flatten_out)
+
+    input_layers_pc.append(grid_input)
+    SWIS_APPROACH_B_with_clustering_model = keras.Model(
+        inputs=input_layers_pc, outputs=full_connected_layer)
+
+    SWIS_APPROACH_B_with_clustering_model.compile(loss=tf.losses.MeanSquaredError(),
+                                                  optimizer=tf.optimizers.Adam(0.0001),
+                                                  metrics=[tf.metrics.MeanAbsoluteError()])
+    return SWIS_APPROACH_B_with_clustering_model
+
+
 def grid_conv_added_at_each_TCN_together_skip_connection_True():
     def get_tcn_layer(dilation_rate, pc, layer_num, input_to_layer):
         return tcn.TCN(nb_filters=32, kernel_size=2, nb_stacks=2, dilations=dilation_rate,

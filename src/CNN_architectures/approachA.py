@@ -5,6 +5,175 @@ import src.CNN_architectures.temporal_conv as tcn
 from constants import SWIS_POSTCODES
 
 
+def SWIS_APPROACH_A_more_layer():
+    input_layers_pc = []
+    for ts in SWIS_POSTCODES:
+        input_layer = keras.Input(shape=(18 * 1, 14), name=f'input_postcode_{ts}')
+        input_layers_pc.append(input_layer)
+
+    # postcode convolutions
+    concatenation_pc = layers.concatenate(input_layers_pc,
+                                          name='postcode_concat')
+    pc_normalization = layers.LayerNormalization()(concatenation_pc)
+    cnn_layer = 10
+    tcn_stacks = 6
+    dilation_rate = 2
+    dilation_rates = [dilation_rate ** i for i in range(cnn_layer)]
+    padding = 'causal'
+    use_skip_connections = True
+    return_sequences = True
+    dropout_rate = 0.05
+    kernel_initializer = 'he_normal'
+    activation = 'relu'
+    use_batch_norm = False
+    use_layer_norm = False
+    use_weight_norm = True
+    tcn_pc_grid = tcn.TCN(nb_filters=32, kernel_size=2, nb_stacks=tcn_stacks, dilations=dilation_rates,
+                          padding=padding,
+                          use_skip_connections=use_skip_connections, dropout_rate=dropout_rate,
+                          return_sequences=return_sequences,
+                          activation=activation, kernel_initializer=kernel_initializer,
+                          use_batch_norm=use_batch_norm,
+                          use_layer_norm=use_layer_norm,
+                          use_weight_norm=use_weight_norm, name='pc_TCN')(pc_normalization)
+    flatten_pc = layers.Flatten(name='flatten_pc')(tcn_pc_grid)
+    full_connected_layer_pc = layers.Dense(18, activation='linear', name="prediction_layer_pc")(flatten_pc)
+
+    grid_model = grid_only_network_SWIS()
+
+    concatenation = layers.concatenate([grid_model.output, full_connected_layer_pc])
+    prediction_layer = layers.Dense(18, activation='linear', name="prediction_layer")(concatenation)
+
+    input_layers_pc.append(grid_model.input)
+    SWIS_APPROACH_A_more_layer_model = keras.Model(
+        inputs=input_layers_pc, outputs=prediction_layer)
+
+    SWIS_APPROACH_A_more_layer_model.compile(loss=tf.losses.MeanSquaredError(),
+                                             optimizer=tf.optimizers.Adam(0.0001),
+                                             metrics=[tf.metrics.MeanAbsoluteError()])
+    return SWIS_APPROACH_A_more_layer_model
+
+
+def SWIS_APPROACH_A_more_layer_without_norm():
+    input_layers_pc = []
+    for ts in SWIS_POSTCODES:
+        input_layer = keras.Input(shape=(18 * 1, 14), name=f'input_postcode_{ts}')
+        input_layers_pc.append(input_layer)
+
+    # postcode convolutions
+    concatenation_pc = layers.concatenate(input_layers_pc,
+                                          name='postcode_concat')
+    # pc_normalization = layers.LayerNormalization()(concatenation_pc)
+    cnn_layer = 10
+    tcn_stacks = 6
+    dilation_rate = 2
+    dilation_rates = [dilation_rate ** i for i in range(cnn_layer)]
+    padding = 'causal'
+    use_skip_connections = True
+    return_sequences = True
+    dropout_rate = 0.05
+    kernel_initializer = 'he_normal'
+    activation = 'relu'
+    use_batch_norm = False
+    use_layer_norm = False
+    use_weight_norm = True
+    tcn_pc_grid = tcn.TCN(nb_filters=32, kernel_size=2, nb_stacks=tcn_stacks, dilations=dilation_rates,
+                          padding=padding,
+                          use_skip_connections=use_skip_connections, dropout_rate=dropout_rate,
+                          return_sequences=return_sequences,
+                          activation=activation, kernel_initializer=kernel_initializer,
+                          use_batch_norm=use_batch_norm,
+                          use_layer_norm=use_layer_norm,
+                          use_weight_norm=use_weight_norm, name='pc_TCN')(concatenation_pc)
+    flatten_pc = layers.Flatten(name='flatten_pc')(tcn_pc_grid)
+    full_connected_layer_pc = layers.Dense(18, activation='linear', name="prediction_layer_pc")(flatten_pc)
+
+    grid_model = grid_only_network_SWIS()
+
+    concatenation = layers.concatenate([grid_model.output, full_connected_layer_pc])
+    prediction_layer = layers.Dense(18, activation='linear', name="prediction_layer")(concatenation)
+
+    input_layers_pc.append(grid_model.input)
+    SWIS_APPROACH_A_more_layer_without_norm_model = keras.Model(
+        inputs=input_layers_pc, outputs=prediction_layer)
+
+    SWIS_APPROACH_A_more_layer_without_norm_model.compile(loss=tf.losses.MeanSquaredError(),
+                                                          optimizer=tf.optimizers.Adam(0.0001),
+                                                          metrics=[tf.metrics.MeanAbsoluteError()])
+    return SWIS_APPROACH_A_more_layer_without_norm_model
+
+
+def gride_level_simple_CNN():
+    input_data = keras.Input(shape=(18 * 1, 14), name=f'input_grid')
+    cnn_layer1 = layers.Conv1D(kernel_size=2, padding='causal', filters=32, name=f'cnn_layer1')(input_data)
+    cnn_layer2 = layers.Conv1D(kernel_size=2, padding='causal', filters=32, name=f'cnn_layer2')(cnn_layer1)
+    max_pool_stage = layers.MaxPooling1D(padding='same')(cnn_layer2)
+    cnn_layer3 = layers.Conv1D(kernel_size=2, padding='causal', filters=32, name=f'cnn_layer3')(max_pool_stage)
+    cnn_layer4 = layers.Conv1D(kernel_size=2, padding='causal', filters=32, name=f'cnn_layer4')(cnn_layer3)
+    max_pool_stage_2 = layers.MaxPooling1D(padding='same')(cnn_layer4)
+
+    flatten_out = layers.Flatten(name='flatten_layer')(max_pool_stage_2)
+    #change for swis - we need to forecast 18 points
+    fully_connect_layer = layers.Dense(18, activation='linear')(flatten_out)
+    conventional_CNN = keras.Model(
+        inputs=input_data, outputs=fully_connect_layer)
+
+    conventional_CNN.compile(loss=tf.losses.MeanSquaredError(),
+                             optimizer=tf.optimizers.Adam(0.0001),
+                             metrics=[tf.metrics.MeanAbsoluteError()])
+    return conventional_CNN
+
+
+
+def SWIS_APPROACH_A_more_layer_with_simple_CNN():
+    input_layers_pc = []
+    for ts in SWIS_POSTCODES:
+        input_layer = keras.Input(shape=(18 * 1, 14), name=f'input_postcode_{ts}')
+        input_layers_pc.append(input_layer)
+
+    # postcode convolutions
+    concatenation_pc = layers.concatenate(input_layers_pc,
+                                          name='postcode_concat')
+    # pc_normalization = layers.LayerNormalization()(concatenation_pc)
+    cnn_layer = 10
+    tcn_stacks = 6
+    dilation_rate = 2
+    dilation_rates = [dilation_rate ** i for i in range(cnn_layer)]
+    padding = 'causal'
+    use_skip_connections = True
+    return_sequences = True
+    dropout_rate = 0.05
+    kernel_initializer = 'he_normal'
+    activation = 'relu'
+    use_batch_norm = False
+    use_layer_norm = False
+    use_weight_norm = True
+    tcn_pc_grid = tcn.TCN(nb_filters=32, kernel_size=2, nb_stacks=tcn_stacks, dilations=dilation_rates,
+                          padding=padding,
+                          use_skip_connections=use_skip_connections, dropout_rate=dropout_rate,
+                          return_sequences=return_sequences,
+                          activation=activation, kernel_initializer=kernel_initializer,
+                          use_batch_norm=use_batch_norm,
+                          use_layer_norm=use_layer_norm,
+                          use_weight_norm=use_weight_norm, name='pc_TCN')(concatenation_pc)
+    flatten_pc = layers.Flatten(name='flatten_pc')(tcn_pc_grid)
+    full_connected_layer_pc = layers.Dense(18, activation='linear', name="prediction_layer_pc")(flatten_pc)
+
+    grid_model = gride_level_simple_CNN()
+
+    concatenation = layers.concatenate([grid_model.output, full_connected_layer_pc])
+    prediction_layer = layers.Dense(18, activation='linear', name="prediction_layer")(concatenation)
+
+    input_layers_pc.append(grid_model.input)
+    SWIS_APPROACH_A_more_layer_without_norm_model = keras.Model(
+        inputs=input_layers_pc, outputs=prediction_layer)
+
+    SWIS_APPROACH_A_more_layer_without_norm_model.compile(loss=tf.losses.MeanSquaredError(),
+                                                          optimizer=tf.optimizers.Adam(0.0001),
+                                                          metrics=[tf.metrics.MeanAbsoluteError()])
+    return SWIS_APPROACH_A_more_layer_without_norm_model
+
+
 # WITH SKIP CONNECTIONS
 def grid_only_network_SWIS_SKIP():
     grid_input = keras.Input(shape=(18 * 1, 7), name='input_grid')
@@ -71,9 +240,6 @@ def SWIS_APPROACH_A_SKIP():
                                              optimizer=tf.optimizers.Adam(0.0001),
                                              metrics=[tf.metrics.MeanAbsoluteError()])
     return frozen_branch_approach_TCN_model
-
-
-
 
 
 # WITHOUT SKIP CONNECTIONS

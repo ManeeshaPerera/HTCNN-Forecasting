@@ -3,7 +3,7 @@
 #SBATCH --account="punim0512"
 
 # The name of the job:
-#SBATCH --job-name="HFModel"
+#SBATCH --job-name="HFModel3"
 
 # Partition for the job:
 #SBATCH --partition gpgpu
@@ -18,7 +18,10 @@
 #SBATCH --mem=64G
 
 # The maximum running time of the job in days-hours:mins:sec
-#SBATCH --time=06-00:00:0
+#SBATCH --time=04-00:00:0
+
+#Job array
+#SBATCH --array=0-9
 
 # Send yourself an email when the job:
 #SBATCH --mail-user=pereramg@student.unimelb.edu.au
@@ -31,13 +34,4 @@ module load python/3.7.4
 module load tensorflow/2.3.1-python-3.7.4
 
 # The job command(s):
-python run_global_approach_for_SWIS_experiment2.py 3 0
-python run_global_approach_for_SWIS_experiment2.py 3 1
-python run_global_approach_for_SWIS_experiment2.py 3 2
-python run_global_approach_for_SWIS_experiment2.py 3 3
-python run_global_approach_for_SWIS_experiment2.py 3 4
-python run_global_approach_for_SWIS_experiment2.py 3 5
-python run_global_approach_for_SWIS_experiment2.py 3 6
-python run_global_approach_for_SWIS_experiment2.py 3 7
-python run_global_approach_for_SWIS_experiment2.py 3 8
-python run_global_approach_for_SWIS_experiment2.py 3 9
+python run_global_approach_for_SWIS_experiment2.py 3 ${SLURM_ARRAY_TASK_ID}
