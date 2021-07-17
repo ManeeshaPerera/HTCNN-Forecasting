@@ -63,7 +63,7 @@ models = {'0': {'name': 'naive', 'dir': 'benchmark_results/swis_benchmarks', 'ru
           '11': {'name': 'SWIS_APPROACH_A_more_layer_with_simple_CNN', 'dir': 'swis_combined_nn_results/approachA',
                  'runs': 10},
           '12': {'name': 'SWIS_APPROACH_B_with_clustering2', 'dir': 'swis_combined_nn_results/approachB', 'runs': 10},
-          '13': {'name': 'approachB_sequentional_training', 'dir': 'swis_combined_nn_results/approachB', 'runs': 10}
+          '13': {'name': 'approachB_sequentional_training', 'dir': 'swis_combined_nn_results/approachB', 'runs': 3}
           }
 
 stat_models = ['arima', 'naive']
