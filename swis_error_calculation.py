@@ -69,7 +69,7 @@ models = {'0': {'name': 'naive', 'dir': 'benchmark_results/swis_benchmarks', 'ru
 stat_models = ['arima', 'naive']
 combined = ['SWIS_APPROACH_A', 'SWIS_APPROACH_B', 'SWIS_APPROACH_B_with_clustering', 'SWIS_APPROACH_A_SKIP',
             'SWIS_APPROACH_B_with_clustering2', 'SWIS_APPROACH_A_more_layer', 'SWIS_APPROACH_A_more_layer_without_norm',
-            'SWIS_APPROACH_A_more_layer_with_simple_CNN', 'approachB_sequentional_training']
+            'SWIS_APPROACH_A_more_layer_with_simple_CNN', 'sequentional_training_approach']
 conventional_nns = ['conventional_lstm', 'conventional_cnn', 'conventional_tcn']
 model_number = sys.argv[1]
 MODEL_NAME = models[model_number]['name']
