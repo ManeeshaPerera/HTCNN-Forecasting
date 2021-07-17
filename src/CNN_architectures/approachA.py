@@ -104,7 +104,7 @@ def SWIS_APPROACH_A_more_layer_without_norm():
 
 
 def gride_level_simple_CNN():
-    input_data = keras.Input(shape=(18 * 1, 14), name=f'input_grid')
+    input_data = keras.Input(shape=(18 * 1, 7), name=f'input_grid')
     cnn_layer1 = layers.Conv1D(kernel_size=2, padding='causal', filters=32, name=f'cnn_layer1')(input_data)
     cnn_layer2 = layers.Conv1D(kernel_size=2, padding='causal', filters=32, name=f'cnn_layer2')(cnn_layer1)
     max_pool_stage = layers.MaxPooling1D(padding='same')(cnn_layer2)
