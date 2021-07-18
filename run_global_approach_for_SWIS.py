@@ -29,7 +29,7 @@ from constants import ALL_SWIS_TS, SWIS_POSTCODES
 
 from src.CNN_architectures.approachA import SWIS_APPROACH_A
 
-from src.CNN_architectures.approachB import SWIS_APPROACH_B, SWIS_APPROACH_B_with_fully_connected, SWIS_APPROACH_B_with_clustering
+from src.CNN_architectures.approachB import SWIS_APPROACH_B, SWIS_APPROACH_B_with_fully_connected, SWIS_APPROACH_B_with_clustering, SWIS_APPROACH_B_max_pool
 
 
 def create_window_data(filename, lookback=1):
@@ -163,6 +163,9 @@ final_test_models = {'0': {'func': SWIS_APPROACH_B,
                            'folder': 'approachB'},
                      '2': {'func': SWIS_APPROACH_B_with_clustering,
                            'model_name': 'SWIS_APPROACH_B_with_clustering',
+                           'folder': 'approachB'},
+                     '3': {'func': SWIS_APPROACH_B_max_pool,
+                           'model_name': 'SWIS_APPROACH_B_max_pool',
                            'folder': 'approachB'}
                      }
 
