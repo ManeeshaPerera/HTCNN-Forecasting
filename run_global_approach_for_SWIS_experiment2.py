@@ -28,7 +28,8 @@ import pickle5 as pickle
 from constants import ALL_SWIS_TS, SWIS_POSTCODES
 
 from src.CNN_architectures.approachA import SWIS_APPROACH_A_more_layer, \
-    SWIS_APPROACH_A_more_layer_without_norm, SWIS_APPROACH_A_more_layer_with_simple_CNN
+    SWIS_APPROACH_A_more_layer_without_norm, SWIS_APPROACH_A_more_layer_with_simple_CNN, SWIS_APPROACH_A_SKIP_GRID_SKIP, \
+    SWIS_APPROACH_A_more_layer_without_norm_grid_skip
 
 from src.CNN_architectures.approachB import SWIS_APPROACH_B_with_clustering2
 
@@ -146,18 +147,27 @@ def run_combine_model(approach, path, model_name, add_grid=True):
     return df, history
 
 
-final_test_models = {'0': {'func': SWIS_APPROACH_A_more_layer,
-                           'model_name': 'SWIS_APPROACH_A_more_layer',
+# final_test_models = {'0': {'func': SWIS_APPROACH_A_more_layer,
+#                            'model_name': 'SWIS_APPROACH_A_more_layer',
+#                            'folder': 'approachA'},
+#                      '1': {'func': SWIS_APPROACH_A_more_layer_without_norm,
+#                            'model_name': 'SWIS_APPROACH_A_more_layer_without_norm',
+#                            'folder': 'approachA'},
+#                      '2': {'func': SWIS_APPROACH_A_more_layer_with_simple_CNN,
+#                            'model_name': 'SWIS_APPROACH_A_more_layer_with_simple_CNN',
+#                            'folder': 'approachA'},
+#                      '3': {'func': SWIS_APPROACH_B_with_clustering2,
+#                            'model_name': 'SWIS_APPROACH_B_with_clustering2',
+#                            'folder': 'approachB'}
+#                      }
+
+
+final_test_models = {'0': {'func': SWIS_APPROACH_A_SKIP_GRID_SKIP,
+                           'model_name': 'SWIS_APPROACH_A_SKIP_GRID_SKIP',
                            'folder': 'approachA'},
-                     '1': {'func': SWIS_APPROACH_A_more_layer_without_norm,
-                           'model_name': 'SWIS_APPROACH_A_more_layer_without_norm',
-                           'folder': 'approachA'},
-                     '2': {'func': SWIS_APPROACH_A_more_layer_with_simple_CNN,
-                           'model_name': 'SWIS_APPROACH_A_more_layer_with_simple_CNN',
-                           'folder': 'approachA'},
-                     '3': {'func': SWIS_APPROACH_B_with_clustering2,
-                           'model_name': 'SWIS_APPROACH_B_with_clustering2',
-                           'folder': 'approachB'}
+                     '1': {'func': SWIS_APPROACH_A_more_layer_without_norm_grid_skip,
+                           'model_name': 'SWIS_APPROACH_A_more_layer_without_norm_grid_skip',
+                           'folder': 'approachA'}
                      }
 
 multiple_run = final_test_models[model_func_name]['folder']
