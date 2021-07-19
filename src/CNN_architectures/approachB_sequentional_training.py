@@ -33,7 +33,6 @@ def sequentional_training_approach():
 
         return tcn_layer4
 
-
     grid_input = keras.Input(shape=(18 * 1, 7), name='input_grid')
     pc_input = keras.Input(shape=(18 * 1, 14), name='input_pc')
 
@@ -50,7 +49,6 @@ def sequentional_training_approach():
                        use_layer_norm=False,
                        use_weight_norm=True, name='TCN_grid')(grid_input)
 
-
     tcn_pc_output = local_convolution_TCN(pc_input, tcn_grid, 'pc')
     lstm_layer1 = layers.LSTM(32, return_sequences=True, kernel_regularizer=regularizers.l2())(tcn_pc_output)
     lstm_layer2 = layers.LSTM(32, return_sequences=False, kernel_regularizer=regularizers.l2())(lstm_layer1)
@@ -64,3 +62,20 @@ def sequentional_training_approach():
                                                        optimizer=tf.optimizers.Adam(0.0001),
                                                        metrics=[tf.metrics.MeanAbsoluteError()])
     return grid_conv_added_at_each_TCN_together_model
+
+
+def pc_together_2D_conv_approach():
+    pc_input = keras.Input(shape=(18 * 1, 1 * 101, 14), name='input_pc')
+
+    conv_2d_layer1 = layers.Conv2D(32, kernel_size=(4, 4))(pc_input)
+    conv_2d_layer2 = layers.Conv2D(32, kernel_size=(4, 4))(conv_2d_layer1)
+    flatten_out = layers.Flatten(name='flatten_all')(conv_2d_layer2)
+    full_connected_layer = layers.Dense(18, activation='linear', name="prediction_layer")(flatten_out)
+
+    pc_together_2D_conv_approach_model = keras.Model(
+        inputs=[pc_input], outputs=full_connected_layer)
+
+    pc_together_2D_conv_approach_model.compile(loss=tf.losses.MeanSquaredError(),
+                                               optimizer=tf.optimizers.Adam(0.0001),
+                                               metrics=[tf.metrics.MeanAbsoluteError()])
+    return pc_together_2D_conv_approach_model
