@@ -1,6 +1,7 @@
 import numpy as np
 from sklearn.metrics import mean_squared_error
 
+
 # calculate the MASE for a given horizon
 def MASE(training_series, testing_series, prediction_series, m, denom=None):
     # h = testing_series.shape[0]
@@ -66,8 +67,21 @@ def calculate_denom(train_df, m):
 def test_errors_nrmse(train_sample, test_sample, forecasts, horizon):
     nrmse_errors = []
     for h in range(0, len(test_sample), horizon):
-        rmse = mean_squared_error(test_sample[h: h + horizon], forecasts[h: h + horizon], squared = False)
+        rmse = mean_squared_error(test_sample[h: h + horizon], forecasts[h: h + horizon], squared=False)
         nrmse = rmse / np.mean(train_sample)
         nrmse_errors.append(nrmse)
 
     return np.mean(nrmse_errors), nrmse_errors
+
+
+def smape_test_sample(test_sample, forecasts, horizon):
+    smape_array = []
+    for h in range(0, len(test_sample), horizon):
+        smape_val = smape(test_sample[h: h + horizon], forecasts[h: h + horizon])
+        smape_array.append(smape_val)
+
+    return np.mean(smape_array), np.median(smape_array), smape_array
+
+
+def smape(A, F):
+    return 100 / len(A) * np.sum(2 * np.abs(F - A) / (np.abs(A) + np.abs(F)))

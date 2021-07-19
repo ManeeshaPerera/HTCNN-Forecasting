@@ -21,11 +21,6 @@ def sum_fc_results(ts_array, model_path, run, model_name):
 
 
 def calculate_grid_error(grid_model_path, dir_path, ts_array, run, model_name):
-    data = pd.read_csv('swis_ts_data/ts_data/grid.csv', index_col=[0])
-
-    train, test = util.split_train_test_statmodels_swis(data)
-    train_df = train[['power']]
-
     # let's take the power values from one dataframe
     results_df = pd.read_csv(f'{grid_model_path}/grid.csv', index_col=[0])
     test_sample = results_df['power'].values
@@ -33,19 +28,24 @@ def calculate_grid_error(grid_model_path, dir_path, ts_array, run, model_name):
     forecasts = sum_fc_results(ts_array, dir_path, run, model_name).values
     horizon = 18
 
-    mean_err, _ = err.test_errors_nrmse(train_df.values, test_sample, forecasts, horizon)
-    return mean_err
+    mean_err, median_err, _ = err.smape_test_sample(test_sample, forecasts, horizon)
+    return mean_err, median_err
 
 
 def get_grid_error_per_run(grid_model_path, model_path, run, model_name, notcombined=True):
-    level_rmse = []
-    grid_rmse = calculate_grid_error(grid_model_path, model_path, [const.ALL_SWIS_TS[0]], run, model_name)
+    level_smape = []
+    level_smape_median = []
+    grid_smape, grid_smape_median = calculate_grid_error(grid_model_path, model_path, [const.ALL_SWIS_TS[0]], run,
+                                                         model_name)
 
-    level_rmse.append(grid_rmse)
+    level_smape.append(grid_smape)
+    level_smape_median.append(grid_smape_median)
     if notcombined:
-        pc_rmse = calculate_grid_error(grid_model_path, model_path, const.SWIS_POSTCODES, run, model_name)
-        level_rmse.append(pc_rmse)
-    return level_rmse
+        pc_sampe, pc_sampe_meidan = calculate_grid_error(grid_model_path, model_path, const.SWIS_POSTCODES, run,
+                                                         model_name)
+        level_smape.append(pc_sampe)
+        level_smape_median.append(pc_sampe_meidan)
+    return level_smape, level_smape_median
 
 
 models = {'0': {'name': 'naive', 'dir': 'benchmark_results/swis_benchmarks', 'runs': 1},
@@ -83,6 +83,7 @@ RUN_RANGE = models[model_number]['runs']
 print(MODEL_NAME)
 
 all_errors = []
+all_errors_median = []
 dir_path = f'{PATH}/{MODEL_NAME}'
 one_grid_path = f'{PATH}/{MODEL_NAME}'
 
@@ -94,17 +95,33 @@ for RUN in range(0, RUN_RANGE):
     notcombined = True
     if MODEL_NAME in combined:
         notcombined = False
-    rmse_run_list = get_grid_error_per_run(one_grid_path, dir_path, RUN, MODEL_NAME, notcombined)
-    all_errors.append([rmse_run_list[0], 'grid'])
+    smape_mean_run_list, smape_median_run_list = get_grid_error_per_run(one_grid_path, dir_path, RUN, MODEL_NAME,
+                                                                        notcombined)
+    all_errors.append([smape_mean_run_list[0], 'grid'])
+    all_errors_median.append([smape_median_run_list[0], 'grid'])
     if notcombined:
-        all_errors.append([rmse_run_list[1], 'pc'])
+        all_errors.append([smape_mean_run_list[1], 'pc'])
+        all_errors_median.append([smape_median_run_list[1], 'pc'])
 
-all_error_df = pd.DataFrame(all_errors, columns=['NRMSE', 'Level'])
+all_error_df = pd.DataFrame(all_errors, columns=['sMAPE_MEAN', 'Level'])
+all_errors_median_df = pd.DataFrame(all_errors_median, columns=['sMAPE_Median', 'Level'])
 
-error_path = f'{dir_path}/errors/'
+
+error_path = f'{dir_path}/smape_errors/'
 if not os.path.exists(error_path):
     os.makedirs(error_path)
-all_error_df.to_csv(f'{error_path}/final_errors.csv')
-mean_std_df = all_error_df.groupby(by='Level').agg({'NRMSE': ['mean', 'std']})
+all_error_df.to_csv(f'{error_path}/smape_mean.csv')
+all_errors_median_df.to_csv(f'{error_path}/smape_median.csv')
+
+final_results = f'swis_combined_nn_results/SMAPE'
+if not os.path.exists(final_results):
+    os.makedirs(final_results)
+
+mean_std_df = all_error_df.groupby(by='Level').agg({'sMAPE_MEAN': ['mean', 'std']})
 # we are running the combined results - so I am storing it in that path for ease
-mean_std_df.to_csv(f'swis_combined_nn_results/{MODEL_NAME}_final_mean_std.csv')
+mean_std_df.to_csv(f'{final_results}/{MODEL_NAME}_smape_mean.csv')
+
+
+mean_std_df = all_errors_median_df.groupby(by='Level').agg({'sMAPE_Median': ['mean', 'std']})
+# we are running the combined results - so I am storing it in that path for ease
+mean_std_df.to_csv(f'{final_results}/{MODEL_NAME}_smape_median.csv')

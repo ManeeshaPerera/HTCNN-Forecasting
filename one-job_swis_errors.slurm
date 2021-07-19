@@ -30,4 +30,10 @@ module load gcc/8.3.0 cuda/10.1.243 openmpi/3.1.4
 module load python/3.7.4
 
 # The job command(s):
-python swis_error_calculation.py 13
+python swis_error_calculation2.py 0
+python swis_error_calculation2.py 1
+python swis_error_calculation2.py 2
+python swis_error_calculation2.py 4
+python swis_error_calculation2.py 5
+python swis_error_calculation2.py 7
+python swis_error_calculation2.py 10
