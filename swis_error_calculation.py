@@ -66,14 +66,25 @@ models = {'0': {'name': 'naive', 'dir': 'benchmark_results/swis_benchmarks', 'ru
           '13': {'name': 'sequentional_training_approach', 'dir': 'swis_combined_nn_results/approachB', 'runs': 3},
           '14': {'name': 'SWIS_APPROACH_A_SKIP_GRID_SKIP', 'dir': 'swis_combined_nn_results/approachA', 'runs': 10},
           '15': {'name': 'SWIS_APPROACH_A_more_layer_without_norm_grid_skip',
-                 'dir': 'swis_combined_nn_results/approachA', 'runs': 10}
+                 'dir': 'swis_combined_nn_results/approachA', 'runs': 10},
+          '16': {'name': 'pc_together_2D_conv_approach',
+                 'dir': 'swis_combined_nn_results/approachB', 'runs': 3},
+          '17': {'name': 'pc_together_2D_conv_approach_with_grid',
+                 'dir': 'swis_combined_nn_results/approachB', 'runs': 3},
+          '18': {'name': 'approachA_increase_number_of_filters',
+                 'dir': 'swis_combined_nn_results/approachA', 'runs': 3},
+          '19': {'name': 'pc_together_2D_conv_approach_with_simple_grid_cnn',
+                 'dir': 'swis_combined_nn_results/approachB', 'runs': 3},
+          '20': {'name': 'SWIS_APPROACH_A_reshape_appraoch',
+                 'dir': 'swis_combined_nn_results/approachA', 'runs': 3}
           }
 
 stat_models = ['arima', 'naive']
 combined = ['SWIS_APPROACH_A', 'SWIS_APPROACH_B', 'SWIS_APPROACH_B_with_clustering', 'SWIS_APPROACH_A_SKIP',
             'SWIS_APPROACH_B_with_clustering2', 'SWIS_APPROACH_A_more_layer', 'SWIS_APPROACH_A_more_layer_without_norm',
             'SWIS_APPROACH_A_more_layer_with_simple_CNN', 'sequentional_training_approach',
-            'SWIS_APPROACH_A_SKIP_GRID_SKIP', 'SWIS_APPROACH_A_more_layer_without_norm_grid_skip']
+            'SWIS_APPROACH_A_SKIP_GRID_SKIP', 'SWIS_APPROACH_A_more_layer_without_norm_grid_skip', 'pc_together_2D_conv_approach', 'pc_together_2D_conv_approach_with_grid'
+            , 'approachA_increase_number_of_filters', 'pc_together_2D_conv_approach_with_simple_grid_cnn', 'SWIS_APPROACH_A_reshape_appraoch']
 conventional_nns = ['conventional_lstm', 'conventional_cnn', 'conventional_tcn']
 model_number = sys.argv[1]
 MODEL_NAME = models[model_number]['name']
