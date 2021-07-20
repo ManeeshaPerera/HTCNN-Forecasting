@@ -27,7 +27,9 @@ import src.utils as utils
 import pickle5 as pickle
 from constants import ALL_SWIS_TS, SWIS_POSTCODES, PCS_SORTED_SWIS
 
-from src.CNN_architectures.approachB_sequentional_training import sequentional_training_approach, pc_together_2D_conv_approach
+from src.CNN_architectures.approachB_sequentional_training import sequentional_training_approach, \
+    pc_together_2D_conv_approach
+from src.CNN_architectures.swis_models import pc_together_2D_conv_approach_with_grid
 
 
 def create_window_data(filename, lookback=1):
@@ -116,17 +118,20 @@ def run_combine_model():
     grid_valus = train_dic_start['input_grid']
     new_pc_input = []
     new_label = []
+    grid_input = []
 
     for grid_index in range(0, len(grid_valus)):
         pc_ls = []
         for pc in PCS_SORTED_SWIS:
             pc_ls.append(train_dic_start[f'input_postcode_{pc}'][grid_index].reshape((18, 1, 14)))
         new_label.append(label_grid_start[grid_index])
+        grid_input.append(grid_valus[grid_index])
         concat_pc = np.concatenate(pc_ls, axis=1)
         new_pc_input.append(concat_pc)
 
     grid_valus_test = test_dic_start['input_grid']
     new_test_pc = []
+    new_grid_test = []
 
     for grid_index in range(0, len(grid_valus_test)):
         pc_ls = []
@@ -134,14 +139,17 @@ def run_combine_model():
             pc_ls.append(test_dic_start[f'input_postcode_{pc}'][grid_index].reshape((18, 1, 14)))
         concat_pc = np.concatenate(pc_ls, axis=1)
         new_test_pc.append(concat_pc)
+        new_grid_test.append(grid_valus_test[grid_index])
 
-    train_dic = {'input_pc': np.array(new_pc_input, dtype=np.float32)}
+    train_dic = {'input_pc': np.array(new_pc_input, dtype=np.float32),
+                 'input_grid': np.array(grid_input, dtype=np.float32)}
     label_grid = np.array(new_label, dtype=np.float32)
-    test_dic = {'input_pc': np.array(new_test_pc, dtype=np.float32)}
+    test_dic = {'input_pc': np.array(new_test_pc, dtype=np.float32),
+                'input_grid': np.array(new_grid_test, dtype=np.float32)}
 
-    model = pc_together_2D_conv_approach()
+    model = pc_together_2D_conv_approach_with_grid()
     callback = tf.keras.callbacks.EarlyStopping(monitor='loss', patience=100)
-    history = model.fit(train_dic, label_grid, batch_size=128, epochs=1000,
+    history = model.fit(train_dic, label_grid, batch_size=128, epochs=800,
                         callbacks=[callback], shuffle=False)
 
     # Forecast
@@ -171,8 +179,8 @@ def run_combine_model():
     return df, history
 
 
-final_test_models = {'0': {'func': pc_together_2D_conv_approach,
-                           'model_name': 'pc_together_2D_conv_approach',
+final_test_models = {'0': {'func': pc_together_2D_conv_approach_with_grid,
+                           'model_name': 'pc_together_2D_conv_approach_with_grid',
                            'folder': 'approachB'}
                      }
 

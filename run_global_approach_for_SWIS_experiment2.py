@@ -33,6 +33,7 @@ from src.CNN_architectures.approachA import SWIS_APPROACH_A_more_layer, \
 
 from src.CNN_architectures.approachB import SWIS_APPROACH_B_with_clustering2
 
+from src.CNN_architectures.swis_models import approachA_increase_number_of_filters, approachA_increase_layers, SWIS_APPROACH_A_reshape_appraoch
 
 def create_window_data(filename, lookback=1):
     horizon = 18  # day ahead forecast
@@ -112,8 +113,9 @@ def run_combine_model(approach, path, model_name, add_grid=True):
     test_dic, label_grid_test = get_samples(map_dic_test)
 
     model = approach()
-    callback = tf.keras.callbacks.EarlyStopping(monitor='loss', patience=50)
-    history = model.fit(train_dic, label_grid, batch_size=128, epochs=1000,
+    callback = tf.keras.callbacks.EarlyStopping(monitor='loss', patience=10)
+    # I am reducing the number of epochs too
+    history = model.fit(train_dic, label_grid, batch_size=128, epochs=500,
                         callbacks=[callback], shuffle=False)
 
     # if not os.path.exists(path):
@@ -162,11 +164,23 @@ def run_combine_model(approach, path, model_name, add_grid=True):
 #                      }
 
 
-final_test_models = {'0': {'func': SWIS_APPROACH_A_SKIP_GRID_SKIP,
-                           'model_name': 'SWIS_APPROACH_A_SKIP_GRID_SKIP',
+# final_test_models = {'0': {'func': SWIS_APPROACH_A_SKIP_GRID_SKIP,
+#                            'model_name': 'SWIS_APPROACH_A_SKIP_GRID_SKIP',
+#                            'folder': 'approachA'},
+#                      '1': {'func': SWIS_APPROACH_A_more_layer_without_norm_grid_skip,
+#                            'model_name': 'SWIS_APPROACH_A_more_layer_without_norm_grid_skip',
+#                            'folder': 'approachA'}
+#                      }
+
+
+final_test_models = {'0': {'func': approachA_increase_number_of_filters,
+                           'model_name': 'approachA_increase_number_of_filters',
                            'folder': 'approachA'},
-                     '1': {'func': SWIS_APPROACH_A_more_layer_without_norm_grid_skip,
-                           'model_name': 'SWIS_APPROACH_A_more_layer_without_norm_grid_skip',
+                     '1': {'func': approachA_increase_layers,
+                           'model_name': 'approachA_increase_layers',
+                           'folder': 'approachA'},
+                     '2': {'func': SWIS_APPROACH_A_reshape_appraoch,
+                           'model_name': 'SWIS_APPROACH_A_reshape_appraoch',
                            'folder': 'approachA'}
                      }
 
