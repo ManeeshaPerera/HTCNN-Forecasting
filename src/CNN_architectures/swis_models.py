@@ -232,3 +232,33 @@ def pc_together_2D_conv_approach_with_grid():
                                                optimizer=tf.optimizers.Adam(0.0001),
                                                metrics=[tf.metrics.MeanAbsoluteError()])
     return pc_together_2D_conv_approach_model
+
+
+def simple_grid_network_cnn():
+    grid_input = keras.Input(shape=(18 * 1, 7), name='input_grid')
+    cnn_layer1 = layers.Conv1D(kernel_size=2, filters=32, name=f'cnn_layer1')(grid_input)
+    cnn_layer2 = layers.Conv1D(kernel_size=2, filters=32, name=f'cnn_layer2')(cnn_layer1)
+    cnn_layer3 = layers.Conv1D(kernel_size=2, filters=32, name=f'cnn_layer3')(cnn_layer2)
+    flatten_out = layers.Flatten(name='flatten_grid')(cnn_layer3)
+    simple_grid_network_model = keras.Model(grid_input, flatten_out)
+    return simple_grid_network_model
+
+def pc_together_2D_conv_approach_with_simple_grid_cnn():
+    pc_input = keras.Input(shape=(18 * 1, 1 * 101, 14), name='input_pc')
+
+    conv_2d_layer1 = layers.Conv2D(32, kernel_size=(4, 4))(pc_input)
+    conv_2d_layer2 = layers.Conv2D(32, kernel_size=(4, 4))(conv_2d_layer1)
+    flatten_out = layers.Flatten(name='flatten_pc')(conv_2d_layer2)
+
+    grid_model = simple_grid_network_cnn()
+    concatenation = layers.concatenate([grid_model.output, flatten_out])
+    prediction_layer1 = layers.Dense(100, activation='linear', name="prediction_layer")(concatenation)
+    prediction_layer2 = layers.Dense(18, activation='linear', name="prediction_layer_final")(prediction_layer1)
+
+    pc_together_2D_conv_approach_with_simple_grid_cnn_model = keras.Model(
+        inputs=[pc_input, grid_model.input], outputs=prediction_layer2)
+
+    pc_together_2D_conv_approach_with_simple_grid_cnn_model.compile(loss=tf.losses.MeanSquaredError(),
+                                               optimizer=tf.optimizers.Adam(0.0001),
+                                               metrics=[tf.metrics.MeanAbsoluteError()])
+    return pc_together_2D_conv_approach_with_simple_grid_cnn_model

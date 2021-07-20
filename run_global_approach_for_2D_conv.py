@@ -29,7 +29,7 @@ from constants import ALL_SWIS_TS, SWIS_POSTCODES, PCS_SORTED_SWIS
 
 from src.CNN_architectures.approachB_sequentional_training import sequentional_training_approach, \
     pc_together_2D_conv_approach
-from src.CNN_architectures.swis_models import pc_together_2D_conv_approach_with_grid
+from src.CNN_architectures.swis_models import pc_together_2D_conv_approach_with_grid, pc_together_2D_conv_approach_with_simple_grid_cnn
 
 
 def create_window_data(filename, lookback=1):
@@ -92,7 +92,7 @@ def get_samples(map_dic):
     return output_values, output_labels['label_grid']
 
 
-def run_combine_model():
+def run_combine_model(model_run):
     window_data_pc = {}
     window_data_grid = {}
 
@@ -147,7 +147,7 @@ def run_combine_model():
     test_dic = {'input_pc': np.array(new_test_pc, dtype=np.float32),
                 'input_grid': np.array(new_grid_test, dtype=np.float32)}
 
-    model = pc_together_2D_conv_approach_with_grid()
+    model = model_run()
     callback = tf.keras.callbacks.EarlyStopping(monitor='loss', patience=100)
     history = model.fit(train_dic, label_grid, batch_size=128, epochs=800,
                         callbacks=[callback], shuffle=False)
@@ -179,8 +179,8 @@ def run_combine_model():
     return df, history
 
 
-final_test_models = {'0': {'func': pc_together_2D_conv_approach_with_grid,
-                           'model_name': 'pc_together_2D_conv_approach_with_grid',
+final_test_models = {'0': {'func': pc_together_2D_conv_approach_with_simple_grid_cnn,
+                           'model_name': 'pc_together_2D_conv_approach_with_simple_grid_cnn',
                            'folder': 'approachB'}
                      }
 
@@ -195,7 +195,7 @@ print("run: ", run)
 print("folder: ", multiple_run)
 
 model_new_name = f'{model_name}/{run}'  # this will save the models with the run info added as folder name
-forecasts, history = run_combine_model()
+forecasts, history = run_combine_model(function_run)
 
 dir_path = f'swis_combined_nn_results/{multiple_run}/{model_new_name}'
 if not os.path.exists(dir_path):
