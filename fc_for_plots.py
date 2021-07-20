@@ -10,11 +10,14 @@ models = {'0': {'name': 'naive', 'dir': 'benchmark_results/swis_benchmarks', 'ru
                 'runs': 10},
           '6': {'name': 'SWIS_APPROACH_B', 'dir': 'swis_combined_nn_results/approachB', 'runs': 10},
           '7': {'name': 'pc_together_2D_conv_approach', 'dir': 'swis_combined_nn_results/approachB', 'runs': 3},
-          '8': {'name': 'sequentional_training_approach', 'dir': 'swis_combined_nn_results/approachB', 'runs': 3}
+          '8': {'name': 'sequentional_training_approach', 'dir': 'swis_combined_nn_results/approachB', 'runs': 3},
+          '9': {'name': 'pc_together_2D_conv_approach_with_simple_grid_cnn',
+                'dir': 'swis_combined_nn_results/approachB', 'runs': 3}
           }
 
 stat_models = ['arima', 'naive']
-combined = ['SWIS_APPROACH_B', 'SWIS_APPROACH_A_more_layer_without_norm', 'pc_together_2D_conv_approach', 'sequentional_training_approach']
+combined = ['SWIS_APPROACH_B', 'SWIS_APPROACH_A_more_layer_without_norm', 'pc_together_2D_conv_approach',
+            'sequentional_training_approach', 'pc_together_2D_conv_approach_with_simple_grid_cnn']
 conventional_nns = ['conventional_lstm', 'conventional_cnn', 'conventional_tcn']
 
 
@@ -47,5 +50,3 @@ for _, model_info in models.items():
 
 all_fc_df = pd.concat(all_fc, axis=1)
 all_fc_df.to_csv('swis_combined_nn_results/forecasts.csv')
-
-
