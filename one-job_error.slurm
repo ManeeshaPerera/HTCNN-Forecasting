@@ -32,4 +32,3 @@ module load python/3.7.4
 # The job command(s):
 python swis_error_calculation.py 21
 python swis_error_calculation.py 22
-python create_multiple_hfs.py
