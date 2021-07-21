@@ -131,7 +131,7 @@ std_err = mean_std_df.values[0][1]
 
 # read the current error file -- note: I am currently running the combined approaches so this will be okay
 FILE = 'swis_combined_nn_results/errors.csv'
-errors = pd.read_csv(FILE)
+errors = pd.read_csv(FILE, index_col=0)
 errors = errors.append({'Name': MODEL_NAME, 'mean NRMSE': mean_err, 'std': std_err}, ignore_index=True)
 errors = errors.sort_values(by='mean NRMSE')
 errors.to_csv(FILE)
