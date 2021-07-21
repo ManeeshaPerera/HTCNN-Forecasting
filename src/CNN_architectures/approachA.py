@@ -6,6 +6,57 @@ from constants import SWIS_POSTCODES
 
 
 
+def multiple_hf_approachA(pc_list):
+    input_layers_pc = []
+    for ts in pc_list:
+        input_layer = keras.Input(shape=(18 * 1, 14), name=f'input_postcode_{ts}')
+        input_layers_pc.append(input_layer)
+
+    # postcode convolutions
+    concatenation_pc = layers.concatenate(input_layers_pc,
+                                          name='postcode_concat')
+    # pc_normalization = layers.LayerNormalization()(concatenation_pc)
+    cnn_layer = 6
+    tcn_stacks = 6
+    dilation_rate = 2
+    dilation_rates = [dilation_rate ** i for i in range(cnn_layer)]
+    padding = 'causal'
+    use_skip_connections = False
+    return_sequences = True
+    dropout_rate = 0.05
+    kernel_initializer = 'he_normal'
+    activation = 'relu'
+    use_batch_norm = False
+    use_layer_norm = False
+    use_weight_norm = True
+    tcn_pc_grid = tcn.TCN(nb_filters=32, kernel_size=2, nb_stacks=tcn_stacks, dilations=dilation_rates,
+                          padding=padding,
+                          use_skip_connections=use_skip_connections, dropout_rate=dropout_rate,
+                          return_sequences=return_sequences,
+                          activation=activation, kernel_initializer=kernel_initializer,
+                          use_batch_norm=use_batch_norm,
+                          use_layer_norm=use_layer_norm,
+                          use_weight_norm=use_weight_norm, name='pc_TCN')(concatenation_pc)
+    flatten_pc = layers.Flatten(name='flatten_pc')(tcn_pc_grid)
+    full_connected_layer_pc = layers.Dense(18, activation='linear', name="prediction_layer_pc")(flatten_pc)
+
+    grid_model = grid_only_network_SWIS()
+
+    concatenation = layers.concatenate([grid_model.output, full_connected_layer_pc])
+    prediction_layer = layers.Dense(18, activation='linear', name="prediction_layer")(concatenation)
+
+    input_layers_pc.append(grid_model.input)
+    SWIS_APPROACH_A_more_layer_without_norm_model = keras.Model(
+        inputs=input_layers_pc, outputs=prediction_layer)
+
+    SWIS_APPROACH_A_more_layer_without_norm_model.compile(loss=tf.losses.MeanSquaredError(),
+                                                          optimizer=tf.optimizers.Adam(0.0001),
+                                                          metrics=[tf.metrics.MeanAbsoluteError()])
+    return SWIS_APPROACH_A_more_layer_without_norm_model
+
+
+
+
 def SWIS_APPROACH_A_SKIP_GRID_SKIP():
     input_layers_pc = []
     for ts in SWIS_POSTCODES:
