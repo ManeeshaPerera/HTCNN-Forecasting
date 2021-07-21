@@ -1,4 +1,4 @@
-from constants import random_5_samples, random_25_samples, random_50_samples, random_75_samples
+from constants import random_5_samples, random_25_samples, random_50_samples, random_75_samples, random_sample_101
 import pandas as pd
 import src.calculate_errors as err
 import src.utils as util
@@ -12,7 +12,7 @@ models = {'0': {'name': 'naive', 'dir': 'benchmark_results/swis_benchmarks', 'ru
 stat_models = ['arima', 'naive']
 conventional_nns = ['conventional_lstm', 'conventional_cnn', 'conventional_tcn']
 all_methods = ['arima', 'naive', 'conventional_lstm', 'conventional_cnn', 'conventional_tcn']
-sample_list = [random_5_samples, random_25_samples, random_50_samples, random_75_samples]
+sample_list = [random_5_samples, random_25_samples, random_50_samples, random_75_samples, random_sample_101]
 
 data_frame_list = []
 
