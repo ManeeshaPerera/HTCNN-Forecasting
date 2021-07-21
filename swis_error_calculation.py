@@ -116,6 +116,15 @@ error_path = f'{dir_path}/errors/'
 if not os.path.exists(error_path):
     os.makedirs(error_path)
 all_error_df.to_csv(f'{error_path}/final_errors.csv')
+
 mean_std_df = all_error_df.groupby(by='Level').agg({'NRMSE': ['mean', 'std']})
-# we are running the combined results - so I am storing it in that path for ease
-mean_std_df.to_csv(f'swis_combined_nn_results/{MODEL_NAME}_final_mean_std.csv')
+mean_err = mean_std_df.values[0][0]
+std_err = mean_std_df.values[0][1]
+
+# read the current error file -- note: I am currently running the combined approaches so this will be okay
+FILE = 'swis_combined_nn_results/errors.csv'
+errors = pd.read_csv(FILE, index_col=0)
+errors.append([MODEL_NAME, mean_err, std_err])
+errors = errors.sort_values(by='mean NRMSE')
+errors.to_csv(FILE)
+

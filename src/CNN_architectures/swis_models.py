@@ -259,6 +259,6 @@ def pc_together_2D_conv_approach_with_simple_grid_cnn():
         inputs=[pc_input, grid_model.input], outputs=prediction_layer2)
 
     pc_together_2D_conv_approach_with_simple_grid_cnn_model.compile(loss=tf.losses.MeanSquaredError(),
-                                               optimizer=tf.optimizers.Adam(0.0001),
+                                               optimizer=tf.optimizers.Adam(0.0005),
                                                metrics=[tf.metrics.MeanAbsoluteError()])
     return pc_together_2D_conv_approach_with_simple_grid_cnn_model
