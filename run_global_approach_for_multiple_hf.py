@@ -175,5 +175,5 @@ if not os.path.exists(dir_path):
 
 forecasts.to_csv(f'{dir_path}/grid_sample_{sample}.csv')
 
-with open(f'{dir_path}/training_loss_grid_iteration', 'wb') as file_loss:
+with open(f'{dir_path}/training_loss_grid_iteration_{sample}', 'wb') as file_loss:
     pickle.dump(history.history, file_loss)
