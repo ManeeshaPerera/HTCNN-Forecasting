@@ -76,15 +76,22 @@ models = {'0': {'name': 'naive', 'dir': 'benchmark_results/swis_benchmarks', 'ru
           '19': {'name': 'pc_together_2D_conv_approach_with_simple_grid_cnn',
                  'dir': 'swis_combined_nn_results/approachB', 'runs': 3},
           '20': {'name': 'SWIS_APPROACH_A_reshape_appraoch',
-                 'dir': 'swis_combined_nn_results/approachA', 'runs': 3}
+                 'dir': 'swis_combined_nn_results/approachA', 'runs': 3},
+          '21': {'name': 'SWIS_APPROACH_B_max_pool',
+                 'dir': 'swis_combined_nn_results/approachB', 'runs': [0, 1, 2, 3, 5, 6, 7, 8, 9]},
+          '22': {'name': 'SWIS_APPROACH_B_with_fully_connected',
+                 'dir': 'swis_combined_nn_results/approachB', 'runs': [1, 2, 3, 4, 5, 6, 7, 9]}
           }
 
 stat_models = ['arima', 'naive']
 combined = ['SWIS_APPROACH_A', 'SWIS_APPROACH_B', 'SWIS_APPROACH_B_with_clustering', 'SWIS_APPROACH_A_SKIP',
             'SWIS_APPROACH_B_with_clustering2', 'SWIS_APPROACH_A_more_layer', 'SWIS_APPROACH_A_more_layer_without_norm',
             'SWIS_APPROACH_A_more_layer_with_simple_CNN', 'sequentional_training_approach',
-            'SWIS_APPROACH_A_SKIP_GRID_SKIP', 'SWIS_APPROACH_A_more_layer_without_norm_grid_skip', 'pc_together_2D_conv_approach', 'pc_together_2D_conv_approach_with_grid'
-            , 'approachA_increase_number_of_filters', 'pc_together_2D_conv_approach_with_simple_grid_cnn', 'SWIS_APPROACH_A_reshape_appraoch']
+            'SWIS_APPROACH_A_SKIP_GRID_SKIP', 'SWIS_APPROACH_A_more_layer_without_norm_grid_skip',
+            'pc_together_2D_conv_approach', 'pc_together_2D_conv_approach_with_grid'
+    , 'approachA_increase_number_of_filters', 'pc_together_2D_conv_approach_with_simple_grid_cnn',
+            'SWIS_APPROACH_A_reshape_appraoch', 'SWIS_APPROACH_B_max_pool',
+            'SWIS_APPROACH_B_with_fully_connected']
 conventional_nns = ['conventional_lstm', 'conventional_cnn', 'conventional_tcn']
 model_number = sys.argv[1]
 MODEL_NAME = models[model_number]['name']
@@ -97,7 +104,8 @@ all_errors = []
 dir_path = f'{PATH}/{MODEL_NAME}'
 one_grid_path = f'{PATH}/{MODEL_NAME}'
 
-for RUN in range(0, RUN_RANGE):
+# for RUN in range(0, RUN_RANGE):
+for RUN in RUN_RANGE:
     if MODEL_NAME in conventional_nns:
         one_grid_path = f'{PATH}/{MODEL_NAME}/grid/{RUN}'
     elif MODEL_NAME in combined:
@@ -127,4 +135,3 @@ errors = pd.read_csv(FILE, index_col=0)
 errors.append([MODEL_NAME, mean_err, std_err])
 errors = errors.sort_values(by='mean NRMSE')
 errors.to_csv(FILE)
-
