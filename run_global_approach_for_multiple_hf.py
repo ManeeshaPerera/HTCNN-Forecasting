@@ -30,7 +30,7 @@ import pickle5 as pickle
 from constants import random_5_samples, random_25_samples, random_50_samples, random_75_samples
 
 from src.CNN_architectures.approachA import multiple_hf_approachA
-from src.CNN_architectures.approachB import SWIS_APPROACH_B
+from src.CNN_architectures.approachB import grid_conv_added_at_each_TCN_multiple_hf
 
 
 
@@ -153,7 +153,7 @@ def run_combine_model(approach, category, pc_sample):
 final_test_models = {'0': {'func': multiple_hf_approachA,
                            'model_name': 'method-A',
                            'folder': 'method-A'},
-                     '1': {'func': SWIS_APPROACH_B,
+                     '1': {'func': grid_conv_added_at_each_TCN_multiple_hf,
                            'model_name': 'method-B',
                            'folder': 'method-B'}
                      }

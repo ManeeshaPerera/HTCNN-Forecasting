@@ -6,6 +6,80 @@ from constants import SWIS_POSTCODES
 import pandas as pd
 import constants
 
+def grid_conv_added_at_each_TCN_multiple_hf(pc_list):
+    def get_tcn_layer(dilation_rate, pc, layer_num, input_to_layer):
+        return tcn.TCN(nb_filters=32, kernel_size=2, nb_stacks=2, dilations=dilation_rate,
+                       padding='causal',
+                       use_skip_connections=True, dropout_rate=0.05,
+                       return_sequences=True,
+                       activation='relu', kernel_initializer='he_normal',
+                       use_batch_norm=False,
+                       use_layer_norm=False,
+                       use_weight_norm=True, name=f'TCN_{layer_num}_{pc}_grid')(input_to_layer)
+
+    def local_convolution_TCN(pc_ts, grid_conv_values, pc):
+        cnn_layer = 6
+        dilation_rate = 2
+        dilation_rates = [dilation_rate ** i for i in range(cnn_layer)]
+
+        concat_each_pc_grid = layers.concatenate([pc_ts, grid_conv_values], name=f'concat_{pc}_grid')
+
+        tcn_layer1 = get_tcn_layer([dilation_rates[0]], pc, 1, concat_each_pc_grid)
+        concat_grid_with_layer1 = layers.concatenate([tcn_layer1, grid_conv_values])
+        tcn_layer2 = get_tcn_layer([dilation_rates[1]], pc, 2, concat_grid_with_layer1)
+        concat_grid_with_layer2 = layers.concatenate([tcn_layer2, grid_conv_values])
+        tcn_layer3 = get_tcn_layer([dilation_rates[2]], pc, 3, concat_grid_with_layer2)
+        concat_grid_with_layer3 = layers.concatenate([tcn_layer3, grid_conv_values])
+        tcn_layer4 = get_tcn_layer([dilation_rates[3]], pc, 4, concat_grid_with_layer3)
+
+        return tcn_layer4
+
+    input_layers_pc = []
+    grid_input = keras.Input(shape=(18 * 1, 7), name='input_grid')
+
+    for ts in pc_list:
+        input_layer = keras.Input(shape=(18 * 1, 14), name=f'input_postcode_{ts}')
+        input_layers_pc.append(input_layer)
+
+    # pass the grid input with Convolution
+    cnn_layer = 4
+    dilation_rate = 2
+    dilation_rates = [dilation_rate ** i for i in range(cnn_layer)]
+    tcn_grid = tcn.TCN(nb_filters=32, kernel_size=2, nb_stacks=cnn_layer, dilations=dilation_rates,
+                       padding='causal',
+                       use_skip_connections=True, dropout_rate=0.05,
+                       return_sequences=True,
+                       activation='relu', kernel_initializer='he_normal',
+                       use_batch_norm=False,
+                       use_layer_norm=False,
+                       use_weight_norm=True, name='TCN_grid')(grid_input)
+
+    tcn_outputs = []
+
+    for pc_index in range(0, len(input_layers_pc)):
+        pc_number = pc_list[pc_index]
+        input_pc = input_layers_pc[pc_index]
+        tcn_pc_output = local_convolution_TCN(input_pc, tcn_grid, pc_number)
+        tcn_outputs.append(tcn_pc_output)
+
+    concat_features = layers.concatenate(
+        tcn_outputs,
+        name='concatenate_all')
+    flatten_out = layers.Flatten(name='flatten_all')(concat_features)
+    full_connected_layer = layers.Dense(18, activation='linear', name="prediction_layer")(flatten_out)
+
+    input_network = input_layers_pc.copy()
+    input_network.append(grid_input)
+    grid_conv_added_at_each_TCN_together_model = keras.Model(
+        inputs=input_network, outputs=full_connected_layer)
+
+    grid_conv_added_at_each_TCN_together_model.compile(loss=tf.losses.MeanSquaredError(),
+                                                       optimizer=tf.optimizers.Adam(0.0001),
+                                                       metrics=[tf.metrics.MeanAbsoluteError()])
+    return grid_conv_added_at_each_TCN_together_model
+
+
+
 
 
 def SWIS_APPROACH_B_max_pool():
