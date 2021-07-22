@@ -34,4 +34,4 @@ module load python/3.7.4
 module load tensorflow/2.3.1-python-3.7.4
 
 # The job command(s):
-python run_global_approach_for_multiple_hf.py 1 4 0 ${SLURM_ARRAY_TASK_ID}
+python run_global_approach_for_multiple_hf.py 0 4 0 ${SLURM_ARRAY_TASK_ID}
