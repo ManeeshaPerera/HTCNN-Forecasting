@@ -91,8 +91,9 @@ for category in sample_list[0:1]:
         run = 10
         for run_val in range(0, run):
             directory = f'swis_ts_data/category_{category_num}/{name}/{run}'
+            print(directory)
             try:
-                sample_fc = pd.read_csv(f'{directory}/grid_sample_{pc_combination}.csv')
+                sample_fc = pd.read_csv(f'{directory}/grid_sample_{pc_combination}.csv', index_col=0)
                 mean_error = calculate_our_method_error(sample_fc, category_num, pc_combination)
                 data_frame_list.append([run_val, pc_combination, category_num, name, mean_error])
             except:
