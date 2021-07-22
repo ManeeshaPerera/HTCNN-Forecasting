@@ -76,7 +76,7 @@ def calculate_our_method_error(fc_dataframe, category_no, sample_num):
     pc_power_df = fc_dataframe[['power']]
     pc_fc_df = fc_dataframe[['fc']]
     mean_err, _ = err.test_errors_nrmse(train.values, pc_power_df.values, pc_fc_df.values, 18)
-    return grid_values
+    return mean_err
 
 
 category_num = 0
