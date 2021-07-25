@@ -152,8 +152,8 @@ def run_combine_model(approach, category, pc_sample):
 
 
 final_test_models = {'0': {'func': multiple_hf_approachA,
-                           'model_name': 'method-AA',
-                           'folder': 'method-AA'},
+                           'model_name': 'method-A',
+                           'folder': 'method-A'},
                      '1': {'func': grid_conv_added_at_each_TCN_multiple_hf,
                            'model_name': 'method-B',
                            'folder': 'method-B'}
