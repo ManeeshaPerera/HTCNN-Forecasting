@@ -18,7 +18,7 @@
 #SBATCH --mem=64G
 
 # The maximum running time of the job in days-hours:mins:sec
-#SBATCH --time=01-12:00:0
+#SBATCH --time=00-08:00:0
 
 #Job array
 #SBATCH --array=0-9
@@ -34,4 +34,4 @@ module load python/3.7.4
 module load tensorflow/2.3.1-python-3.7.4
 
 # The job command(s):
-python run_global_approach_for_multiple_hf.py 0 2 0 ${SLURM_ARRAY_TASK_ID}
+python run_global_approach_for_multiple_hf.py 0 2 1 ${SLURM_ARRAY_TASK_ID}

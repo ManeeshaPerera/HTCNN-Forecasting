@@ -101,6 +101,7 @@ def run_combine_model(approach, category, pc_sample):
     ts_array = sample_list[category][pc_sample].copy()
     grid_str = f'grid_sample_{pc_sample}'
     ts_array.append(grid_str)
+    print(ts_array)
 
     for swis_ts in ts_array:
         if swis_ts == grid_str:
