@@ -18,6 +18,7 @@ all_ts_data
 swis_ts_data
 swis_conventional_nn_results
 swis_combined_nn_results
+slurm
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

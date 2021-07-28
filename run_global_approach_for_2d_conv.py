@@ -25,12 +25,13 @@ from src.WindowGenerator.window_generator import WindowGenerator
 from sklearn.preprocessing import StandardScaler
 import src.utils as utils
 import pickle5 as pickle
-from constants import ALL_SWIS_TS, SWIS_POSTCODES
+from constants import ALL_SWIS_TS, SWIS_POSTCODES, PCS_SORTED_SWIS
 
-from src.CNN_architectures.approachA import SWIS_APPROACH_A
+# from src.CNN_architectures.approachB_sequentional_training import sequentional_training_approach, \
+#     pc_together_2D_conv_approach
+# from src.CNN_architectures.swis_models import pc_together_2D_conv_approach_with_grid, pc_together_2D_conv_approach_with_simple_grid_cnn
 
-from src.CNN_architectures.approachB import SWIS_APPROACH_B, SWIS_APPROACH_B_with_fully_connected, SWIS_APPROACH_B_with_clustering, SWIS_APPROACH_B_max_pool
-
+from src.CNN_architectures.swis_new_architectures import pc_2d_conv_with_grid_tcn
 
 def create_window_data(filename, lookback=1):
     horizon = 18  # day ahead forecast
@@ -92,8 +93,7 @@ def get_samples(map_dic):
     return output_values, output_labels['label_grid']
 
 
-def run_combine_model(approach, path, model_name, add_grid=True):
-
+def run_combine_model(model_run):
     window_data_pc = {}
     window_data_grid = {}
 
@@ -107,17 +107,51 @@ def run_combine_model(approach, path, model_name, add_grid=True):
     map_dic_train = window_grid.train_combine_SWIS(window_data_pc)
     map_dic_test = window_grid.test_combine_SWIS(window_data_pc)
 
-    train_dic, label_grid = get_samples(map_dic_train)
-    test_dic, label_grid_test = get_samples(map_dic_test)
+    train_dic_start, label_grid_start = get_samples(map_dic_train)
+    test_dic_start, _ = get_samples(map_dic_test)
 
-    model = approach()
-    callback = tf.keras.callbacks.EarlyStopping(monitor='loss', patience=50)
-    history = model.fit(train_dic, label_grid, batch_size=128, epochs=1000,
+    # pc1 = train_dic_start[f'input_postcode_{ALL_SWIS_TS[1]}']
+    # pc2 = train_dic_start[f'input_postcode_{ALL_SWIS_TS[2]}']
+    # pc1_updated = pc1[0].reshape((18, 1, 14))
+    # pc2_updated = pc2[0].reshape((18, 1, 14))
+    # print(np.concatenate((pc1_updated, pc2_updated), axis=1).shape)
+
+    grid_valus = train_dic_start['input_grid']
+    new_pc_input = []
+    new_label = []
+    grid_input = []
+
+    for grid_index in range(0, len(grid_valus)):
+        pc_ls = []
+        for pc in PCS_SORTED_SWIS:
+            pc_ls.append(train_dic_start[f'input_postcode_{pc}'][grid_index].reshape((18, 1, 14)))
+        new_label.append(label_grid_start[grid_index])
+        grid_input.append(grid_valus[grid_index])
+        concat_pc = np.concatenate(pc_ls, axis=1)
+        new_pc_input.append(concat_pc)
+
+    grid_valus_test = test_dic_start['input_grid']
+    new_test_pc = []
+    new_grid_test = []
+
+    for grid_index in range(0, len(grid_valus_test)):
+        pc_ls = []
+        for pc in PCS_SORTED_SWIS:
+            pc_ls.append(test_dic_start[f'input_postcode_{pc}'][grid_index].reshape((18, 1, 14)))
+        concat_pc = np.concatenate(pc_ls, axis=1)
+        new_test_pc.append(concat_pc)
+        new_grid_test.append(grid_valus_test[grid_index])
+
+    train_dic = {'input_pc': np.array(new_pc_input, dtype=np.float32),
+                 'input_grid': np.array(grid_input, dtype=np.float32)}
+    label_grid = np.array(new_label, dtype=np.float32)
+    test_dic = {'input_pc': np.array(new_test_pc, dtype=np.float32),
+                'input_grid': np.array(new_grid_test, dtype=np.float32)}
+
+    model = model_run()
+    callback = tf.keras.callbacks.EarlyStopping(monitor='loss', patience=100)
+    history = model.fit(train_dic, label_grid, batch_size=128, epochs=800,
                         callbacks=[callback], shuffle=False)
-
-    # if not os.path.exists(path):
-    #     os.makedirs(path)
-    # model.save(f'{path}/{model_name}')
 
     # Forecast
     lookback = 1
@@ -146,31 +180,12 @@ def run_combine_model(approach, path, model_name, add_grid=True):
     return df, history
 
 
-# SWIS MODELS
-# final_test_models = {'0': {'func': SWIS_APPROACH_B,
-#                            'model_name': 'SWIS_APPROACH_B',
-#                            'folder': 'approachB'},
-#                      '1': {'func': SWIS_APPROACH_A,
-#                            'model_name': 'SWIS_APPROACH_A',
-#                            'folder': 'approachA'}
-#                      }
-
-final_test_models = {'0': {'func': SWIS_APPROACH_B,
-                           'model_name': 'SWIS_APPROACH_B',
-                           'folder': 'approachB'},
-                     '1': {'func': SWIS_APPROACH_B_with_fully_connected,
-                           'model_name': 'SWIS_APPROACH_B_with_fully_connected',
-                           'folder': 'approachB'},
-                     '2': {'func': SWIS_APPROACH_B_with_clustering,
-                           'model_name': 'SWIS_APPROACH_B_with_clustering',
-                           'folder': 'approachB'},
-                     '3': {'func': SWIS_APPROACH_B_max_pool,
-                           'model_name': 'SWIS_APPROACH_B_max_pool',
-                           'folder': 'approachB'}
+final_test_models = {'0': {'func': pc_2d_conv_with_grid_tcn,
+                           'model_name': 'pc_2d_conv_with_grid_tcn',
+                           'folder': 'new_models'}
                      }
 
 multiple_run = final_test_models[model_func_name]['folder']
-model_save_path = f'swis_combined_nn_results/{multiple_run}/saved_models'
 model_name = final_test_models[model_func_name]['model_name']
 function_run = final_test_models[model_func_name]['func']
 
@@ -180,7 +195,7 @@ print("run: ", run)
 print("folder: ", multiple_run)
 
 model_new_name = f'{model_name}/{run}'  # this will save the models with the run info added as folder name
-forecasts, history = run_combine_model(function_run, model_save_path, model_new_name)
+forecasts, history = run_combine_model(function_run)
 
 dir_path = f'swis_combined_nn_results/{multiple_run}/{model_new_name}'
 if not os.path.exists(dir_path):
