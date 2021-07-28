@@ -25,7 +25,7 @@
 
 # Send yourself an email when the job:
 #SBATCH --mail-user=pereramg@student.unimelb.edu.au
-#SBATCH --mail-type=BEGIN,FAIL,END
+#SBATCH --mail-type=FAIL,END
 
 source /usr/local/module/spartan_new.sh
 module load fosscuda/2019b
