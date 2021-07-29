@@ -129,7 +129,7 @@ for model_number in models:
         if notcombined:
             all_errors.append([MODEL_NAME, rmse_run_list[1], RUN, 'pc'])
 
-all_error_df = pd.DataFrame(all_errors, columns=['model_name', 'error', 'run' 'Level'])
+all_error_df = pd.DataFrame(all_errors, columns=['model_name', 'error', 'run', 'Level'])
 
 error_path = f'swis_combined_nn_results/all_errors.csv'
 all_error_df.to_csv(error_path)
