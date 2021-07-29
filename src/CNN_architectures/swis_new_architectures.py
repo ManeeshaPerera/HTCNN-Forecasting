@@ -39,7 +39,7 @@ def swis_parallel_ts():
         all_tcn_outputs.append(ts_flatten)
 
     concat_layer = layers.concatenate(all_tcn_outputs)
-    dense_1 = layers.Dense(100, activation='relu', name="dense_1")(concat_layer)
+    dense_1 = layers.Dense(100, activation='linear', name="dense_1")(concat_layer)
     final_fully_connect_layer = layers.Dense(18, activation='linear', name="prediction_layer")(dense_1)
 
     swis_parallel_ts_model = keras.Model(inputs=input_layers, outputs=final_fully_connect_layer)
@@ -86,7 +86,7 @@ def swis_pc_grid_parallel():
     flatten_grid = layers.Flatten(name='flatten_grid')(tcn_grid)
 
     concatenation = layers.concatenate([flatten_grid, flatten_pc])
-    dense_1 = layers.Dense(30, activation='relu', name="dense_1")(concatenation)
+    dense_1 = layers.Dense(30, activation='linear', name="dense_1")(concatenation)
     prediction_layer = layers.Dense(18, activation='linear', name="prediction_layer")(dense_1)
 
     input_layers_pc.append(grid_input)
@@ -100,8 +100,8 @@ def swis_pc_grid_parallel():
 def pc_2d_conv_with_grid_tcn():
     pc_input = keras.Input(shape=(18 * 1, 1 * 101, 14), name='input_pc')
 
-    conv_2d_layer1 = layers.Conv2D(32, kernel_size=(4, 4))(pc_input)
-    conv_2d_layer2 = layers.Conv2D(32, kernel_size=(4, 4))(conv_2d_layer1)
+    conv_2d_layer1 = layers.Conv2D(32, kernel_size=(4, 4), activation='relu')(pc_input)
+    conv_2d_layer2 = layers.Conv2D(32, kernel_size=(4, 4), activation='relu')(conv_2d_layer1)
     flatten_out_pc = layers.Flatten(name='flatten_pc')(conv_2d_layer2)
 
     # gird convolution
@@ -119,7 +119,7 @@ def pc_2d_conv_with_grid_tcn():
     flatten_grid = layers.Flatten(name='flatten_grid')(tcn_grid)
 
     concatenation = layers.concatenate([flatten_grid, flatten_out_pc])
-    dense_layer_1 = layers.Dense(100, activation='relu', name="dense_layer1")(concatenation)
+    dense_layer_1 = layers.Dense(100, activation='linear', name="dense_layer1")(concatenation)
     prediction_layer = layers.Dense(18, activation='linear', name="prediction_layer")(dense_layer_1)
 
     pc_2d_conv_with_grid_tcn_model = keras.Model(
