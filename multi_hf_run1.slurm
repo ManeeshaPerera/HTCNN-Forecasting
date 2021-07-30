@@ -3,7 +3,7 @@
 #SBATCH --account="punim0512"
 
 # The name of the job:
-#SBATCH --job-name="HFModelRun5"
+#SBATCH --job-name="multi_hf_run1"
 
 # Partition for the job:
 #SBATCH --partition gpgpu
@@ -25,7 +25,7 @@
 
 # Send yourself an email when the job:
 #SBATCH --mail-user=pereramg@student.unimelb.edu.au
-#SBATCH --mail-type=BEGIN,FAIL,END
+#SBATCH --mail-type=FAIL,END
 
 source /usr/local/module/spartan_new.sh
 module load fosscuda/2019b
@@ -34,4 +34,4 @@ module load python/3.7.4
 module load tensorflow/2.3.1-python-3.7.4
 
 # The job command(s):
-python run_global_approach_for_multiple_hf.py 0 5 1 ${SLURM_ARRAY_TASK_ID}
+python run_global_approach_for_multiple_hf.py 0 1 2 ${SLURM_ARRAY_TASK_ID}
