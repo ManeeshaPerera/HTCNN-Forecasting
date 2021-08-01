@@ -80,14 +80,14 @@ def calculate_our_method_error(fc_dataframe, category_no, sample_num):
 
 
 category_num = 0
-for category in sample_list[0:1]:
+for category in sample_list:
     print("random_sample_category", category_num)
     pc_combination = 0
     for pc_list in category:
         print("pc random in that sample", pc_combination)
         print(pc_list)
         gird_level = []
-        name = 'method-AA'
+        name = 'method-A'
         run = 10
         for run_val in range(0, run):
             directory = f'swis_ts_data/category_{category_num}/{name}/{run_val}'
@@ -102,4 +102,4 @@ for category in sample_list[0:1]:
     category_num += 1
 
 data_frame_store = pd.DataFrame(data_frame_list, columns=['run', 'sample', 'category', 'method', 'error'])
-data_frame_store.to_csv('swis_ts_data/hf_dataframe_errors_methodAA.csv')
+data_frame_store.to_csv('swis_ts_data/hf_dataframe_errors_methodA.csv')
