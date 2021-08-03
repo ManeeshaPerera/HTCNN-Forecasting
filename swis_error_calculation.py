@@ -99,7 +99,7 @@ stat_models = ['arima', 'naive']
 #             'SWIS_APPROACH_A_reshape_appraoch', 'SWIS_APPROACH_B_max_pool',
 #             'SWIS_APPROACH_B_with_fully_connected']
 
-combined = ['pc_2d_conv_with_grid_tcn', 'pc_2d_conv_with_grid_tcn_method2']
+combined = ['pc_2d_conv_with_grid_tcn', 'pc_2d_conv_with_grid_tcn_method2', 'SWIS_APPROACH_A_more_layer_without_norm_grid_skip', 'swis_pc_grid_parallel']
 conventional_nns = ['conventional_lstm', 'conventional_cnn', 'conventional_tcn']
 # model_number = sys.argv[1]
 # MODEL_NAME = models[model_number]['name']
