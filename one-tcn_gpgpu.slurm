@@ -21,7 +21,7 @@
 #SBATCH --time=05-00:00:0
 
 #Job array
-#SBATCH --array=0-101
+#SBATCH --array=0-100
 
 # Send yourself an email when the job:
 #SBATCH --mail-user=pereramg@student.unimelb.edu.au
@@ -34,13 +34,13 @@ module load python/3.7.4
 module load tensorflow/2.3.1-python-3.7.4
 
 # The job command(s):
-python run_benchmark_nns.py ${SLURM_ARRAY_TASK_ID} 2 0
-python run_benchmark_nns.py ${SLURM_ARRAY_TASK_ID} 2 1
-python run_benchmark_nns.py ${SLURM_ARRAY_TASK_ID} 2 2
-python run_benchmark_nns.py ${SLURM_ARRAY_TASK_ID} 2 3
-python run_benchmark_nns.py ${SLURM_ARRAY_TASK_ID} 2 4
-python run_benchmark_nns.py ${SLURM_ARRAY_TASK_ID} 2 5
-python run_benchmark_nns.py ${SLURM_ARRAY_TASK_ID} 2 6
-python run_benchmark_nns.py ${SLURM_ARRAY_TASK_ID} 2 7
-python run_benchmark_nns.py ${SLURM_ARRAY_TASK_ID} 2 8
-python run_benchmark_nns.py ${SLURM_ARRAY_TASK_ID} 2 9
+python run_global_approach_for_swis2.py 0 0 ${SLURM_ARRAY_TASK_ID}
+python run_global_approach_for_swis2.py 0 1 ${SLURM_ARRAY_TASK_ID}
+python run_global_approach_for_swis2.py 0 2 ${SLURM_ARRAY_TASK_ID}
+python run_global_approach_for_swis2.py 0 3 ${SLURM_ARRAY_TASK_ID}
+python run_global_approach_for_swis2.py 0 4 ${SLURM_ARRAY_TASK_ID}
+python run_global_approach_for_swis2.py 0 5 ${SLURM_ARRAY_TASK_ID}
+python run_global_approach_for_swis2.py 0 6 ${SLURM_ARRAY_TASK_ID}
+python run_global_approach_for_swis2.py 0 7 ${SLURM_ARRAY_TASK_ID}
+python run_global_approach_for_swis2.py 0 8 ${SLURM_ARRAY_TASK_ID}
+python run_global_approach_for_swis2.py 0 9 ${SLURM_ARRAY_TASK_ID}
