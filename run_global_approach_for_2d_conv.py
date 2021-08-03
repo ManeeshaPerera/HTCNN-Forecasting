@@ -148,7 +148,7 @@ def run_combine_model(model_run):
 
     model = model_run()
     callback = tf.keras.callbacks.EarlyStopping(monitor='loss', patience=100)
-    history = model.fit(train_dic, label_grid, batch_size=128, epochs=800,
+    history = model.fit(train_dic, label_grid, batch_size=128, epochs=150,
                         callbacks=[callback], shuffle=False)
 
     # Forecast
