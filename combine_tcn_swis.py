@@ -10,7 +10,7 @@ data_frame_list = []
 def sum_fc_results(ts_array, run):
     dfs = []
     for ts in ts_array:
-        ts_fc = pd.read_csv(f'swis_conventional_nn_results/{ts}/{run}/grid.csv', index_col=[0])[['fc']]
+        ts_fc = pd.read_csv(f'swis_conventional_nn_results/conventional_tcn/{ts}/{run}/grid.csv', index_col=[0])[['fc']]
         dfs.append(ts_fc)
     concat_df = pd.DataFrame(pd.concat(dfs, axis=1).sum(axis=1), columns=['tcn_fc'])
     return concat_df
