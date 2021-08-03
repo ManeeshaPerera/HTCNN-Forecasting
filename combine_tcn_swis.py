@@ -18,7 +18,7 @@ def sum_fc_results(ts_array, run):
 
 def calculate_our_method_error(pc_fc_df, category_no, sample_num, pc_power_df, category_val):
     if category_val == 4:
-        grid_values = pd.read_csv(f'swis_ts_data/ts_data/grid.csv.csv', index_col=0)
+        grid_values = pd.read_csv(f'swis_ts_data/ts_data/grid.csv', index_col=0)
     else:
         grid_values = pd.read_csv(f'swis_ts_data/category_{category_no}/grid_sample_{sample_num}.csv', index_col=0)
     train, _ = util.split_train_test_statmodels_swis(grid_values)
