@@ -52,7 +52,7 @@ for category in sample_list:
                 power = pd.read_csv(f'{directory}/grid_sample_{pc_combination}.csv', index_col=0)[['power']]
 
             # let's get the tcn fc and get the mean
-            tcn_fc = sum_fc_results(pc_list, run)
+            tcn_fc = sum_fc_results(pc_list, run_val)
             fc_df = pd.DataFrame(pd.concat([sample_fc, tcn_fc], axis=1).mean(axis=1), columns=['fc'])
 
             mean_error = calculate_our_method_error(fc_df, category_num, pc_combination, power, category_num)
