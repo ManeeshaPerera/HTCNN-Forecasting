@@ -83,9 +83,8 @@ def get_grid_error_per_run(grid_model_path, model_path, run, model_name, notcomb
 #                  'dir': 'swis_combined_nn_results/approachB', 'runs': [1, 2, 3, 4, 5, 6, 7, 9]}
 #           }
 
-models = {'0': {'name': 'swis_parallel_ts', 'dir': 'swis_combined_nn_results/new_models', 'runs': 10},
-          '1': {'name': 'swis_pc_grid_parallel', 'dir': 'swis_combined_nn_results/new_models', 'runs': 10},
-          '2': {'name': 'pc_2d_conv_with_grid_tcn', 'dir': 'swis_combined_nn_results/new_models', 'runs': 10},
+models = {'0': {'name': 'pc_2d_conv_with_grid_tcn', 'dir': 'swis_combined_nn_results/new_models', 'runs': 10},
+          '1': {'name': 'pc_2d_conv_with_grid_tcn_method2', 'dir': 'swis_combined_nn_results/new_models', 'runs': 10}
           }
 
 stat_models = ['arima', 'naive']
@@ -98,7 +97,7 @@ stat_models = ['arima', 'naive']
 #             'SWIS_APPROACH_A_reshape_appraoch', 'SWIS_APPROACH_B_max_pool',
 #             'SWIS_APPROACH_B_with_fully_connected']
 
-combined = ['swis_parallel_ts', 'pc_2d_conv_with_grid_tcn', 'swis_pc_grid_parallel']
+combined = ['pc_2d_conv_with_grid_tcn', 'pc_2d_conv_with_grid_tcn_method2']
 conventional_nns = ['conventional_lstm', 'conventional_cnn', 'conventional_tcn']
 # model_number = sys.argv[1]
 # MODEL_NAME = models[model_number]['name']
