@@ -44,8 +44,8 @@ for category in sample_list:
             # print(directory)
             if category_num == 4:
                 # method A forecast
-                sample_fc = pd.read_csv(f'{directory}/grid.csv', index_col=0)[['fc']]
-                power = pd.read_csv(f'{directory}/grid.csv', index_col=0)[['power']]
+                sample_fc = pd.read_csv(f'{directory}/{run_val}/grid.csv', index_col=0)[['fc']]
+                power = pd.read_csv(f'{directory}/{run_val}/grid.csv', index_col=0)[['power']]
             else:
                 # method A forecast
                 sample_fc = pd.read_csv(f'{directory}/grid_sample_{pc_combination}.csv', index_col=0)[['fc']]
