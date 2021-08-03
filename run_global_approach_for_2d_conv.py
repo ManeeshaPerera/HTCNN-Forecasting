@@ -169,7 +169,8 @@ def run_combine_model(model_run):
     fc = model.predict(test_dic)
 
     for sample in range(0, len(fc), 18):
-        fc_sample = fc[sample]
+        # fc_sample = fc[sample]
+        fc_sample = fc[sample].reshape(-1,1)
         fc_sample = scaler.inverse_transform(fc_sample)
         fc_array.extend(fc_sample)
 
