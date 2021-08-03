@@ -6,6 +6,7 @@ import src.calculate_errors as err
 sample_list = [random_5_samples, random_25_samples, random_50_samples, random_75_samples, random_sample_101]
 data_frame_list = []
 
+
 def sum_fc_results(ts_array, run):
     dfs = []
     for ts in ts_array:
@@ -41,24 +42,21 @@ for category in sample_list:
             else:
                 directory = f'swis_ts_data/category_{category_num}/{name}/{run_val}'
             # print(directory)
-            try:
-                if category_num == 4:
-                    # method A forecast
-                    sample_fc = pd.read_csv(f'{directory}/grid.csv', index_col=0)[['fc']]
-                    power = pd.read_csv(f'{directory}/grid.csv', index_col=0)[['power']]
-                else:
-                    # method A forecast
-                    sample_fc = pd.read_csv(f'{directory}/grid_sample_{pc_combination}.csv', index_col=0)[['fc']]
-                    power = pd.read_csv(f'{directory}/grid_sample_{pc_combination}.csv', index_col=0)[['power']]
+            if category_num == 4:
+                # method A forecast
+                sample_fc = pd.read_csv(f'{directory}/grid.csv', index_col=0)[['fc']]
+                power = pd.read_csv(f'{directory}/grid.csv', index_col=0)[['power']]
+            else:
+                # method A forecast
+                sample_fc = pd.read_csv(f'{directory}/grid_sample_{pc_combination}.csv', index_col=0)[['fc']]
+                power = pd.read_csv(f'{directory}/grid_sample_{pc_combination}.csv', index_col=0)[['power']]
 
-                # let's get the tcn fc and get the mean
-                tcn_fc = sum_fc_results(pc_list, run)
-                fc_df = pd.DataFrame(pd.concat([sample_fc, tcn_fc], axis=1).mean(axis=1), columns=['fc'])
+            # let's get the tcn fc and get the mean
+            tcn_fc = sum_fc_results(pc_list, run)
+            fc_df = pd.DataFrame(pd.concat([sample_fc, tcn_fc], axis=1).mean(axis=1), columns=['fc'])
 
-                mean_error = calculate_our_method_error(fc_df, category_num, pc_combination, power, category_num)
-                data_frame_list.append([run_val, pc_combination, category_num, 'ensemble', mean_error])
-            except:
-                print("no file")
+            mean_error = calculate_our_method_error(fc_df, category_num, pc_combination, power, category_num)
+            data_frame_list.append([run_val, pc_combination, category_num, 'ensemble', mean_error])
         pc_combination += 1
     category_num += 1
 
