@@ -3,7 +3,7 @@
 #SBATCH --account="punim0512"
 
 # The name of the job:
-#SBATCH --job-name="HFModel3"
+#SBATCH --job-name="CNN"
 
 # Partition for the job:
 #SBATCH --partition gpgpu
@@ -18,7 +18,7 @@
 #SBATCH --mem=64G
 
 # The maximum running time of the job in days-hours:mins:sec
-#SBATCH --time=00-08:00:0
+#SBATCH --time=01-00:00:0
 
 #Job array
 #SBATCH --array=0-9

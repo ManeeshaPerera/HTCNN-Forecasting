@@ -22,7 +22,7 @@ tf.config.threading.set_intra_op_parallelism_threads(1)
 
 import pandas as pd
 from src.WindowGenerator.window_generator import WindowGenerator
-from sklearn.preprocessing import StandardScaler
+from sklearn.preprocessing import StandardScaler, MinMaxScaler
 import src.utils as utils
 import pickle5 as pickle
 from constants import ALL_SWIS_TS, SWIS_POSTCODES
@@ -30,7 +30,7 @@ from constants import ALL_SWIS_TS, SWIS_POSTCODES
 # from src.CNN_architectures.approachA import SWIS_APPROACH_A
 
 # from src.CNN_architectures.approachB import SWIS_APPROACH_B, SWIS_APPROACH_B_with_fully_connected, SWIS_APPROACH_B_with_clustering, SWIS_APPROACH_B_max_pool
-from src.CNN_architectures.swis_new_architectures import swis_pc_grid_parallel, swis_parallel_ts
+from src.CNN_architectures.swis_new_architectures import swis_pc_grid_parallel, SWIS_APPROACH_A_more_layer_without_norm_grid_skip
 
 
 def create_window_data(filename, lookback=1):
@@ -42,7 +42,9 @@ def create_window_data(filename, lookback=1):
 
     train, test = utils.split_hourly_data_test_SWIS(data, look_back)
 
-    scaler = StandardScaler()
+    # scaler = StandardScaler()
+
+    scaler = MinMaxScaler()
     scaler.fit(train.values)
     train_array = scaler.transform(train.values)
     # val_array = scaler.transform(val.values)
@@ -124,7 +126,8 @@ def run_combine_model(approach):
     train, test = utils.split_hourly_data_test_SWIS(data, look_back)
     dataframe_store = test[look_back:][['power']]
 
-    scaler = StandardScaler()
+    # scaler = StandardScaler()
+    scaler = MinMaxScaler()
     scaler.fit(train[['power']].values)
 
     fc_array = []
@@ -142,8 +145,10 @@ def run_combine_model(approach):
     return df, history
 
 
-final_test_models = {'0': {'func': swis_parallel_ts,
-                           'model_name': 'swis_parallel_ts',
+# running with min max scaling
+
+final_test_models = {'0': {'func': SWIS_APPROACH_A_more_layer_without_norm_grid_skip,
+                           'model_name': 'SWIS_APPROACH_A_more_layer_without_norm_grid_skip',
                            'folder': 'new_models'},
                      '1': {'func': swis_pc_grid_parallel,
                            'model_name': 'swis_pc_grid_parallel',

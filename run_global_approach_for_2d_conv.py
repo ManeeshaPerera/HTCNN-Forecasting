@@ -22,16 +22,12 @@ tf.config.threading.set_intra_op_parallelism_threads(1)
 
 import pandas as pd
 from src.WindowGenerator.window_generator import WindowGenerator
-from sklearn.preprocessing import StandardScaler
+from sklearn.preprocessing import StandardScaler, MinMaxScaler
 import src.utils as utils
 import pickle5 as pickle
 from constants import ALL_SWIS_TS, SWIS_POSTCODES, PCS_SORTED_SWIS
 
-# from src.CNN_architectures.approachB_sequentional_training import sequentional_training_approach, \
-#     pc_together_2D_conv_approach
-# from src.CNN_architectures.swis_models import pc_together_2D_conv_approach_with_grid, pc_together_2D_conv_approach_with_simple_grid_cnn
-
-from src.CNN_architectures.swis_new_architectures import pc_2d_conv_with_grid_tcn
+from src.CNN_architectures.swis_new_architectures import pc_2d_conv_with_grid_tcn, pc_2d_conv_with_grid_tcn_method2
 
 def create_window_data(filename, lookback=1):
     horizon = 18  # day ahead forecast
@@ -42,8 +38,10 @@ def create_window_data(filename, lookback=1):
 
     train, test = utils.split_hourly_data_test_SWIS(data, look_back)
 
-    scaler = StandardScaler()
+    # scaler = StandardScaler()
+    scaler = MinMaxScaler()
     scaler.fit(train.values)
+
     train_array = scaler.transform(train.values)
     # val_array = scaler.transform(val.values)
     test_array = scaler.transform(test.values)
@@ -162,7 +160,8 @@ def run_combine_model(model_run):
     train, test = utils.split_hourly_data_test_SWIS(data, look_back)
     dataframe_store = test[look_back:][['power']]
 
-    scaler = StandardScaler()
+    # scaler = StandardScaler()
+    scaler = MinMaxScaler()
     scaler.fit(train[['power']].values)
 
     fc_array = []
@@ -182,6 +181,9 @@ def run_combine_model(model_run):
 
 final_test_models = {'0': {'func': pc_2d_conv_with_grid_tcn,
                            'model_name': 'pc_2d_conv_with_grid_tcn',
+                           'folder': 'new_models'},
+                     '1': {'func': pc_2d_conv_with_grid_tcn_method2,
+                           'model_name': 'pc_2d_conv_with_grid_tcn_method2',
                            'folder': 'new_models'}
                      }
 
