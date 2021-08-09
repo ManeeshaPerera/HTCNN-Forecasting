@@ -39,9 +39,9 @@ def calculate_grid_error(grid_model_path, dir_path, ts_array, run, model_name):
 
 def get_grid_error_per_run(grid_model_path, model_path, run, model_name, notcombined=True):
     level_rmse = []
-    grid_rmse = calculate_grid_error(grid_model_path, model_path, [const.ALL_SWIS_TS[0]], run, model_name)
-
-    level_rmse.append(grid_rmse)
+    if model_name not in no_grid:
+        grid_rmse = calculate_grid_error(grid_model_path, model_path, [const.ALL_SWIS_TS[0]], run, model_name)
+        level_rmse.append(grid_rmse)
     if notcombined:
         pc_rmse = calculate_grid_error(grid_model_path, model_path, const.SWIS_POSTCODES, run, model_name)
         level_rmse.append(pc_rmse)
@@ -83,11 +83,15 @@ def get_grid_error_per_run(grid_model_path, model_path, run, model_name, notcomb
 #                  'dir': 'swis_combined_nn_results/approachB', 'runs': [1, 2, 3, 4, 5, 6, 7, 9]}
 #           }
 
-models = {'0': {'name': 'pc_2d_conv_with_grid_tcn', 'dir': 'swis_combined_nn_results/new_models', 'runs': 10},
-          '1': {'name': 'pc_2d_conv_with_grid_tcn_method2', 'dir': 'swis_combined_nn_results/new_models', 'runs': 10},
-          '2': {'name': 'SWIS_APPROACH_A_more_layer_without_norm_grid_skip', 'dir': 'swis_combined_nn_results/new_models', 'runs': 10},
-          '3': {'name': 'swis_pc_grid_parallel', 'dir': 'swis_combined_nn_results/new_models', 'runs': 10}
-          }
+# models = {'0': {'name': 'pc_2d_conv_with_grid_tcn', 'dir': 'swis_combined_nn_results/new_models', 'runs': 10},
+#           '1': {'name': 'pc_2d_conv_with_grid_tcn_method2', 'dir': 'swis_combined_nn_results/new_models', 'runs': 10},
+#           '2': {'name': 'SWIS_APPROACH_A_more_layer_without_norm_grid_skip', 'dir': 'swis_combined_nn_results/new_models', 'runs': 10},
+#           '3': {'name': 'swis_pc_grid_parallel', 'dir': 'swis_combined_nn_results/new_models', 'runs': 10}
+#           }
+
+models = {'0': {'name': 'SWIS_APPROACH_A_with_weather_only', 'dir': 'swis_combined_nn_results/new_models', 'runs': 10},
+          '1': {'name': 'grid_conv_in_each_pc_seperately', 'dir': 'swis_combined_nn_results/new_models', 'runs': 10}
+        }
 
 stat_models = ['arima', 'naive']
 # combined = ['SWIS_APPROACH_A', 'SWIS_APPROACH_B', 'SWIS_APPROACH_B_with_clustering', 'SWIS_APPROACH_A_SKIP',
@@ -99,8 +103,10 @@ stat_models = ['arima', 'naive']
 #             'SWIS_APPROACH_A_reshape_appraoch', 'SWIS_APPROACH_B_max_pool',
 #             'SWIS_APPROACH_B_with_fully_connected']
 
-combined = ['pc_2d_conv_with_grid_tcn', 'pc_2d_conv_with_grid_tcn_method2', 'SWIS_APPROACH_A_more_layer_without_norm_grid_skip', 'swis_pc_grid_parallel']
-conventional_nns = ['conventional_lstm', 'conventional_cnn', 'conventional_tcn']
+combined = ['pc_2d_conv_with_grid_tcn', 'pc_2d_conv_with_grid_tcn_method2', 'SWIS_APPROACH_A_more_layer_without_norm_grid_skip', 'swis_pc_grid_parallel',
+            'SWIS_APPROACH_A_with_weather_only']
+conventional_nns = ['conventional_lstm', 'conventional_cnn', 'conventional_tcn', 'grid_conv_in_each_pc_seperately']
+no_grid = ['grid_conv_in_each_pc_seperately']
 # model_number = sys.argv[1]
 # MODEL_NAME = models[model_number]['name']
 # PATH = models[model_number]['dir']
@@ -120,19 +126,23 @@ for model_number in models:
     for RUN in range(0, RUN_RANGE):
         if MODEL_NAME in conventional_nns:
             one_grid_path = f'{PATH}/{MODEL_NAME}/grid/{RUN}'
+            if MODEL_NAME in no_grid:
+                one_grid_path = f'{PATH}/conventional_tcn/grid/{RUN}'
         elif MODEL_NAME in combined:
             one_grid_path = f'{PATH}/{MODEL_NAME}/{RUN}'
         notcombined = True
         if MODEL_NAME in combined:
             notcombined = False
         rmse_run_list = get_grid_error_per_run(one_grid_path, dir_path, RUN, MODEL_NAME, notcombined)
-        all_errors.append([MODEL_NAME, rmse_run_list[0], RUN, 'grid'])
+
+        if MODEL_NAME not in no_grid:
+            all_errors.append([MODEL_NAME, rmse_run_list[0], RUN, 'grid'])
         if notcombined:
             all_errors.append([MODEL_NAME, rmse_run_list[1], RUN, 'pc'])
 
 all_error_df = pd.DataFrame(all_errors, columns=['model_name', 'error', 'run', 'Level'])
 
-error_path = f'swis_combined_nn_results/all_errors.csv'
+error_path = f'swis_combined_nn_results/all_errors_new.csv'
 all_error_df.to_csv(error_path)
 # if not os.path.exists(error_path):
 #     os.makedirs(error_path)
