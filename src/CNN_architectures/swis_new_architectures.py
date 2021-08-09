@@ -299,6 +299,24 @@ def SWIS_APPROACH_A_more_layer_without_norm_grid_skip():
     return SWIS_APPROACH_A_more_layer_without_norm_model
 
 
+def grid_only_simple():
+    grid_input = keras.Input(shape=(18 * 1, 7), name='input_grid')
+    cnn_layer = 4
+    dilation_rate = 2
+    dilation_rates = [dilation_rate ** i for i in range(cnn_layer)]
+    tcn_grid = tcn.TCN(nb_filters=32, kernel_size=2, nb_stacks=2, dilations=dilation_rates,
+                       padding='causal',
+                       use_skip_connections=False, dropout_rate=0.05,
+                       return_sequences=True,
+                       activation='relu', kernel_initializer='he_normal',
+                       use_batch_norm=False,
+                       use_layer_norm=False,
+                       use_weight_norm=True, name='TCN_grid')(grid_input)
+    flatten_grid = layers.Flatten(name='flatten_grid')(tcn_grid)
+    full_connected_layer = layers.Dense(18, activation='linear', name="prediction_layer_grid")(flatten_grid)
+    grid_simple_model = keras.Model(grid_input, full_connected_layer)
+    return grid_simple_model
+
 
 def SWIS_APPROACH_A_with_weather_only():
     input_layers_pc = []
@@ -310,8 +328,8 @@ def SWIS_APPROACH_A_with_weather_only():
     concatenation_pc = layers.concatenate(input_layers_pc,
                                           name='postcode_concat')
     # pc_normalization = layers.LayerNormalization()(concatenation_pc)
-    cnn_layer = 10
-    tcn_stacks = 6
+    cnn_layer = 6
+    tcn_stacks = 2
     dilation_rate = 2
     dilation_rates = [dilation_rate ** i for i in range(cnn_layer)]
     padding = 'causal'
@@ -321,8 +339,8 @@ def SWIS_APPROACH_A_with_weather_only():
     kernel_initializer = 'he_normal'
     activation = 'relu'
     use_batch_norm = False
-    use_layer_norm = False
-    use_weight_norm = True
+    use_layer_norm = True
+    use_weight_norm = False
     tcn_pc_grid = tcn.TCN(nb_filters=32, kernel_size=2, nb_stacks=tcn_stacks, dilations=dilation_rates,
                           padding=padding,
                           use_skip_connections=use_skip_connections, dropout_rate=dropout_rate,
@@ -334,16 +352,15 @@ def SWIS_APPROACH_A_with_weather_only():
     flatten_pc = layers.Flatten(name='flatten_pc')(tcn_pc_grid)
     full_connected_layer_pc = layers.Dense(18, activation='linear', name="prediction_layer_pc")(flatten_pc)
 
-    grid_model = grid_only_network_SWIS_SKIP()
-
+    grid_model = grid_only_simple()
     concatenation = layers.concatenate([grid_model.output, full_connected_layer_pc])
     prediction_layer = layers.Dense(18, activation='linear', name="prediction_layer")(concatenation)
 
     input_layers_pc.append(grid_model.input)
-    SWIS_APPROACH_A_more_layer_without_norm_model = keras.Model(
+    swis_weather_model = keras.Model(
         inputs=input_layers_pc, outputs=prediction_layer)
 
-    SWIS_APPROACH_A_more_layer_without_norm_model.compile(loss=tf.losses.MeanSquaredError(),
+    swis_weather_model.compile(loss=tf.losses.MeanSquaredError(),
                                                           optimizer=tf.optimizers.Adam(0.0001),
                                                           metrics=[tf.metrics.MeanAbsoluteError()])
-    return SWIS_APPROACH_A_more_layer_without_norm_model
+    return swis_weather_model
