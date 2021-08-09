@@ -127,7 +127,7 @@ for model_number in models:
         if MODEL_NAME in conventional_nns:
             one_grid_path = f'{PATH}/{MODEL_NAME}/grid/{RUN}'
             if MODEL_NAME in no_grid:
-                one_grid_path = f'{PATH}/conventional_tcn/grid/{RUN}'
+                one_grid_path = f'swis_conventional_nn_results/conventional_tcn/grid/{RUN}'
         elif MODEL_NAME in combined:
             one_grid_path = f'{PATH}/{MODEL_NAME}/{RUN}'
         notcombined = True
