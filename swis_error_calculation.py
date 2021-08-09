@@ -137,7 +137,9 @@ for model_number in models:
 
         if MODEL_NAME not in no_grid:
             all_errors.append([MODEL_NAME, rmse_run_list[0], RUN, 'grid'])
-        if notcombined:
+        else:
+            all_errors.append([MODEL_NAME, rmse_run_list[0], RUN, 'pc'])
+        if notcombined and (MODEL_NAME not in no_grid):
             all_errors.append([MODEL_NAME, rmse_run_list[1], RUN, 'pc'])
 
 all_error_df = pd.DataFrame(all_errors, columns=['model_name', 'error', 'run', 'Level'])
