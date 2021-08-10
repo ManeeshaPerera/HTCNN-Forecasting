@@ -91,7 +91,9 @@ def get_grid_error_per_run(grid_model_path, model_path, run, model_name, notcomb
 
 models = {'0': {'name': 'SWIS_APPROACH_A_with_weather_only', 'dir': 'swis_combined_nn_results/new_models', 'runs': 10},
           '1': {'name': 'grid_conv_in_each_pc_seperately', 'dir': 'swis_combined_nn_results/new_models', 'runs': 10},
-          '2': {'name': 'concat_pc_with_grid_tcn', 'dir': 'swis_combined_nn_results/new_models', 'runs': 10}
+          '2': {'name': 'concat_pc_with_grid_tcn', 'dir': 'swis_combined_nn_results/new_models', 'runs': 10},
+          '3': {'name': 'pc_2d_conv_with_grid_tcn', 'dir': 'swis_combined_nn_results/new_models', 'runs': 7},
+          '4': {'name': 'pc_2d_conv_with_grid_tcn_method2', 'dir': 'swis_combined_nn_results/new_models', 'runs': 7}
         }
 
 stat_models = ['arima', 'naive']
