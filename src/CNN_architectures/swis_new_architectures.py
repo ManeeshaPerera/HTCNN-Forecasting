@@ -367,7 +367,7 @@ def SWIS_APPROACH_A_with_weather_only():
 
 
 
-def concat_pc_with_grid_tcn():
+def concat_pc_with_grid_tcn2():
     input_layers_pc = []
     for ts in SWIS_POSTCODES:
         input_layer = keras.Input(shape=(18 * 1, 14), name=f'input_postcode_{ts}')
@@ -403,17 +403,17 @@ def concat_pc_with_grid_tcn():
                        use_layer_norm=False,
                        use_weight_norm=True, name=f'TCN_{layer_num}_grid')(input_to_layer)
 
-    dilation_rates = [2 ** i for i in range(4)]
+    # dilation_rates = [2 ** i for i in range(4)]
 
     concat_each_pc_grid = layers.concatenate([tcn_pc_grid, grid_input], name=f'concat_pc_grid')
 
-    tcn_layer1 = get_tcn_layer([dilation_rates[0]], 1, concat_each_pc_grid)
+    tcn_layer1 = get_tcn_layer([1, 2], 1, concat_each_pc_grid)
     concat_pc_with_layer1 = layers.concatenate([tcn_layer1, tcn_pc_grid])
-    tcn_layer2 = get_tcn_layer([dilation_rates[1]], 2, concat_pc_with_layer1)
+    tcn_layer2 = get_tcn_layer([1, 4], 2, concat_pc_with_layer1)
     concat_pc_with_layer2 = layers.concatenate([tcn_layer2, tcn_pc_grid])
-    tcn_layer3 = get_tcn_layer([dilation_rates[2]], 3, concat_pc_with_layer2)
+    tcn_layer3 = get_tcn_layer([1, 8], 3, concat_pc_with_layer2)
     concat_pc_with_layer3 = layers.concatenate([tcn_layer3, tcn_pc_grid])
-    tcn_layer4 = get_tcn_layer([dilation_rates[3]], 4, concat_pc_with_layer3)
+    tcn_layer4 = get_tcn_layer([1, 16], 4, concat_pc_with_layer3)
     flatten_out = layers.Flatten(name='flatten_all')(tcn_layer4)
     prediction_layer = layers.Dense(18, activation='linear', name="prediction_layer")(flatten_out)
 
