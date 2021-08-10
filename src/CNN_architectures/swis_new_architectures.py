@@ -364,3 +364,63 @@ def SWIS_APPROACH_A_with_weather_only():
                                                           optimizer=tf.optimizers.Adam(0.0001),
                                                           metrics=[tf.metrics.MeanAbsoluteError()])
     return swis_weather_model
+
+
+
+def concat_pc_with_grid_tcn():
+    input_layers_pc = []
+    for ts in SWIS_POSTCODES:
+        input_layer = keras.Input(shape=(18 * 1, 14), name=f'input_postcode_{ts}')
+        input_layers_pc.append(input_layer)
+
+    # postcode convolutions
+    concatenation_pc = layers.concatenate(input_layers_pc,
+                                          name='postcode_concat')
+    dilation_rates = [2 ** i for i in range(4)]
+    dropout_rate = 0.05
+    use_batch_norm = False
+    use_layer_norm = False
+    use_weight_norm = True
+    tcn_pc_grid = tcn.TCN(nb_filters=32, kernel_size=2, nb_stacks=3, dilations=dilation_rates,
+                          padding='causal',
+                          use_skip_connections=True, dropout_rate=dropout_rate,
+                          return_sequences=True,
+                          activation='relu', kernel_initializer='he_normal',
+                          use_batch_norm=use_batch_norm,
+                          use_layer_norm=use_layer_norm,
+                          use_weight_norm=use_weight_norm, name='pc_TCN')(concatenation_pc)
+
+    # create the grid model
+    grid_input = keras.Input(shape=(18 * 1, 7), name='input_grid')
+
+    def get_tcn_layer(dilation_rate, layer_num, input_to_layer):
+        return tcn.TCN(nb_filters=32, kernel_size=2, nb_stacks=2, dilations=dilation_rate,
+                       padding='causal',
+                       use_skip_connections=True, dropout_rate=0.05,
+                       return_sequences=True,
+                       activation='relu', kernel_initializer='he_normal',
+                       use_batch_norm=False,
+                       use_layer_norm=False,
+                       use_weight_norm=True, name=f'TCN_{layer_num}_grid')(input_to_layer)
+
+    dilation_rates = [2 ** i for i in range(4)]
+
+    concat_each_pc_grid = layers.concatenate([tcn_pc_grid, grid_input], name=f'concat_pc_grid')
+
+    tcn_layer1 = get_tcn_layer([dilation_rates[0]], 1, concat_each_pc_grid)
+    concat_pc_with_layer1 = layers.concatenate([tcn_layer1, tcn_pc_grid])
+    tcn_layer2 = get_tcn_layer([dilation_rates[1]], 2, concat_pc_with_layer1)
+    concat_pc_with_layer2 = layers.concatenate([tcn_layer2, tcn_pc_grid])
+    tcn_layer3 = get_tcn_layer([dilation_rates[2]], 3, concat_pc_with_layer2)
+    concat_pc_with_layer3 = layers.concatenate([tcn_layer3, tcn_pc_grid])
+    tcn_layer4 = get_tcn_layer([dilation_rates[3]], 4, concat_pc_with_layer3)
+    flatten_out = layers.Flatten(name='flatten_all')(tcn_layer4)
+    prediction_layer = layers.Dense(18, activation='linear', name="prediction_layer")(flatten_out)
+
+    input_layers_pc.append(grid_input)
+    concat_pc_with_grid_tcn_model = keras.Model(
+        inputs=input_layers_pc, outputs=prediction_layer)
+
+    concat_pc_with_grid_tcn_model.compile(loss=tf.losses.MeanSquaredError(), optimizer=tf.optimizers.Adam(0.0001),
+                                            metrics=[tf.metrics.MeanAbsoluteError()])
+    return concat_pc_with_grid_tcn_model
