@@ -90,7 +90,8 @@ def get_grid_error_per_run(grid_model_path, model_path, run, model_name, notcomb
 #           }
 
 models = {'0': {'name': 'SWIS_APPROACH_A_with_weather_only', 'dir': 'swis_combined_nn_results/new_models', 'runs': 10},
-          '1': {'name': 'grid_conv_in_each_pc_seperately', 'dir': 'swis_combined_nn_results/new_models', 'runs': 10}
+          '1': {'name': 'grid_conv_in_each_pc_seperately', 'dir': 'swis_combined_nn_results/new_models', 'runs': 10},
+          '2': {'name': 'concat_pc_with_grid_tcn', 'dir': 'swis_combined_nn_results/new_models', 'runs': 10}
         }
 
 stat_models = ['arima', 'naive']
@@ -104,7 +105,7 @@ stat_models = ['arima', 'naive']
 #             'SWIS_APPROACH_B_with_fully_connected']
 
 combined = ['pc_2d_conv_with_grid_tcn', 'pc_2d_conv_with_grid_tcn_method2', 'SWIS_APPROACH_A_more_layer_without_norm_grid_skip', 'swis_pc_grid_parallel',
-            'SWIS_APPROACH_A_with_weather_only']
+            'SWIS_APPROACH_A_with_weather_only', 'concat_pc_with_grid_tcn']
 conventional_nns = ['conventional_lstm', 'conventional_cnn', 'conventional_tcn', 'grid_conv_in_each_pc_seperately']
 no_grid = ['grid_conv_in_each_pc_seperately']
 # model_number = sys.argv[1]
