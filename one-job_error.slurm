@@ -6,8 +6,8 @@
 #SBATCH --job-name="errors"
 
 # Partition for the job:
-#SBATCH --partition gpgpu
-#SBATCH --qos gpgpumse
+#SBATCH --partition deeplearn
+#SBATCH --qos gpgpudeeplearn
 
 # Number of GPUs requested per node:
 #SBATCH --gres=gpu:1
