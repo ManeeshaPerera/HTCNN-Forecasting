@@ -130,7 +130,7 @@ def pc_2d_conv_with_grid_tcn():
     pc_2d_conv_with_grid_tcn_model = keras.Model(
         inputs=[pc_input, grid_input], outputs=prediction_layer)
 
-    pc_2d_conv_with_grid_tcn_model.compile(loss=tf.losses.MeanSquaredError(), optimizer=tf.optimizers.Adam(0.0005),
+    pc_2d_conv_with_grid_tcn_model.compile(loss=tf.losses.MeanSquaredError(), optimizer=tf.optimizers.Adam(0.0001),
                                            metrics=[tf.metrics.MeanAbsoluteError()])
     return pc_2d_conv_with_grid_tcn_model
 
@@ -170,7 +170,7 @@ def pc_2d_conv_with_grid_tcn_method2():
     pc_2d_conv_with_grid_tcn_model = keras.Model(
         inputs=[pc_input, grid_input], outputs=prediction_layer)
 
-    pc_2d_conv_with_grid_tcn_model.compile(loss=tf.losses.MeanSquaredError(), optimizer=tf.optimizers.Adam(0.0005),
+    pc_2d_conv_with_grid_tcn_model.compile(loss=tf.losses.MeanSquaredError(), optimizer=tf.optimizers.Adam(0.0001),
                                            metrics=[tf.metrics.MeanAbsoluteError()])
     return pc_2d_conv_with_grid_tcn_model
 

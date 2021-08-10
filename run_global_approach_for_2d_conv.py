@@ -25,7 +25,7 @@ from src.WindowGenerator.window_generator import WindowGenerator
 from sklearn.preprocessing import StandardScaler, MinMaxScaler
 import src.utils as utils
 import pickle5 as pickle
-from constants import ALL_SWIS_TS, SWIS_POSTCODES, PCS_SORTED_SWIS
+from constants import SWIS_DISTANCE_SORTED_PCS, ALL_SWIS_TS
 
 from src.CNN_architectures.swis_new_architectures import pc_2d_conv_with_grid_tcn, pc_2d_conv_with_grid_tcn_method2
 
@@ -38,8 +38,8 @@ def create_window_data(filename, lookback=1):
 
     train, test = utils.split_hourly_data_test_SWIS(data, look_back)
 
-    # scaler = StandardScaler()
-    scaler = MinMaxScaler()
+    scaler = StandardScaler()
+    # scaler = MinMaxScaler()
     scaler.fit(train.values)
 
     train_array = scaler.transform(train.values)
@@ -121,7 +121,7 @@ def run_combine_model(model_run):
 
     for grid_index in range(0, len(grid_valus)):
         pc_ls = []
-        for pc in PCS_SORTED_SWIS:
+        for pc in SWIS_DISTANCE_SORTED_PCS:
             pc_ls.append(train_dic_start[f'input_postcode_{pc}'][grid_index].reshape((18, 1, 14)))
         new_label.append(label_grid_start[grid_index])
         grid_input.append(grid_valus[grid_index])
@@ -134,7 +134,7 @@ def run_combine_model(model_run):
 
     for grid_index in range(0, len(grid_valus_test)):
         pc_ls = []
-        for pc in PCS_SORTED_SWIS:
+        for pc in SWIS_DISTANCE_SORTED_PCS:
             pc_ls.append(test_dic_start[f'input_postcode_{pc}'][grid_index].reshape((18, 1, 14)))
         concat_pc = np.concatenate(pc_ls, axis=1)
         new_test_pc.append(concat_pc)
@@ -148,7 +148,7 @@ def run_combine_model(model_run):
 
     model = model_run()
     callback = tf.keras.callbacks.EarlyStopping(monitor='loss', patience=100)
-    history = model.fit(train_dic, label_grid, batch_size=128, epochs=150,
+    history = model.fit(train_dic, label_grid, batch_size=128, epochs=800,
                         callbacks=[callback], shuffle=False)
 
     # Forecast
@@ -160,8 +160,8 @@ def run_combine_model(model_run):
     train, test = utils.split_hourly_data_test_SWIS(data, look_back)
     dataframe_store = test[look_back:][['power']]
 
-    # scaler = StandardScaler()
-    scaler = MinMaxScaler()
+    scaler = StandardScaler()
+    # scaler = MinMaxScaler()
     scaler.fit(train[['power']].values)
 
     fc_array = []
@@ -169,8 +169,8 @@ def run_combine_model(model_run):
     fc = model.predict(test_dic)
 
     for sample in range(0, len(fc), 18):
-        # fc_sample = fc[sample]
-        fc_sample = fc[sample].reshape(-1,1)
+        fc_sample = fc[sample]
+        # fc_sample = fc[sample].reshape(-1,1)
         fc_sample = scaler.inverse_transform(fc_sample)
         fc_array.extend(fc_sample)
 
