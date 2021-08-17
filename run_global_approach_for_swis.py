@@ -32,7 +32,7 @@ from constants import ALL_SWIS_TS, SWIS_POSTCODES
 # from src.CNN_architectures.approachB import SWIS_APPROACH_B, SWIS_APPROACH_B_with_fully_connected, SWIS_APPROACH_B_with_clustering, SWIS_APPROACH_B_max_pool
 from src.CNN_architectures.swis_new_architectures import swis_pc_grid_parallel, \
     SWIS_APPROACH_A_more_layer_without_norm_grid_skip, concat_pc_with_grid_tcn2, concat_pc_with_grid_tcn2_with_batchnorm, \
-    concat_pc_with_grid_tcn2_with_layernorm, concat_pc_with_grid_tcn3
+    concat_pc_with_grid_tcn2_with_layernorm, concat_pc_with_grid_tcn3, concat_pc_with_grid_tcn2_lr,concat_pc_with_grid_tcn4, concat_pc_with_grid_tcn4_lr
 
 
 def create_window_data(filename, lookback=1):
@@ -156,14 +156,14 @@ def run_combine_model(approach):
 #                            'folder': 'new_models'}
 #                      }
 
-final_test_models = {'0': {'func': concat_pc_with_grid_tcn2_with_batchnorm,
-                           'model_name': 'concat_pc_with_grid_tcn2_with_batchnorm',
+final_test_models = {'0': {'func': concat_pc_with_grid_tcn2_lr,
+                           'model_name': 'concat_pc_with_grid_tcn2_lr',
                            'folder': 'new_models'},
-                     '1': {'func': concat_pc_with_grid_tcn2_with_layernorm,
-                           'model_name': 'concat_pc_with_grid_tcn2_with_layernorm',
+                     '1': {'func': concat_pc_with_grid_tcn4,
+                           'model_name': 'concat_pc_with_grid_tcn4',
                            'folder': 'new_models'},
-                     '2': {'func': concat_pc_with_grid_tcn3,
-                           'model_name': 'concat_pc_with_grid_tcn3',
+                     '2': {'func': concat_pc_with_grid_tcn4_lr,
+                           'model_name': 'concat_pc_with_grid_tcn4_lr',
                            'folder': 'new_models'}
                      }
 
