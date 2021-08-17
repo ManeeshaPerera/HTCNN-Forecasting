@@ -2,6 +2,7 @@ import pandas as pd
 from geots2img import ImageGenerator
 import numpy as np
 import constants
+from sklearn.preprocessing import MinMaxScaler
 
 # I have run the cluster data creation notebook in  geo-timeseries-to-image project
 
@@ -12,7 +13,7 @@ import constants
 # # SWIS
 LAT_RANGE = [-36.05, -26.5]
 LON_RANGE = [113.8, 122.4]
-GEO_RES = 0.005
+GEO_RES = 0.05
 UNIQUE_WEATHER_PCS = {0: 6028, 2: 6254, 3: 6430, 4: 6006, 10: 6324, 13: 6284, 14: 6173, 15: 6401, 16: 6426, 17: 6312,
                       18: 6230, 19: 6317, 20: 6112, 21: 6055,
                       24: 6509, 25: 6391, 26: 6528, 27: 6220, 28: 6280, 29: 6000}
@@ -22,7 +23,6 @@ WEATHER_MAP = {7: 'temperature', 8: 'humidity', 9: 'dewPoint', 10: 'wind', 11: '
 source_points = []
 NUM_DAYS = 6
 NUM_DAYS_WEATHER = 6
-
 
 
 def get_weather_df(column_index, column_name):
@@ -42,7 +42,7 @@ def scale_data(df, num_days):
     return scaled
 
 
-cluster_gen_data = pd.read_csv('swis_ts_data/geo_ts_cluster.csv', index_col=0)[18*6:]
+cluster_gen_data = pd.read_csv('swis_ts_data/geo_ts_cluster.csv', index_col=0)[18 * 6:]
 coordinates_clusters = pd.read_csv('swis_ts_data/coordinates.csv')
 
 # starting the forecasting day from 20th 2nd Feb
@@ -63,13 +63,21 @@ scaled_cluster_gen = scale_data(cluster_gen_data, NUM_DAYS)
 scaled_grid_data = scale_data(grid_data, NUM_DAYS)
 scaled_weather_data = []
 
-
 # print(scaled_grid_data)
 # print(scaled_cluster_gen)
 
 
-for weather_dfs in weather_data:
-    scaled_weather_data.append(scale_data(weather_dfs, NUM_DAYS_WEATHER))
+for weather_i in range(0, 7):
+    weather_dfs = weather_data[weather_i]
+    if weather_i == 2:
+        # dew point
+        scaler = MinMaxScaler()
+        train_dew = weather_dfs[:-18 * constants.TEST_DAYS]
+        scaled_vals = scaler.fit_transform(weather_dfs.to_numpy())
+        scaled_temp = pd.DataFrame(scaled_vals, columns=weather_dfs.columns, index=weather_dfs.index)
+        scaled_weather_data.append(scaled_temp['2020-02-25':])
+    else:
+        scaled_weather_data.append(scale_data(weather_dfs, NUM_DAYS_WEATHER))
 
 # print(scaled_weather_data)
 
@@ -77,7 +85,6 @@ for weather_dfs in weather_data:
 for cluster_num in UNIQUE_WEATHER_PCS:
     [lon, lat] = coordinates_clusters.loc[cluster_num, ['lon', 'lat']]
     source_points.append((lon, lat))
-
 
 # we need an image generator for each time series
 power_image = ImageGenerator(LON_RANGE, LAT_RANGE, GEO_RES)
@@ -91,7 +98,7 @@ uvIndex_image = ImageGenerator(LON_RANGE, LAT_RANGE, GEO_RES)
 
 power_image.set_source_points(source_points)
 weather_generators = [temperature_image, humidity_image, dewPoint_image, wind_image, pressure_image,
-                        cloudCover_image, uvIndex_image]
+                      cloudCover_image, uvIndex_image]
 
 for image_gen in weather_generators:
     image_gen.set_source_points(source_points)
@@ -102,7 +109,28 @@ grid_label_train = []
 grid_label_test = []
 time = 0
 
+print(scaled_cluster_gen.max())
+print(scaled_cluster_gen.min())
+print(scaled_weather_data[0].min())
+print(scaled_weather_data[1].min())
+print(scaled_weather_data[2].min())
+print(scaled_weather_data[3].min())
+print(scaled_weather_data[4].min())
+print(scaled_weather_data[5].min())
+print(scaled_weather_data[6].min())
+
+print(len(scaled_cluster_gen))
+print(len(scaled_grid_data))
+print(len(scaled_weather_data[0]))
+print(len(scaled_weather_data[1]))
+print(len(scaled_weather_data[2]))
+print(len(scaled_weather_data[3]))
+print(len(scaled_weather_data[4]))
+print(len(scaled_weather_data[5]))
+print(len(scaled_weather_data[6]))
+
 while time < len(scaled_grid_data):
+    print(time)
     grid_date = scaled_grid_data.index[time]
     all_features_per_day = []
     for time_per_day_weather in range(time, time+18):
@@ -181,4 +209,3 @@ with open('swis_ts_data/test_data.npy', 'wb') as test_data_file:
 with open('swis_ts_data/test_label.npy', 'wb') as test_label_file:
     np.save(test_label_file, test_label)
     test_label_file.close()
-
