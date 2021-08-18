@@ -26,7 +26,7 @@ from src.CNN_Images.data_generator import DataGenerator
 
 # Parameters
 params = {'dim': (173, 192, 18),
-          'batch_size': 32}
+          'batch_size': 128}
 
 # Datasets
 partition = {'train': [i for i in range(0, 5800)], 'validation': [j for j in range(5800, 5994)]}
@@ -53,7 +53,7 @@ model_3d_conv.compile(loss=tf.losses.MeanSquaredError(), optimizer=tf.optimizers
 history = model_3d_conv.fit(training_generator,
                             validation_data=validation_generator,
                             use_multiprocessing=False,
-                            workers=1, callbacks=[callback])
+                            workers=1, callbacks=[callback], epochs=50)
 
 # test_data = np.load(f'swis_ts_data/img_ts/train_0.npy').reshape(1, 173, 192, 18, 8)
 # print(model_3d_conv.predict(test_data))
