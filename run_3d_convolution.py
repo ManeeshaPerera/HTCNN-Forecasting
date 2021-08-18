@@ -47,13 +47,13 @@ model_3d_conv = keras.Model(inputs=input_layer, outputs=prediction_layer)
 
 callback = tf.keras.callbacks.EarlyStopping(monitor='val_loss', patience=20)
 model_3d_conv.compile(loss=tf.losses.MeanSquaredError(), optimizer=tf.optimizers.Adam(0.001),
-                      metrics=[tf.metrics.MeanAbsoluteError()], callback=[callback])
+                      metrics=[tf.metrics.MeanAbsoluteError()])
 # model_3d_conv.summary()
 # Train model on dataset
 history = model_3d_conv.fit(training_generator,
                             validation_data=validation_generator,
                             use_multiprocessing=False,
-                            workers=1)
+                            workers=1, callback=[callback])
 
 # test_data = np.load(f'swis_ts_data/img_ts/train_0.npy').reshape(1, 173, 192, 18, 8)
 # print(model_3d_conv.predict(test_data))
