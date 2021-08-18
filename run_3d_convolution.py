@@ -62,7 +62,7 @@ test = grid_data[-18 * constants.TEST_DAYS:]
 # predict data
 predictions = []
 for sample in range(1, 37):
-    test_data = np.load(f'swis_ts_data/img_ts/train_{sample}.npy').reshape(1, 173, 192, 18, 8)
+    test_data = np.load(f'swis_ts_data/img_ts/test_{sample}.npy').reshape(1, 173, 192, 18, 8)
     predictions.extend(model_3d_conv.predict(test_data)[0])
 
 fc_df = pd.DataFrame(predictions, index=grid_data[-18 * constants.TEST_DAYS:].index, columns=['power'])
