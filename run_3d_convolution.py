@@ -53,7 +53,7 @@ model_3d_conv.compile(loss=tf.losses.MeanSquaredError(), optimizer=tf.optimizers
 history = model_3d_conv.fit(training_generator,
                             validation_data=validation_generator,
                             use_multiprocessing=False,
-                            workers=1, callback=[callback])
+                            workers=1, callbacks=[callback])
 
 # test_data = np.load(f'swis_ts_data/img_ts/train_0.npy').reshape(1, 173, 192, 18, 8)
 # print(model_3d_conv.predict(test_data))
