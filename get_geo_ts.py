@@ -129,8 +129,14 @@ print(len(scaled_weather_data[4]))
 print(len(scaled_weather_data[5]))
 print(len(scaled_weather_data[6]))
 
+test_sample_num = 0
+
 while time < len(scaled_grid_data):
     print(time)
+    if time < 4881:
+        print("here")
+        time = time + 1
+        continue
     grid_date = scaled_grid_data.index[time]
     all_features_per_day = []
     for time_per_day_weather in range(time, time+18):
@@ -172,19 +178,22 @@ while time < len(scaled_grid_data):
             data_to_store = np.array(sample_label, dtype=np.float32)
             np.save(f, data_to_store)
             f.close()
+        time = time + 1
     #     all_days.append(np.concatenate(all_features_per_day, axis=2))
     #     grid_label_train.append(scaled_grid_data[time: time+18].values)
-        time = time + 1
+
 
     else:
-        with open(f'swis_ts_data/img_ts/test_{time}.npy', 'wb') as f:
+        test_sample_num = test_sample_num + 1
+        with open(f'swis_ts_data/img_ts/test_{test_sample_num}.npy', 'wb') as f:
             data_to_store = np.array(sample_data, dtype=np.float32)
             np.save(f, data_to_store)
             f.close()
-        with open(f'swis_ts_data/img_ts/test_{time}_label.npy', 'wb') as f:
+        with open(f'swis_ts_data/img_ts/test_{test_sample_num}_label.npy', 'wb') as f:
             data_to_store = np.array(sample_label, dtype=np.float32)
             np.save(f, data_to_store)
             f.close()
+        time = time + 18
     # elif grid_date == test_start_date:
     # #     all_days_test.append(np.concatenate(all_features_per_day, axis=2))
     # #     grid_label_test.append(scaled_grid_data[time: time+18].values)
