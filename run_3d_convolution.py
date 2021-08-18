@@ -29,11 +29,11 @@ params = {'dim': (173, 192, 18),
           'batch_size': 32}
 
 # Datasets
-partition = {'train': [i for i in range(0, 5800)], 'validation': [j for j in range(5800, 5994)]}
+partition = {'train': [i for i in range(0, 5994)], 'validation': [j for j in range(5800, 5994)]}
 
 # Generators
 training_generator = DataGenerator(partition['train'], **params)
-validation_generator = DataGenerator(partition['validation'], **params)
+# validation_generator = DataGenerator(partition['validation'], **params)
 
 input_layer = keras.Input(shape=(173, 192, 18, 8), name=f'input_postcode')
 layer_3d = tf.keras.layers.Conv3D(16, 3, activation='relu')(input_layer)
@@ -45,13 +45,17 @@ flatten_out = layers.Flatten(name='flatten_all')(max_pool2)
 prediction_layer = layers.Dense(18, activation='linear', name="prediction_layer")(flatten_out)
 model_3d_conv = keras.Model(inputs=input_layer, outputs=prediction_layer)
 
-callback = tf.keras.callbacks.EarlyStopping(monitor='val_loss', patience=20)
-model_3d_conv.compile(loss=tf.losses.MeanSquaredError(), optimizer=tf.optimizers.Adam(0.001),
+callback = tf.keras.callbacks.EarlyStopping(monitor='loss', patience=20)
+model_3d_conv.compile(loss=tf.losses.MeanSquaredError(), optimizer=tf.optimizers.Adam(0.0001),
                       metrics=[tf.metrics.MeanAbsoluteError()])
 # model_3d_conv.summary()
 # Train model on dataset
+# history = model_3d_conv.fit(training_generator,
+#                             validation_data=validation_generator,
+#                             use_multiprocessing=False,
+#                             workers=1, callbacks=[callback], epochs=50)
+
 history = model_3d_conv.fit(training_generator,
-                            validation_data=validation_generator,
                             use_multiprocessing=False,
                             workers=1, callbacks=[callback], epochs=50)
 
