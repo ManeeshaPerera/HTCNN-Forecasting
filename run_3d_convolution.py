@@ -26,7 +26,7 @@ from src.CNN_Images.data_generator import DataGenerator
 
 # Parameters
 params = {'dim': (173, 192, 18),
-          'batch_size': 128}
+          'batch_size': 32}
 
 # Datasets
 partition = {'train': [i for i in range(0, 5800)], 'validation': [j for j in range(5800, 5994)]}
