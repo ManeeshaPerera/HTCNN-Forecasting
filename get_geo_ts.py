@@ -103,10 +103,10 @@ weather_generators = [temperature_image, humidity_image, dewPoint_image, wind_im
 for image_gen in weather_generators:
     image_gen.set_source_points(source_points)
 
-all_days = []
-all_days_test = []
-grid_label_train = []
-grid_label_test = []
+# all_days = []
+# all_days_test = []
+# grid_label_train = []
+# grid_label_test = []
 time = 0
 
 print(scaled_cluster_gen.max())
@@ -160,52 +160,73 @@ while time < len(scaled_grid_data):
         w = len(vals[0])
         all_features.append(vals.reshape(h, w, 1, 1))
         all_features_per_day.append(np.concatenate(all_features, axis=3))
+
+    sample_data = np.concatenate(all_features_per_day, axis=2)
+    sample_label = scaled_grid_data[time: time+18].values
     if grid_date < test_start_date:
-        all_days.append(np.concatenate(all_features_per_day, axis=2))
-        grid_label_train.append(scaled_grid_data[time: time+18].values)
+        with open(f'swis_ts_data/img_ts/train_{time}.npy', 'wb') as f:
+            data_to_store = np.array(sample_data, dtype=np.float32)
+            np.save(f, data_to_store)
+            f.close()
+        with open(f'swis_ts_data/img_ts/train_{time}_label.npy', 'wb') as f:
+            data_to_store = np.array(sample_label, dtype=np.float32)
+            np.save(f, data_to_store)
+            f.close()
+    #     all_days.append(np.concatenate(all_features_per_day, axis=2))
+    #     grid_label_train.append(scaled_grid_data[time: time+18].values)
         time = time + 1
-    elif grid_date == test_start_date:
-        all_days_test.append(np.concatenate(all_features_per_day, axis=2))
-        grid_label_test.append(scaled_grid_data[time: time+18].values)
-        time = time + 18
+
     else:
-        all_days_test.append(np.concatenate(all_features_per_day, axis=2))
-        grid_label_test.append(scaled_grid_data[time: time+18].values)
-        time = time + 18
+        with open(f'swis_ts_data/img_ts/test_{time}.npy', 'wb') as f:
+            data_to_store = np.array(sample_data, dtype=np.float32)
+            np.save(f, data_to_store)
+            f.close()
+        with open(f'swis_ts_data/img_ts/test_{time}_label.npy', 'wb') as f:
+            data_to_store = np.array(sample_label, dtype=np.float32)
+            np.save(f, data_to_store)
+            f.close()
+    # elif grid_date == test_start_date:
+    # #     all_days_test.append(np.concatenate(all_features_per_day, axis=2))
+    # #     grid_label_test.append(scaled_grid_data[time: time+18].values)
+    #     time = time + 18
+    # else:
+    # #     all_days_test.append(np.concatenate(all_features_per_day, axis=2))
+    # #     grid_label_test.append(scaled_grid_data[time: time+18].values)
+    #     time = time + 18
 
 
-train_data = np.array(all_days, dtype=np.float32)
-train_label = np.array(grid_label_train, dtype=np.float32)
-
-test_data = np.array(all_days_test, dtype=np.float32)
-test_label = np.array(grid_label_test, dtype=np.float32)
-
-
-print(train_data.shape)
-print(train_label.shape)
-print(test_data.shape)
-print(test_label.shape)
-
-
-# with open('swis_ts_data/train_data.npy', 'wb') as f:
-#     data_to_store = np.array(grid_label_test, dtype=np.float32)
-#     np.save(f, data_to_store)
-#     f.close()
-
-with open('swis_ts_data/train_data.npy', 'wb') as train_file:
-    np.save(train_file, train_data)
-    train_file.close()
-
-with open('swis_ts_data/train_label.npy', 'wb') as train_label_file:
-    np.save(train_label_file, train_label)
-    train_label_file.close()
-
-
-with open('swis_ts_data/test_data.npy', 'wb') as test_data_file:
-    np.save(test_data_file, test_data)
-    test_data_file.close()
-
-
-with open('swis_ts_data/test_label.npy', 'wb') as test_label_file:
-    np.save(test_label_file, test_label)
-    test_label_file.close()
+# train_data = np.array(all_days, dtype=np.float32)
+# train_label = np.array(grid_label_train, dtype=np.float32)
+#
+# test_data = np.array(all_days_test, dtype=np.float32)
+# test_label = np.array(grid_label_test, dtype=np.float32)
+#
+#
+# print(train_data.shape)
+# print(train_label.shape)
+# print(test_data.shape)
+# print(test_label.shape)
+#
+#
+# # with open('swis_ts_data/train_data.npy', 'wb') as f:
+# #     data_to_store = np.array(grid_label_test, dtype=np.float32)
+# #     np.save(f, data_to_store)
+# #     f.close()
+#
+# with open('swis_ts_data/train_data.npy', 'wb') as train_file:
+#     np.save(train_file, train_data)
+#     train_file.close()
+#
+# with open('swis_ts_data/train_label.npy', 'wb') as train_label_file:
+#     np.save(train_label_file, train_label)
+#     train_label_file.close()
+#
+#
+# with open('swis_ts_data/test_data.npy', 'wb') as test_data_file:
+#     np.save(test_data_file, test_data)
+#     test_data_file.close()
+#
+#
+# with open('swis_ts_data/test_label.npy', 'wb') as test_label_file:
+#     np.save(test_label_file, test_label)
+#     test_label_file.close()
