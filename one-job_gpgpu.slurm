@@ -36,4 +36,3 @@ module load tensorflow/2.3.1-python-3.7.4
 # The job command(s):
 python run_global_approach_for_swis.py 0 ${SLURM_ARRAY_TASK_ID}
 python run_global_approach_for_swis.py 1 ${SLURM_ARRAY_TASK_ID}
-python run_global_approach_for_swis.py 2 ${SLURM_ARRAY_TASK_ID}
