@@ -32,17 +32,39 @@ params = {'dim': (173, 192, 18),
 partition = {'train': [i for i in range(0, 5994)], 'validation': [j for j in range(5800, 5994)]}
 
 # Generators
+# print(partition['train'])
 training_generator = DataGenerator(partition['train'], **params)
 # validation_generator = DataGenerator(partition['validation'], **params)
 
 input_layer = keras.Input(shape=(173, 192, 18, 8), name=f'input_postcode')
-layer_3d = tf.keras.layers.Conv3D(16, 3, activation='relu')(input_layer)
-max_pool = tf.keras.layers.MaxPooling3D()(layer_3d)
-layer_3d_1 = tf.keras.layers.Conv3D(16, 3, dilation_rate=(2, 2, 2), activation='relu')(max_pool)
-max_pool2 = tf.keras.layers.MaxPooling3D()(layer_3d_1)
-flatten_out = layers.Flatten(name='flatten_all')(max_pool2)
+
+
+def getConv(layer):
+    conv1 = layers.Conv2D(32, 2, activation='relu')(layer)
+    conv2 = layers.Conv2D(32, 2, activation='relu')(conv1)
+    max_pool = layers.MaxPooling2D()(conv2)
+    conv3 = layers.Conv2D(64, 2, activation='relu')(max_pool)
+    conv4 = layers.Conv2D(64, 2, activation='relu')(conv3)
+    flatten = layers.Flatten()(conv4)
+    return flatten
+
+
+branch_outputs = []
+for i in range(8):
+    # Slicing the ith channel:
+    out = layers.Lambda(lambda x: x[:, :, :, :, i])(input_layer)
+    print(out.shape)
+    branch_outputs.append(getConv(out))
+
+# layer_3d = tf.keras.layers.Conv3D(16, 3, activation='relu')(input_layer)
+# max_pool = tf.keras.layers.MaxPooling3D()(layer_3d)
+# layer_3d_1 = tf.keras.layers.Conv3D(16, 3, dilation_rate=(2, 2, 2), activation='relu')(max_pool)
+# max_pool2 = tf.keras.layers.MaxPooling3D()(layer_3d_1)
+# flatten_out = layers.Flatten(name='flatten_all')(max_pool2)
 # prediction_layer1 = layers.Dense(100, activation='linear', name="prediction_layer1")(flatten_out)
-prediction_layer = layers.Dense(18, activation='linear', name="prediction_layer")(flatten_out)
+concat = layers.Concatenate()(branch_outputs)
+prediction_layer1 = layers.Dense(50, activation='linear', name="prediction_layer1")(concat)
+prediction_layer = layers.Dense(18, activation='linear', name="prediction_layer")(prediction_layer1)
 model_3d_conv = keras.Model(inputs=input_layer, outputs=prediction_layer)
 
 callback = tf.keras.callbacks.EarlyStopping(monitor='loss', patience=20)
@@ -76,7 +98,7 @@ fc_df = fc_df.rename(columns={'power': 'fc'})
 forecasts = pd.concat([test, fc_df], axis=1)
 # print(df)
 
-model_name = 'conv_3d_model'
+model_name = 'conv_3d_model_2'
 model_new_name = f'{model_name}/{run}'
 dir_path = f'swis_combined_nn_results/new_models/{model_new_name}'
 if not os.path.exists(dir_path):
