@@ -231,7 +231,6 @@ def grid_conv_in_each_pc_seperately(ts):
     return grid_conv_in_each_pc_seperately_model
 
 
-
 def grid_only_network_SWIS_SKIP():
     grid_input = keras.Input(shape=(18 * 1, 7), name='input_grid')
     cnn_layer = 4
@@ -249,6 +248,7 @@ def grid_only_network_SWIS_SKIP():
     full_connected_layer = layers.Dense(18, activation='linear', name="prediction_layer_grid")(flatten_grid)
     grid_only_network_model = keras.Model(grid_input, full_connected_layer)
     return grid_only_network_model
+
 
 def SWIS_APPROACH_A_more_layer_without_norm_grid_skip():
     input_layers_pc = []
@@ -361,10 +361,9 @@ def SWIS_APPROACH_A_with_weather_only():
         inputs=input_layers_pc, outputs=prediction_layer)
 
     swis_weather_model.compile(loss=tf.losses.MeanSquaredError(),
-                                                          optimizer=tf.optimizers.Adam(0.0001),
-                                                          metrics=[tf.metrics.MeanAbsoluteError()])
+                               optimizer=tf.optimizers.Adam(0.0001),
+                               metrics=[tf.metrics.MeanAbsoluteError()])
     return swis_weather_model
-
 
 
 def concat_pc_with_grid_tcn2():
@@ -422,7 +421,7 @@ def concat_pc_with_grid_tcn2():
         inputs=input_layers_pc, outputs=prediction_layer)
 
     concat_pc_with_grid_tcn_model.compile(loss=tf.losses.MeanSquaredError(), optimizer=tf.optimizers.Adam(0.0001),
-                                            metrics=[tf.metrics.MeanAbsoluteError()])
+                                          metrics=[tf.metrics.MeanAbsoluteError()])
     return concat_pc_with_grid_tcn_model
 
 
@@ -480,8 +479,9 @@ def concat_pc_with_grid_tcn2_with_batchnorm():
     concat_pc_with_grid_tcn2_withoutnorm_model = keras.Model(
         inputs=input_layers_pc, outputs=prediction_layer)
 
-    concat_pc_with_grid_tcn2_withoutnorm_model.compile(loss=tf.losses.MeanSquaredError(), optimizer=tf.optimizers.Adam(0.0001),
-                                          metrics=[tf.metrics.MeanAbsoluteError()])
+    concat_pc_with_grid_tcn2_withoutnorm_model.compile(loss=tf.losses.MeanSquaredError(),
+                                                       optimizer=tf.optimizers.Adam(0.0001),
+                                                       metrics=[tf.metrics.MeanAbsoluteError()])
     return concat_pc_with_grid_tcn2_withoutnorm_model
 
 
@@ -539,8 +539,9 @@ def concat_pc_with_grid_tcn2_with_layernorm():
     concat_pc_with_grid_tcn2_withoutlayernorm_model = keras.Model(
         inputs=input_layers_pc, outputs=prediction_layer)
 
-    concat_pc_with_grid_tcn2_withoutlayernorm_model.compile(loss=tf.losses.MeanSquaredError(), optimizer=tf.optimizers.Adam(0.0001),
-                                          metrics=[tf.metrics.MeanAbsoluteError()])
+    concat_pc_with_grid_tcn2_withoutlayernorm_model.compile(loss=tf.losses.MeanSquaredError(),
+                                                            optimizer=tf.optimizers.Adam(0.0001),
+                                                            metrics=[tf.metrics.MeanAbsoluteError()])
     return concat_pc_with_grid_tcn2_withoutlayernorm_model
 
 
@@ -593,7 +594,7 @@ def concat_pc_with_grid_tcn3():
         inputs=input_layers_pc, outputs=prediction_layer)
 
     concat_pc_with_grid_tcn3_model.compile(loss=tf.losses.MeanSquaredError(), optimizer=tf.optimizers.Adam(0.0001),
-                                          metrics=[tf.metrics.MeanAbsoluteError()])
+                                           metrics=[tf.metrics.MeanAbsoluteError()])
     return concat_pc_with_grid_tcn3_model
 
 
@@ -715,7 +716,6 @@ def concat_pc_with_grid_tcn4():
     return concat_pc_with_grid_tcn_model
 
 
-
 def concat_pc_with_grid_tcn4_lr():
     input_layers_pc = []
     for ts in SWIS_POSTCODES:
@@ -775,7 +775,6 @@ def concat_pc_with_grid_tcn4_lr():
     return concat_pc_with_grid_tcn_model
 
 
-
 def concat_pc_with_grid_tcn5():
     input_layers_pc = []
     for ts in SWIS_POSTCODES:
@@ -831,7 +830,7 @@ def concat_pc_with_grid_tcn5():
         inputs=input_layers_pc, outputs=prediction_layer)
 
     concat_pc_with_grid_tcn5_model.compile(loss=tf.losses.MeanSquaredError(), optimizer=tf.optimizers.Adam(0.0001),
-                                          metrics=[tf.metrics.MeanAbsoluteError()])
+                                           metrics=[tf.metrics.MeanAbsoluteError()])
     return concat_pc_with_grid_tcn5_model
 
 
@@ -886,7 +885,6 @@ def concat_pc_with_grid_tcn6():
     concat_pc_with_grid_tcn6_model.compile(loss=tf.losses.MeanSquaredError(), optimizer=tf.optimizers.Adam(0.0001),
                                            metrics=[tf.metrics.MeanAbsoluteError()])
     return concat_pc_with_grid_tcn6_model
-
 
 
 def concat_pc_with_grid_at_each_tcn():
@@ -948,7 +946,6 @@ def concat_pc_with_grid_at_each_tcn():
     return concat_pc_with_grid_tcn_model
 
 
-
 def concat_pc_with_grid_tcn2_new():
     input_layers_pc = []
     for ts in SWIS_POSTCODES:
@@ -1006,3 +1003,197 @@ def concat_pc_with_grid_tcn2_new():
     concat_pc_with_grid_tcn_model.compile(loss=tf.losses.MeanSquaredError(), optimizer=tf.optimizers.Adam(0.0001),
                                           metrics=[tf.metrics.MeanAbsoluteError()])
     return concat_pc_with_grid_tcn_model
+
+
+def concat_pc_with_grid_tcn2_relu_and_norm():
+    input_layers_pc = []
+    for ts in SWIS_POSTCODES:
+        input_layer = keras.Input(shape=(18 * 1, 14), name=f'input_postcode_{ts}')
+        input_layers_pc.append(input_layer)
+
+    # postcode convolutions
+    concatenation_pc = layers.concatenate(input_layers_pc,
+                                          name='postcode_concat')
+    dilation_rates = [2 ** i for i in range(4)]
+    dropout_rate = 0.05
+    use_batch_norm = False
+    use_layer_norm = False
+    use_weight_norm = True
+    tcn_pc_grid = tcn.TCN(nb_filters=32, kernel_size=2, nb_stacks=3, dilations=dilation_rates,
+                          padding='causal',
+                          use_skip_connections=True, dropout_rate=dropout_rate,
+                          return_sequences=True,
+                          activation='relu', kernel_initializer='he_normal',
+                          use_batch_norm=use_batch_norm,
+                          use_layer_norm=use_layer_norm,
+                          use_weight_norm=use_weight_norm, name='pc_TCN')(concatenation_pc)
+
+    # create the grid model
+    grid_input = keras.Input(shape=(18 * 1, 7), name='input_grid')
+
+    def get_tcn_layer(dilation_rate, layer_num, input_to_layer):
+        return tcn.TCN(nb_filters=32, kernel_size=2, nb_stacks=2, dilations=dilation_rate,
+                       padding='causal',
+                       use_skip_connections=True, dropout_rate=0.05,
+                       return_sequences=True,
+                       activation='relu', kernel_initializer='he_normal',
+                       use_batch_norm=False,
+                       use_layer_norm=False,
+                       use_weight_norm=True, name=f'TCN_{layer_num}_grid')(input_to_layer)
+
+    def normalise_output(layer_input):
+        batch_norm = layers.BatchNormalization()(layer_input)
+        activation = layers.Activation(activation='relu')(batch_norm)
+        drop_out = layers.SpatialDropout1D(0.05)(activation)
+        return drop_out
+
+    concat_each_pc_grid = layers.concatenate([tcn_pc_grid, grid_input], name=f'concat_pc_grid')
+    normalise_value1 = normalise_output(concat_each_pc_grid)
+    tcn_layer1 = get_tcn_layer([1, 2], 1, normalise_value1)
+
+    concat_pc_with_layer1 = layers.concatenate([tcn_layer1, tcn_pc_grid])
+    normalise_value2 = normalise_output(concat_pc_with_layer1)
+    tcn_layer2 = get_tcn_layer([1, 4], 2, normalise_value2)
+
+    concat_pc_with_layer2 = layers.concatenate([tcn_layer2, tcn_pc_grid])
+    normalise_value3 = normalise_output(concat_pc_with_layer2)
+    tcn_layer3 = get_tcn_layer([1, 8], 3, normalise_value3)
+
+    concat_pc_with_layer3 = layers.concatenate([tcn_layer3, tcn_pc_grid])
+    normalise_value4 = normalise_output(concat_pc_with_layer3)
+    tcn_layer4 = get_tcn_layer([1, 16], 4, normalise_value4)
+
+    flatten_out = layers.Flatten(name='flatten_all')(tcn_layer4)
+    prediction_layer = layers.Dense(18, activation='linear', name="prediction_layer")(flatten_out)
+
+    input_layers_pc.append(grid_input)
+    concat_pc_with_grid_tcn_model = keras.Model(
+        inputs=input_layers_pc, outputs=prediction_layer)
+
+    concat_pc_with_grid_tcn_model.compile(loss=tf.losses.MeanSquaredError(), optimizer=tf.optimizers.Adam(0.0001),
+                                          metrics=[tf.metrics.MeanAbsoluteError()])
+    return concat_pc_with_grid_tcn_model
+
+
+def concat_pc_with_grid_tcn2_lr_decay():
+    input_layers_pc = []
+    for ts in SWIS_POSTCODES:
+        input_layer = keras.Input(shape=(18 * 1, 14), name=f'input_postcode_{ts}')
+        input_layers_pc.append(input_layer)
+
+    # postcode convolutions
+    concatenation_pc = layers.concatenate(input_layers_pc,
+                                          name='postcode_concat')
+    dilation_rates = [2 ** i for i in range(4)]
+    dropout_rate = 0.05
+    use_batch_norm = False
+    use_layer_norm = False
+    use_weight_norm = True
+    tcn_pc_grid = tcn.TCN(nb_filters=32, kernel_size=2, nb_stacks=3, dilations=dilation_rates,
+                          padding='causal',
+                          use_skip_connections=True, dropout_rate=dropout_rate,
+                          return_sequences=True,
+                          activation='relu', kernel_initializer='he_normal',
+                          use_batch_norm=use_batch_norm,
+                          use_layer_norm=use_layer_norm,
+                          use_weight_norm=use_weight_norm, name='pc_TCN')(concatenation_pc)
+
+    # create the grid model
+    grid_input = keras.Input(shape=(18 * 1, 7), name='input_grid')
+
+    def get_tcn_layer(dilation_rate, layer_num, input_to_layer):
+        return tcn.TCN(nb_filters=32, kernel_size=2, nb_stacks=2, dilations=dilation_rate,
+                       padding='causal',
+                       use_skip_connections=True, dropout_rate=0.05,
+                       return_sequences=True,
+                       activation='relu', kernel_initializer='he_normal',
+                       use_batch_norm=False,
+                       use_layer_norm=False,
+                       use_weight_norm=True, name=f'TCN_{layer_num}_grid')(input_to_layer)
+
+    concat_each_pc_grid = layers.concatenate([tcn_pc_grid, grid_input], name=f'concat_pc_grid')
+
+    tcn_layer1 = get_tcn_layer([1, 2], 1, concat_each_pc_grid)
+    concat_pc_with_layer1 = layers.concatenate([tcn_layer1, tcn_pc_grid])
+    tcn_layer2 = get_tcn_layer([1, 4], 2, concat_pc_with_layer1)
+    concat_pc_with_layer2 = layers.concatenate([tcn_layer2, tcn_pc_grid])
+    tcn_layer3 = get_tcn_layer([1, 8], 3, concat_pc_with_layer2)
+    concat_pc_with_layer3 = layers.concatenate([tcn_layer3, tcn_pc_grid])
+    tcn_layer4 = get_tcn_layer([1, 16], 4, concat_pc_with_layer3)
+    flatten_out = layers.Flatten(name='flatten_all')(tcn_layer4)
+    prediction_layer = layers.Dense(18, activation='linear', name="prediction_layer")(flatten_out)
+
+    input_layers_pc.append(grid_input)
+    concat_pc_with_grid_tcn2_lr_decay_model = keras.Model(
+        inputs=input_layers_pc, outputs=prediction_layer)
+
+    initial_learning_rate = 0.1
+    lr_schedule = tf.keras.optimizers.schedules.ExponentialDecay(
+        initial_learning_rate,
+        decay_steps=100000,
+        decay_rate=0.96,
+        staircase=True)
+
+    concat_pc_with_grid_tcn2_lr_decay_model.compile(loss=tf.losses.MeanSquaredError(),
+                                                    optimizer=tf.optimizers.Adam(lr_schedule),
+                                                    metrics=[tf.metrics.MeanAbsoluteError()])
+    return concat_pc_with_grid_tcn2_lr_decay_model
+
+
+def concat_pc_with_grid_tcn2_concat_at_end():
+    input_layers_pc = []
+    for ts in SWIS_POSTCODES:
+        input_layer = keras.Input(shape=(18 * 1, 14), name=f'input_postcode_{ts}')
+        input_layers_pc.append(input_layer)
+
+    # postcode convolutions
+    concatenation_pc = layers.concatenate(input_layers_pc,
+                                          name='postcode_concat')
+    dilation_rates = [2 ** i for i in range(4)]
+    dropout_rate = 0.05
+    use_batch_norm = False
+    use_layer_norm = False
+    use_weight_norm = True
+    tcn_pc_grid = tcn.TCN(nb_filters=32, kernel_size=2, nb_stacks=3, dilations=dilation_rates,
+                          padding='causal',
+                          use_skip_connections=True, dropout_rate=dropout_rate,
+                          return_sequences=True,
+                          activation='relu', kernel_initializer='he_normal',
+                          use_batch_norm=use_batch_norm,
+                          use_layer_norm=use_layer_norm,
+                          use_weight_norm=use_weight_norm, name='pc_TCN')(concatenation_pc)
+
+    # create the grid model
+    grid_input = keras.Input(shape=(18 * 1, 7), name='input_grid')
+
+    def get_tcn_layer(dilation_rate, layer_num, input_to_layer):
+        return tcn.TCN(nb_filters=32, kernel_size=2, nb_stacks=2, dilations=dilation_rate,
+                       padding='causal',
+                       use_skip_connections=True, dropout_rate=0.05,
+                       return_sequences=True,
+                       activation='relu', kernel_initializer='he_normal',
+                       use_batch_norm=False,
+                       use_layer_norm=False,
+                       use_weight_norm=True, name=f'TCN_{layer_num}_grid')(input_to_layer)
+
+    concat_each_pc_grid = layers.concatenate([tcn_pc_grid, grid_input], name=f'concat_pc_grid')
+
+    tcn_layer1 = get_tcn_layer([1, 2], 1, concat_each_pc_grid)
+    concat_pc_with_layer1 = layers.concatenate([tcn_layer1, tcn_pc_grid])
+    tcn_layer2 = get_tcn_layer([1, 4], 2, concat_pc_with_layer1)
+    concat_pc_with_layer2 = layers.concatenate([tcn_layer2, tcn_pc_grid])
+    tcn_layer3 = get_tcn_layer([1, 8], 3, concat_pc_with_layer2)
+    concat_pc_with_layer3 = layers.concatenate([tcn_layer3, tcn_pc_grid])
+    tcn_layer4 = get_tcn_layer([1, 16], 4, concat_pc_with_layer3)
+    concat_pc_with_layer4 = layers.concatenate([tcn_layer4, tcn_pc_grid])
+    flatten_out = layers.Flatten(name='flatten_all')(concat_pc_with_layer4)
+    prediction_layer = layers.Dense(18, activation='linear', name="prediction_layer")(flatten_out)
+
+    input_layers_pc.append(grid_input)
+    concat_pc_with_grid_tcn2_concat_at_end_model = keras.Model(
+        inputs=input_layers_pc, outputs=prediction_layer)
+
+    concat_pc_with_grid_tcn2_concat_at_end_model.compile(loss=tf.losses.MeanSquaredError(),
+                                                         optimizer=tf.optimizers.Adam(0.0001),
+                                                         metrics=[tf.metrics.MeanAbsoluteError()])
+    return concat_pc_with_grid_tcn2_concat_at_end_model

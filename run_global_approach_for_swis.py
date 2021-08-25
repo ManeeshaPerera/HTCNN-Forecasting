@@ -22,7 +22,7 @@ tf.config.threading.set_intra_op_parallelism_threads(1)
 
 import pandas as pd
 from src.WindowGenerator.window_generator import WindowGenerator
-from sklearn.preprocessing import StandardScaler, MinMaxScaler
+from sklearn.preprocessing import StandardScaler
 import src.utils as utils
 import pickle5 as pickle
 from constants import ALL_SWIS_TS, SWIS_POSTCODES
@@ -30,10 +30,13 @@ from constants import ALL_SWIS_TS, SWIS_POSTCODES
 # from src.CNN_architectures.approachA import SWIS_APPROACH_A
 
 # from src.CNN_architectures.approachB import SWIS_APPROACH_B, SWIS_APPROACH_B_with_fully_connected, SWIS_APPROACH_B_with_clustering, SWIS_APPROACH_B_max_pool
-from src.CNN_architectures.swis_new_architectures import swis_pc_grid_parallel, \
-    SWIS_APPROACH_A_more_layer_without_norm_grid_skip, concat_pc_with_grid_tcn2, concat_pc_with_grid_tcn2_with_batchnorm, \
-    concat_pc_with_grid_tcn2_with_layernorm, concat_pc_with_grid_tcn3, concat_pc_with_grid_tcn2_lr,concat_pc_with_grid_tcn4, concat_pc_with_grid_tcn4_lr, \
-    concat_pc_with_grid_tcn5, concat_pc_with_grid_tcn6, concat_pc_with_grid_at_each_tcn, concat_pc_with_grid_tcn2_new
+# from src.CNN_architectures.swis_new_architectures import swis_pc_grid_parallel, \
+#     SWIS_APPROACH_A_more_layer_without_norm_grid_skip, concat_pc_with_grid_tcn2, concat_pc_with_grid_tcn2_with_batchnorm, \
+#     concat_pc_with_grid_tcn2_with_layernorm, concat_pc_with_grid_tcn3, concat_pc_with_grid_tcn2_lr,concat_pc_with_grid_tcn4, concat_pc_with_grid_tcn4_lr, \
+#     concat_pc_with_grid_tcn5, concat_pc_with_grid_tcn6, concat_pc_with_grid_at_each_tcn, concat_pc_with_grid_tcn2_new, concat_pc_with_grid_tcn2_relu_and_norm
+
+from src.CNN_architectures.swis_new_architectures import concat_pc_with_grid_tcn2_relu_and_norm, \
+    concat_pc_with_grid_tcn2_lr_decay, concat_pc_with_grid_tcn2_concat_at_end
 
 
 def create_window_data(filename, lookback=1):
@@ -157,11 +160,14 @@ def run_combine_model(approach):
 #                            'folder': 'new_models'}
 #                      }
 
-final_test_models = {'0': {'func': concat_pc_with_grid_at_each_tcn,
-                           'model_name': 'concat_pc_with_grid_at_each_tcn',
+final_test_models = {'0': {'func': concat_pc_with_grid_tcn2_relu_and_norm,
+                           'model_name': 'concat_pc_with_grid_tcn2_relu_and_norm',
                            'folder': 'new_models'},
-                     '1': {'func': concat_pc_with_grid_tcn2_new,
-                           'model_name': 'concat_pc_with_grid_tcn2_new',
+                     '1': {'func': concat_pc_with_grid_tcn2_lr_decay,
+                           'model_name': 'concat_pc_with_grid_tcn2_lr_decay',
+                           'folder': 'new_models'},
+                     '2': {'func': concat_pc_with_grid_tcn2_concat_at_end,
+                           'model_name': 'concat_pc_with_grid_tcn2_concat_at_end',
                            'folder': 'new_models'}
                      }
 
