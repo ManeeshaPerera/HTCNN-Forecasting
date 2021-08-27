@@ -109,9 +109,11 @@ models = {'0': {'name': 'SWIS_APPROACH_A_with_weather_only', 'dir': 'swis_combin
           '15': {'name': 'conv_3d_model_2', 'dir': 'swis_combined_nn_results/new_models', 'runs': 10},
           '16': {'name': 'concat_pc_with_grid_at_each_tcn', 'dir': 'swis_combined_nn_results/new_models', 'runs': 10},
           '17': {'name': 'concat_pc_with_grid_tcn2_new', 'dir': 'swis_combined_nn_results/new_models', 'runs': 10},
+          '18': {'name': 'concat_pc_with_grid_tcn2_relu_and_norm', 'dir': 'swis_combined_nn_results/new_models', 'runs': 10},
+          '19': {'name': 'concat_pc_with_grid_tcn2_lr_decay', 'dir': 'swis_combined_nn_results/new_models', 'runs': 10},
+          '20': {'name': 'concat_pc_with_grid_tcn2_concat_at_end', 'dir': 'swis_combined_nn_results/new_models', 'runs': 10},
 
           }
-
 stat_models = ['arima', 'naive']
 # combined = ['SWIS_APPROACH_A', 'SWIS_APPROACH_B', 'SWIS_APPROACH_B_with_clustering', 'SWIS_APPROACH_A_SKIP',
 #             'SWIS_APPROACH_B_with_clustering2', 'SWIS_APPROACH_A_more_layer', 'SWIS_APPROACH_A_more_layer_without_norm',
@@ -129,7 +131,9 @@ combined = ['pc_2d_conv_with_grid_tcn', 'pc_2d_conv_with_grid_tcn_method2',
             'concat_pc_with_grid_tcn2_with_layernorm', 'concat_pc_with_grid_tcn3', 'concat_pc_with_grid_tcn4_lr',
             'concat_pc_with_grid_tcn4',
             'concat_pc_with_grid_tcn2_lr', 'conv_3d_model', 'concat_pc_with_grid_tcn5', 'concat_pc_with_grid_tcn6',
-            'conv_3d_model_2', 'concat_pc_with_grid_tcn2_new', 'concat_pc_with_grid_at_each_tcn']
+            'conv_3d_model_2', 'concat_pc_with_grid_tcn2_new', 'concat_pc_with_grid_at_each_tcn',
+            'concat_pc_with_grid_tcn2_relu_and_norm', 'concat_pc_with_grid_tcn2_lr_decay',
+            'concat_pc_with_grid_tcn2_concat_at_end']
 conventional_nns = ['conventional_lstm', 'conventional_cnn', 'conventional_tcn', 'grid_conv_in_each_pc_seperately']
 no_grid = ['grid_conv_in_each_pc_seperately']
 # model_number = sys.argv[1]
