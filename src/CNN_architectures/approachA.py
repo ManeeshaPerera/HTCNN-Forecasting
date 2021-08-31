@@ -2,8 +2,7 @@ import tensorflow as tf
 from tensorflow import keras
 from tensorflow.keras import layers
 import src.CNN_architectures.temporal_conv as tcn
-from constants import SWIS_POSTCODES
-
+from constants import SWIS_POSTCODES, Clusters
 
 
 def multiple_hf_approachA(pc_list):
@@ -54,8 +53,6 @@ def multiple_hf_approachA(pc_list):
                                                           optimizer=tf.optimizers.Adam(0.0001),
                                                           metrics=[tf.metrics.MeanAbsoluteError()])
     return SWIS_APPROACH_A_more_layer_without_norm_model
-
-
 
 
 def SWIS_APPROACH_A_SKIP_GRID_SKIP():
@@ -263,7 +260,7 @@ def gride_level_simple_CNN():
     max_pool_stage_2 = layers.MaxPooling1D(padding='same')(cnn_layer4)
 
     flatten_out = layers.Flatten(name='flatten_layer')(max_pool_stage_2)
-    #change for swis - we need to forecast 18 points
+    # change for swis - we need to forecast 18 points
     fully_connect_layer = layers.Dense(18, activation='linear')(flatten_out)
     conventional_CNN = keras.Model(
         inputs=input_data, outputs=fully_connect_layer)
@@ -272,7 +269,6 @@ def gride_level_simple_CNN():
                              optimizer=tf.optimizers.Adam(0.0001),
                              metrics=[tf.metrics.MeanAbsoluteError()])
     return conventional_CNN
-
 
 
 def SWIS_APPROACH_A_more_layer_with_simple_CNN():
@@ -683,3 +679,57 @@ def possibility_4_ApproachA():
                                           optimizer=tf.optimizers.Adam(0.0001),
                                           metrics=[tf.metrics.MeanAbsoluteError()])
     return possibility_4_ApproachA_model
+
+
+def SWIS_APPROACH_A_more_layer_without_norm_cluster(cluster_num):
+    input_layers_pc = []
+    count = 0
+    for ts in Clusters[cluster_num]:
+        if count == 0:
+            input_layer = keras.Input(shape=(18 * 1, 14), name=f'input_postcode_{ts}')
+        else:
+            input_layer = keras.Input(shape=(18 * 1, 7), name=f'input_postcode_{ts}')
+        input_layers_pc.append(input_layer)
+        count = count + 1
+
+    # postcode convolutions
+    concatenation_pc = layers.concatenate(input_layers_pc,
+                                          name='postcode_concat')
+    # pc_normalization = layers.LayerNormalization()(concatenation_pc)
+    cnn_layer = 6
+    tcn_stacks = 6
+    dilation_rate = 2
+    dilation_rates = [dilation_rate ** i for i in range(cnn_layer)]
+    padding = 'causal'
+    use_skip_connections = True
+    return_sequences = True
+    dropout_rate = 0.05
+    kernel_initializer = 'he_normal'
+    activation = 'relu'
+    use_batch_norm = False
+    use_layer_norm = False
+    use_weight_norm = True
+    tcn_pc_grid = tcn.TCN(nb_filters=32, kernel_size=2, nb_stacks=tcn_stacks, dilations=dilation_rates,
+                          padding=padding,
+                          use_skip_connections=use_skip_connections, dropout_rate=dropout_rate,
+                          return_sequences=return_sequences,
+                          activation=activation, kernel_initializer=kernel_initializer,
+                          use_batch_norm=use_batch_norm,
+                          use_layer_norm=use_layer_norm,
+                          use_weight_norm=use_weight_norm, name='pc_TCN')(concatenation_pc)
+    flatten_pc = layers.Flatten(name='flatten_pc')(tcn_pc_grid)
+    full_connected_layer_pc = layers.Dense(18, activation='linear', name="prediction_layer_pc")(flatten_pc)
+
+    grid_model = grid_only_network_SWIS()
+
+    concatenation = layers.concatenate([grid_model.output, full_connected_layer_pc])
+    prediction_layer = layers.Dense(18, activation='linear', name="prediction_layer")(concatenation)
+
+    input_layers_pc.append(grid_model.input)
+    SWIS_APPROACH_A_more_layer_without_norm_cluster_model = keras.Model(
+        inputs=input_layers_pc, outputs=prediction_layer)
+
+    SWIS_APPROACH_A_more_layer_without_norm_cluster_model.compile(loss=tf.losses.MeanSquaredError(),
+                                                                  optimizer=tf.optimizers.Adam(0.0001),
+                                                                  metrics=[tf.metrics.MeanAbsoluteError()])
+    return SWIS_APPROACH_A_more_layer_without_norm_cluster_model

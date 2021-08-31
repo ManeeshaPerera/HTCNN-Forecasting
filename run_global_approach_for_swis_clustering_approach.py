@@ -30,7 +30,7 @@ from constants import Clusters, Clusters_HF
 
 
 from src.CNN_architectures.swis_new_architectures import concat_pc_with_grid_tcn2_for_cluster
-from src.CNN_architectures.approachA import SWIS_APPROACH_A_SKIP_GRID_SKIP
+from src.CNN_architectures.approachA import SWIS_APPROACH_A_more_layer_without_norm_cluster
 
 
 def create_window_data(filename, count, lookback=1):
@@ -159,8 +159,8 @@ def run_combine_model(approach):
 final_test_models = {'0': {'func': concat_pc_with_grid_tcn2_for_cluster,
                            'model_name': 'concat_pc_with_grid_tcn2_for_cluster',
                            'folder': 'new_models'},
-                     '1': {'func': SWIS_APPROACH_A_SKIP_GRID_SKIP,
-                           'model_name': 'SWIS_APPROACH_A_SKIP_GRID_SKIP_cluster',
+                     '1': {'func': SWIS_APPROACH_A_more_layer_without_norm_cluster,
+                           'model_name': 'SWIS_APPROACH_A_more_layer_without_norm_cluster',
                            'folder': 'new_models'}
                      }
 
