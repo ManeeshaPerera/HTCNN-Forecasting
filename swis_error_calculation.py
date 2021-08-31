@@ -13,6 +13,14 @@ def sum_fc_results(ts_array, model_path, run, model_name):
             ts_fc = pd.read_csv(f'{model_path}/{ts}.csv', index_col=[0])[['fc']]
         elif model_name in conventional_nns:
             ts_fc = pd.read_csv(f'{model_path}/{ts}/{run}/grid.csv', index_col=[0])[['fc']]
+        # clustering approach
+        elif model_name in clustering:
+            if ts in const.OTHER_TS:
+                ts_fc = \
+                    pd.read_csv(f'swis_conventional_nn_results/conventional_tcn/{ts}/{run}/grid.csv', index_col=[0])[
+                        ['fc']]
+            else:
+                ts_fc = pd.read_csv(f'{model_path}/{ts}/{run}/grid.csv', index_col=[0])[['fc']]
         else:
             ts_fc = pd.read_csv(f'{model_path}/{run}/grid.csv', index_col=[0])[['fc']]
         dfs.append(ts_fc)
@@ -43,8 +51,18 @@ def get_grid_error_per_run(grid_model_path, model_path, run, model_name, notcomb
         grid_rmse = calculate_grid_error(grid_model_path, model_path, [const.ALL_SWIS_TS[0]], run, model_name)
         level_rmse.append(grid_rmse)
     if notcombined:
-        pc_rmse = calculate_grid_error(grid_model_path, model_path, const.SWIS_POSTCODES, run, model_name)
-        level_rmse.append(pc_rmse)
+
+        if model_name in clustering:
+            ts_to_run = []
+            for clusters in const.CLUSTER_TS:
+                ts_to_run.append(f'cluster_{clusters}')
+            for other_ts in const.OTHER_TS:
+                ts_to_run.append(other_ts)
+            cluster_rmse = calculate_grid_error(grid_model_path, model_path, ts_to_run, run, model_name)
+            level_rmse.append(cluster_rmse)
+        else:
+            pc_rmse = calculate_grid_error(grid_model_path, model_path, const.SWIS_POSTCODES, run, model_name)
+            level_rmse.append(pc_rmse)
     return level_rmse
 
 
@@ -89,31 +107,43 @@ def get_grid_error_per_run(grid_model_path, model_path, run, model_name, notcomb
 #           '3': {'name': 'swis_pc_grid_parallel', 'dir': 'swis_combined_nn_results/new_models', 'runs': 10}
 #           }
 
-models = {'0': {'name': 'SWIS_APPROACH_A_with_weather_only', 'dir': 'swis_combined_nn_results/new_models', 'runs': 10},
-          '1': {'name': 'grid_conv_in_each_pc_seperately', 'dir': 'swis_combined_nn_results/new_models', 'runs': 10},
-          '2': {'name': 'concat_pc_with_grid_tcn', 'dir': 'swis_combined_nn_results/new_models', 'runs': 10},
-          '3': {'name': 'pc_2d_conv_with_grid_tcn', 'dir': 'swis_combined_nn_results/new_models', 'runs': 10},
-          '4': {'name': 'pc_2d_conv_with_grid_tcn_method2', 'dir': 'swis_combined_nn_results/new_models', 'runs': 10},
+models = {'1': {'name': 'grid_conv_in_each_pc_seperately', 'dir': 'swis_combined_nn_results/new_models', 'runs': 10},
           '5': {'name': 'concat_pc_with_grid_tcn2', 'dir': 'swis_combined_nn_results/new_models', 'runs': 10},
-          '6': {'name': 'concat_pc_with_grid_tcn2_with_batchnorm', 'dir': 'swis_combined_nn_results/new_models',
-                'runs': 10},
-          '7': {'name': 'concat_pc_with_grid_tcn2_with_layernorm', 'dir': 'swis_combined_nn_results/new_models',
-                'runs': 10},
           '8': {'name': 'concat_pc_with_grid_tcn3', 'dir': 'swis_combined_nn_results/new_models', 'runs': 10},
-          '9': {'name': 'concat_pc_with_grid_tcn4_lr', 'dir': 'swis_combined_nn_results/new_models', 'runs': 10},
-          '10': {'name': 'concat_pc_with_grid_tcn4', 'dir': 'swis_combined_nn_results/new_models', 'runs': 10},
-          '11': {'name': 'concat_pc_with_grid_tcn2_lr', 'dir': 'swis_combined_nn_results/new_models', 'runs': 10},
-          '12': {'name': 'conv_3d_model', 'dir': 'swis_combined_nn_results/new_models', 'runs': 10},
-          '13': {'name': 'concat_pc_with_grid_tcn5', 'dir': 'swis_combined_nn_results/new_models', 'runs': 10},
-          '14': {'name': 'concat_pc_with_grid_tcn6', 'dir': 'swis_combined_nn_results/new_models', 'runs': 10},
-          '15': {'name': 'conv_3d_model_2', 'dir': 'swis_combined_nn_results/new_models', 'runs': 10},
-          '16': {'name': 'concat_pc_with_grid_at_each_tcn', 'dir': 'swis_combined_nn_results/new_models', 'runs': 10},
-          '17': {'name': 'concat_pc_with_grid_tcn2_new', 'dir': 'swis_combined_nn_results/new_models', 'runs': 10},
-          '18': {'name': 'concat_pc_with_grid_tcn2_relu_and_norm', 'dir': 'swis_combined_nn_results/new_models', 'runs': 10},
-          '19': {'name': 'concat_pc_with_grid_tcn2_lr_decay', 'dir': 'swis_combined_nn_results/new_models', 'runs': 10},
-          '20': {'name': 'concat_pc_with_grid_tcn2_concat_at_end', 'dir': 'swis_combined_nn_results/new_models', 'runs': 10},
+          '21': {'name': 'concat_pc_with_grid_tcn2_for_cluster', 'dir': 'swis_combined_nn_results/new_models',
+                 'runs': 10},
+          '10': {'name': 'SWIS_APPROACH_A_more_layer_without_norm', 'dir': 'swis_combined_nn_results/approachA',
+                 'runs': 10}}
 
-          }
+# models = {'0': {'name': 'SWIS_APPROACH_A_with_weather_only', 'dir': 'swis_combined_nn_results/new_models', 'runs': 10},
+#           '1': {'name': 'grid_conv_in_each_pc_seperately', 'dir': 'swis_combined_nn_results/new_models', 'runs': 10},
+#           '2': {'name': 'concat_pc_with_grid_tcn', 'dir': 'swis_combined_nn_results/new_models', 'runs': 10},
+#           '3': {'name': 'pc_2d_conv_with_grid_tcn', 'dir': 'swis_combined_nn_results/new_models', 'runs': 10},
+#           '4': {'name': 'pc_2d_conv_with_grid_tcn_method2', 'dir': 'swis_combined_nn_results/new_models', 'runs': 10},
+#           '5': {'name': 'concat_pc_with_grid_tcn2', 'dir': 'swis_combined_nn_results/new_models', 'runs': 10},
+#           '6': {'name': 'concat_pc_with_grid_tcn2_with_batchnorm', 'dir': 'swis_combined_nn_results/new_models',
+#                 'runs': 10},
+#           '7': {'name': 'concat_pc_with_grid_tcn2_with_layernorm', 'dir': 'swis_combined_nn_results/new_models',
+#                 'runs': 10},
+#           '8': {'name': 'concat_pc_with_grid_tcn3', 'dir': 'swis_combined_nn_results/new_models', 'runs': 10},
+#           '9': {'name': 'concat_pc_with_grid_tcn4_lr', 'dir': 'swis_combined_nn_results/new_models', 'runs': 10},
+#           '10': {'name': 'concat_pc_with_grid_tcn4', 'dir': 'swis_combined_nn_results/new_models', 'runs': 10},
+#           '11': {'name': 'concat_pc_with_grid_tcn2_lr', 'dir': 'swis_combined_nn_results/new_models', 'runs': 10},
+#           '12': {'name': 'conv_3d_model', 'dir': 'swis_combined_nn_results/new_models', 'runs': 10},
+#           '13': {'name': 'concat_pc_with_grid_tcn5', 'dir': 'swis_combined_nn_results/new_models', 'runs': 10},
+#           '14': {'name': 'concat_pc_with_grid_tcn6', 'dir': 'swis_combined_nn_results/new_models', 'runs': 10},
+#           '15': {'name': 'conv_3d_model_2', 'dir': 'swis_combined_nn_results/new_models', 'runs': 10},
+#           '16': {'name': 'concat_pc_with_grid_at_each_tcn', 'dir': 'swis_combined_nn_results/new_models', 'runs': 10},
+#           '17': {'name': 'concat_pc_with_grid_tcn2_new', 'dir': 'swis_combined_nn_results/new_models', 'runs': 10},
+#           '18': {'name': 'concat_pc_with_grid_tcn2_relu_and_norm', 'dir': 'swis_combined_nn_results/new_models',
+#                  'runs': 10},
+#           '19': {'name': 'concat_pc_with_grid_tcn2_lr_decay', 'dir': 'swis_combined_nn_results/new_models', 'runs': 10},
+#           '20': {'name': 'concat_pc_with_grid_tcn2_concat_at_end', 'dir': 'swis_combined_nn_results/new_models',
+#                  'runs': 10},
+#           '21': {'name': 'concat_pc_with_grid_tcn2_for_cluster', 'dir': 'swis_combined_nn_results/new_models',
+#                  'runs': 10}
+
+# }
 stat_models = ['arima', 'naive']
 # combined = ['SWIS_APPROACH_A', 'SWIS_APPROACH_B', 'SWIS_APPROACH_B_with_clustering', 'SWIS_APPROACH_A_SKIP',
 #             'SWIS_APPROACH_B_with_clustering2', 'SWIS_APPROACH_A_more_layer', 'SWIS_APPROACH_A_more_layer_without_norm',
@@ -133,9 +163,11 @@ combined = ['pc_2d_conv_with_grid_tcn', 'pc_2d_conv_with_grid_tcn_method2',
             'concat_pc_with_grid_tcn2_lr', 'conv_3d_model', 'concat_pc_with_grid_tcn5', 'concat_pc_with_grid_tcn6',
             'conv_3d_model_2', 'concat_pc_with_grid_tcn2_new', 'concat_pc_with_grid_at_each_tcn',
             'concat_pc_with_grid_tcn2_relu_and_norm', 'concat_pc_with_grid_tcn2_lr_decay',
-            'concat_pc_with_grid_tcn2_concat_at_end']
-conventional_nns = ['conventional_lstm', 'conventional_cnn', 'conventional_tcn', 'grid_conv_in_each_pc_seperately']
-no_grid = ['grid_conv_in_each_pc_seperately']
+            'concat_pc_with_grid_tcn2_concat_at_end', 'SWIS_APPROACH_A']
+conventional_nns = ['conventional_lstm', 'conventional_cnn', 'conventional_tcn', 'grid_conv_in_each_pc_seperately',
+                    'SWIS_APPROACH_A_more_layer_without_norm']
+no_grid = ['grid_conv_in_each_pc_seperately', 'concat_pc_with_grid_tcn2_for_cluster']
+clustering = ['concat_pc_with_grid_tcn2_for_cluster']
 # model_number = sys.argv[1]
 # MODEL_NAME = models[model_number]['name']
 # PATH = models[model_number]['dir']
@@ -159,6 +191,8 @@ for model_number in models:
                 one_grid_path = f'swis_conventional_nn_results/conventional_tcn/grid/{RUN}'
         elif MODEL_NAME in combined:
             one_grid_path = f'{PATH}/{MODEL_NAME}/{RUN}'
+        elif MODEL_NAME in clustering:
+            one_grid_path = f'swis_conventional_nn_results/conventional_tcn/grid/{RUN}'
         notcombined = True
         if MODEL_NAME in combined:
             notcombined = False
@@ -173,7 +207,7 @@ for model_number in models:
 
 all_error_df = pd.DataFrame(all_errors, columns=['model_name', 'error', 'run', 'Level'])
 
-error_path = f'swis_combined_nn_results/all_errors_new.csv'
+error_path = f'swis_combined_nn_results/all_fc_errors.csv'
 all_error_df.to_csv(error_path)
 # if not os.path.exists(error_path):
 #     os.makedirs(error_path)
