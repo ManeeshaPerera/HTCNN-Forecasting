@@ -163,9 +163,8 @@ combined = ['pc_2d_conv_with_grid_tcn', 'pc_2d_conv_with_grid_tcn_method2',
             'concat_pc_with_grid_tcn2_lr', 'conv_3d_model', 'concat_pc_with_grid_tcn5', 'concat_pc_with_grid_tcn6',
             'conv_3d_model_2', 'concat_pc_with_grid_tcn2_new', 'concat_pc_with_grid_at_each_tcn',
             'concat_pc_with_grid_tcn2_relu_and_norm', 'concat_pc_with_grid_tcn2_lr_decay',
-            'concat_pc_with_grid_tcn2_concat_at_end', 'SWIS_APPROACH_A']
-conventional_nns = ['conventional_lstm', 'conventional_cnn', 'conventional_tcn', 'grid_conv_in_each_pc_seperately',
-                    'SWIS_APPROACH_A_more_layer_without_norm']
+            'concat_pc_with_grid_tcn2_concat_at_end', 'SWIS_APPROACH_A', 'SWIS_APPROACH_A_more_layer_without_norm']
+conventional_nns = ['conventional_lstm', 'conventional_cnn', 'conventional_tcn', 'grid_conv_in_each_pc_seperately']
 no_grid = ['grid_conv_in_each_pc_seperately', 'concat_pc_with_grid_tcn2_for_cluster']
 clustering = ['concat_pc_with_grid_tcn2_for_cluster']
 # model_number = sys.argv[1]
