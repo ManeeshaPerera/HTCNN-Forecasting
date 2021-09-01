@@ -25,9 +25,9 @@ from src.WindowGenerator.window_generator import WindowGenerator
 from sklearn.preprocessing import StandardScaler
 import src.utils as utils
 import pickle5 as pickle
-from constants import ALL_SWIS_TS, SWIS_POSTCODES
+from constants import ALL_SWIS_TS, SWIS_POSTCODES, PC_CLUSTER_MAP
 
-# from src.CNN_architectures.approachA import SWIS_APPROACH_A
+from src.CNN_architectures.approachA import SWIS_APPROACH_A, SWIS_APPROACH_A_more_layer_without_norm_weather_centroids
 
 # from src.CNN_architectures.approachB import SWIS_APPROACH_B, SWIS_APPROACH_B_with_fully_connected, SWIS_APPROACH_B_with_clustering, SWIS_APPROACH_B_max_pool
 # from src.CNN_architectures.swis_new_architectures import swis_pc_grid_parallel, \
@@ -35,15 +35,27 @@ from constants import ALL_SWIS_TS, SWIS_POSTCODES
 #     concat_pc_with_grid_tcn2_with_layernorm, concat_pc_with_grid_tcn3, concat_pc_with_grid_tcn2_lr,concat_pc_with_grid_tcn4, concat_pc_with_grid_tcn4_lr, \
 #     concat_pc_with_grid_tcn5, concat_pc_with_grid_tcn6, concat_pc_with_grid_at_each_tcn, concat_pc_with_grid_tcn2_new, concat_pc_with_grid_tcn2_relu_and_norm
 
-from src.CNN_architectures.swis_new_architectures import concat_pc_with_grid_tcn2_relu_and_norm, \
-    concat_pc_with_grid_tcn2_lr_decay, concat_pc_with_grid_tcn2_concat_at_end
+from src.CNN_architectures.swis_new_architectures import concat_pc_with_grid_tcn2_weather_centroids
 
+CHECKED_CLUSTERS = []
 
 def create_window_data(filename, lookback=1):
     horizon = 18  # day ahead forecast
 
-    data = pd.read_csv(f'swis_ts_data/ts_data/{filename}.csv', index_col=[0])
+    # data = pd.read_csv(f'swis_ts_data/ts_data/{filename}.csv', index_col=[0])
+    # print(filename)
+
+    if filename == 'grid':
+        data = pd.read_csv(f'swis_ts_data/ts_data/{filename}.csv', index_col=[0])
+    else:
+        cluster_val = PC_CLUSTER_MAP[int(filename)]
+        if cluster_val not in CHECKED_CLUSTERS:
+            data = pd.read_csv(f'swis_ts_data/ts_data/{filename}.csv', index_col=[0])
+            CHECKED_CLUSTERS.append(cluster_val)
+        else:
+            data = pd.read_csv(f'swis_ts_data/ts_data/{filename}.csv', index_col=[0]).iloc[:, 0:7]
     print(filename)
+
     look_back = 18 * lookback
 
     train, test = utils.split_hourly_data_test_SWIS(data, look_back)
@@ -160,17 +172,13 @@ def run_combine_model(approach):
 #                            'folder': 'new_models'}
 #                      }
 
-final_test_models = {'0': {'func': concat_pc_with_grid_tcn2_relu_and_norm,
-                           'model_name': 'concat_pc_with_grid_tcn2_relu_and_norm',
+final_test_models = {'0': {'func': concat_pc_with_grid_tcn2_weather_centroids,
+                           'model_name': 'concat_pc_with_grid_tcn2_weather_centroids',
                            'folder': 'new_models'},
-                     '1': {'func': concat_pc_with_grid_tcn2_lr_decay,
-                           'model_name': 'concat_pc_with_grid_tcn2_lr_decay',
-                           'folder': 'new_models'},
-                     '2': {'func': concat_pc_with_grid_tcn2_concat_at_end,
-                           'model_name': 'concat_pc_with_grid_tcn2_concat_at_end',
+                     '1': {'func': SWIS_APPROACH_A_more_layer_without_norm_weather_centroids,
+                           'model_name': 'SWIS_APPROACH_A_more_layer_without_norm_weather_centroids',
                            'folder': 'new_models'}
                      }
-
 multiple_run = final_test_models[model_func_name]['folder']
 model_name = final_test_models[model_func_name]['model_name']
 function_run = final_test_models[model_func_name]['func']

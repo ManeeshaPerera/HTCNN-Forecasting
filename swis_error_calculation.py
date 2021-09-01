@@ -107,9 +107,7 @@ def get_grid_error_per_run(grid_model_path, model_path, run, model_name, notcomb
 #           '3': {'name': 'swis_pc_grid_parallel', 'dir': 'swis_combined_nn_results/new_models', 'runs': 10}
 #           }
 
-models = {'1': {'name': 'grid_conv_in_each_pc_seperately', 'dir': 'swis_combined_nn_results/new_models', 'runs': 10},
-          '5': {'name': 'concat_pc_with_grid_tcn2', 'dir': 'swis_combined_nn_results/new_models', 'runs': 10},
-          '8': {'name': 'concat_pc_with_grid_tcn3', 'dir': 'swis_combined_nn_results/new_models', 'runs': 10},
+models = {'5': {'name': 'concat_pc_with_grid_tcn2', 'dir': 'swis_combined_nn_results/new_models', 'runs': 10},
           '21': {'name': 'concat_pc_with_grid_tcn2_for_cluster', 'dir': 'swis_combined_nn_results/new_models',
                  'runs': 10},
           '10': {'name': 'SWIS_APPROACH_A_more_layer_without_norm', 'dir': 'swis_combined_nn_results/approachA',
