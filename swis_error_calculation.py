@@ -113,6 +113,9 @@ models = {'1': {'name': 'grid_conv_in_each_pc_seperately', 'dir': 'swis_combined
           '21': {'name': 'concat_pc_with_grid_tcn2_for_cluster', 'dir': 'swis_combined_nn_results/new_models',
                  'runs': 10},
           '10': {'name': 'SWIS_APPROACH_A_more_layer_without_norm', 'dir': 'swis_combined_nn_results/approachA',
+                 'runs': 10},
+          '11': {'name': 'SWIS_APPROACH_A_more_layer_without_norm_cluster',
+                 'dir': 'swis_combined_nn_results/new_models',
                  'runs': 10}}
 
 # models = {'0': {'name': 'SWIS_APPROACH_A_with_weather_only', 'dir': 'swis_combined_nn_results/new_models', 'runs': 10},
@@ -165,8 +168,9 @@ combined = ['pc_2d_conv_with_grid_tcn', 'pc_2d_conv_with_grid_tcn_method2',
             'concat_pc_with_grid_tcn2_relu_and_norm', 'concat_pc_with_grid_tcn2_lr_decay',
             'concat_pc_with_grid_tcn2_concat_at_end', 'SWIS_APPROACH_A', 'SWIS_APPROACH_A_more_layer_without_norm']
 conventional_nns = ['conventional_lstm', 'conventional_cnn', 'conventional_tcn', 'grid_conv_in_each_pc_seperately']
-no_grid = ['grid_conv_in_each_pc_seperately', 'concat_pc_with_grid_tcn2_for_cluster']
-clustering = ['concat_pc_with_grid_tcn2_for_cluster']
+no_grid = ['grid_conv_in_each_pc_seperately', 'concat_pc_with_grid_tcn2_for_cluster',
+           'SWIS_APPROACH_A_more_layer_without_norm_cluster']
+clustering = ['concat_pc_with_grid_tcn2_for_cluster', 'SWIS_APPROACH_A_more_layer_without_norm_cluster']
 # model_number = sys.argv[1]
 # MODEL_NAME = models[model_number]['name']
 # PATH = models[model_number]['dir']
