@@ -114,7 +114,7 @@ def run_combine_model(approach):
 
     model = approach((18*1, 14), 'postcode')
     callback = tf.keras.callbacks.EarlyStopping(monitor='loss', patience=50)
-    history = model.fit(train_dic, label_grid, batch_size=128, epochs=1000,
+    history = model.fit(train_dic, label_grid, batch_size=256, epochs=800,
                         callbacks=[callback], shuffle=False)
 
     # Forecast
@@ -142,14 +142,16 @@ def run_combine_model(approach):
     fc = model.predict(test_dic)
     pc = 0
     sample = 0
-
+    print(scalers)
     while sample < len(fc):
         if len(fc_array[pc]) == len(df_store[pc]):
             pc = pc+1
-            sample = 630*pc
+            sample = 631*pc
         fc_sample = fc[sample]
+        # print(pc)
         # fc_sample = fc[sample].reshape(-1,1)
         pc_scaler = scalers[pc]
+        # print(pc_scaler)
         fc_sample = pc_scaler.inverse_transform(fc_sample)
         fc_array[pc].extend(fc_sample)
         sample = sample + 18
