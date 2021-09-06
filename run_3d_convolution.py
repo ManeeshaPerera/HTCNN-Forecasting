@@ -67,7 +67,7 @@ prediction_layer1 = layers.Dense(50, activation='linear', name="prediction_layer
 prediction_layer = layers.Dense(18, activation='linear', name="prediction_layer")(prediction_layer1)
 model_3d_conv = keras.Model(inputs=input_layer, outputs=prediction_layer)
 
-callback = tf.keras.callbacks.EarlyStopping(monitor='loss', patience=20)
+# callback = tf.keras.callbacks.EarlyStopping(monitor='loss', patience=20)
 model_3d_conv.compile(loss=tf.losses.MeanSquaredError(), optimizer=tf.optimizers.Adam(0.0001),
                       metrics=[tf.metrics.MeanAbsoluteError()])
 # model_3d_conv.summary()
@@ -77,9 +77,12 @@ model_3d_conv.compile(loss=tf.losses.MeanSquaredError(), optimizer=tf.optimizers
 #                             use_multiprocessing=False,
 #                             workers=1, callbacks=[callback], epochs=50)
 
+# history = model_3d_conv.fit(training_generator,
+#                             use_multiprocessing=False,
+#                             workers=1, callbacks=[callback], epochs=1)
 history = model_3d_conv.fit(training_generator,
                             use_multiprocessing=False,
-                            workers=1, callbacks=[callback], epochs=50)
+                            workers=1, epochs=2)
 
 # test_data = np.load(f'swis_ts_data/img_ts/train_0.npy').reshape(1, 173, 192, 18, 8)
 # print(model_3d_conv.predict(test_data))
@@ -98,7 +101,7 @@ fc_df = fc_df.rename(columns={'power': 'fc'})
 forecasts = pd.concat([test, fc_df], axis=1)
 # print(df)
 
-model_name = 'conv_2d_with_images'
+model_name = 'conv_2d_with_images_epochs2'
 model_new_name = f'{model_name}/{run}'
 dir_path = f'swis_combined_nn_results/new_models/{model_new_name}'
 if not os.path.exists(dir_path):
