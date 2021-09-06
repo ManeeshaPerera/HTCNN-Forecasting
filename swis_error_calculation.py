@@ -178,7 +178,7 @@ combined = ['pc_2d_conv_with_grid_tcn', 'pc_2d_conv_with_grid_tcn_method2',
             'SWIS_APPROACH_A_more_layer_without_norm_weather_centroids', 'concat_pc_with_grid_tcn2_weather_centroids']
 conventional_nns = ['conventional_lstm', 'conventional_cnn', 'conventional_tcn', 'grid_conv_in_each_pc_seperately']
 no_grid = ['grid_conv_in_each_pc_seperately', 'concat_pc_with_grid_tcn2_for_cluster',
-           'SWIS_APPROACH_A_more_layer_without_norm_cluster']
+           'SWIS_APPROACH_A_more_layer_without_norm_cluster', 'conventional_TCN_approach']
 clustering = ['concat_pc_with_grid_tcn2_for_cluster', 'SWIS_APPROACH_A_more_layer_without_norm_cluster']
 clustering_and_pc = ['conventional_TCN_approach']
 # model_number = sys.argv[1]
