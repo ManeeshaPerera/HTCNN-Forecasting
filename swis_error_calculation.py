@@ -14,7 +14,7 @@ def sum_fc_results(ts_array, model_path, run, model_name):
         elif model_name in conventional_nns:
             ts_fc = pd.read_csv(f'{model_path}/{ts}/{run}/grid.csv', index_col=[0])[['fc']]
         # clustering approach
-        elif model_name in clustering:
+        elif model_name in clustering or model_name in clustering_and_pc:
             if ts in const.OTHER_TS:
                 ts_fc = \
                     pd.read_csv(f'swis_conventional_nn_results/conventional_tcn/{ts}/{run}/grid.csv', index_col=[0])[
@@ -114,7 +114,17 @@ models = {'5': {'name': 'concat_pc_with_grid_tcn2', 'dir': 'swis_combined_nn_res
                  'runs': 10},
           '11': {'name': 'SWIS_APPROACH_A_more_layer_without_norm_cluster',
                  'dir': 'swis_combined_nn_results/new_models',
-                 'runs': 10}}
+                 'runs': 10},
+          '12': {'name': 'concat_pc_with_grid_tcn2_weather_centroids',
+                 'dir': 'swis_combined_nn_results/new_models',
+                 'runs': 10},
+          '13': {'name': 'SWIS_APPROACH_A_more_layer_without_norm_weather_centroids',
+                 'dir': 'swis_combined_nn_results/new_models',
+                 'runs': 10},
+          '14': {'name': 'conventional_TCN_approach',
+                 'dir': 'swis_combined_nn_results/new_models',
+                 'runs': 10}
+          }
 
 # models = {'0': {'name': 'SWIS_APPROACH_A_with_weather_only', 'dir': 'swis_combined_nn_results/new_models', 'runs': 10},
 #           '1': {'name': 'grid_conv_in_each_pc_seperately', 'dir': 'swis_combined_nn_results/new_models', 'runs': 10},
@@ -164,11 +174,13 @@ combined = ['pc_2d_conv_with_grid_tcn', 'pc_2d_conv_with_grid_tcn_method2',
             'concat_pc_with_grid_tcn2_lr', 'conv_3d_model', 'concat_pc_with_grid_tcn5', 'concat_pc_with_grid_tcn6',
             'conv_3d_model_2', 'concat_pc_with_grid_tcn2_new', 'concat_pc_with_grid_at_each_tcn',
             'concat_pc_with_grid_tcn2_relu_and_norm', 'concat_pc_with_grid_tcn2_lr_decay',
-            'concat_pc_with_grid_tcn2_concat_at_end', 'SWIS_APPROACH_A', 'SWIS_APPROACH_A_more_layer_without_norm']
+            'concat_pc_with_grid_tcn2_concat_at_end', 'SWIS_APPROACH_A', 'SWIS_APPROACH_A_more_layer_without_norm',
+            'SWIS_APPROACH_A_more_layer_without_norm_weather_centroids', 'concat_pc_with_grid_tcn2_weather_centroids']
 conventional_nns = ['conventional_lstm', 'conventional_cnn', 'conventional_tcn', 'grid_conv_in_each_pc_seperately']
 no_grid = ['grid_conv_in_each_pc_seperately', 'concat_pc_with_grid_tcn2_for_cluster',
            'SWIS_APPROACH_A_more_layer_without_norm_cluster']
 clustering = ['concat_pc_with_grid_tcn2_for_cluster', 'SWIS_APPROACH_A_more_layer_without_norm_cluster']
+clustering_and_pc = ['conventional_TCN_approach']
 # model_number = sys.argv[1]
 # MODEL_NAME = models[model_number]['name']
 # PATH = models[model_number]['dir']
@@ -193,6 +205,8 @@ for model_number in models:
         elif MODEL_NAME in combined:
             one_grid_path = f'{PATH}/{MODEL_NAME}/{RUN}'
         elif MODEL_NAME in clustering:
+            one_grid_path = f'swis_conventional_nn_results/conventional_tcn/grid/{RUN}'
+        elif MODEL_NAME in clustering_and_pc:
             one_grid_path = f'swis_conventional_nn_results/conventional_tcn/grid/{RUN}'
         notcombined = True
         if MODEL_NAME in combined:
