@@ -20,9 +20,6 @@
 # The maximum running time of the job in days-hours:mins:sec
 #SBATCH --time=04-00:00:0
 
-#Job array
-#SBATCH --array=0-9
-
 # Send yourself an email when the job:
 #SBATCH --mail-user=pereramg@student.unimelb.edu.au
 #SBATCH --mail-type=FAIL,END
@@ -34,4 +31,4 @@ module load python/3.7.4
 module load tensorflow/2.3.1-python-3.7.4
 
 # The job command(s):
-python run_3d_convolution.py ${SLURM_ARRAY_TASK_ID}
+python run_3d_convolution.py 0

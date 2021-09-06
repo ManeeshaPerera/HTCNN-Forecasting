@@ -39,12 +39,12 @@ training_generator = DataGenerator(partition['train'], **params)
 input_layer = keras.Input(shape=(173, 192, 18, 8), name=f'input_postcode')
 
 
-def getConv(layer):
-    conv1 = layers.Conv2D(32, 2, activation='relu')(layer)
-    conv2 = layers.Conv2D(32, 2, activation='relu')(conv1)
-    max_pool = layers.MaxPooling2D()(conv2)
-    conv3 = layers.Conv2D(64, 2, activation='relu')(max_pool)
-    conv4 = layers.Conv2D(64, 2, activation='relu')(conv3)
+def getConv(layer, ts_number):
+    conv1 = layers.Conv2D(32, 2, activation='relu', name=f'conv1_{ts_number}')(layer)
+    conv2 = layers.Conv2D(32, 2, activation='relu', name=f'conv2_{ts_number}')(conv1)
+    max_pool = layers.MaxPooling2D(name=f'max_pool_{ts_number}')(conv2)
+    conv3 = layers.Conv2D(64, 2, activation='relu', name=f'conv3_{ts_number}')(max_pool)
+    conv4 = layers.Conv2D(64, 2, activation='relu', name=f'conv4_{ts_number}')(conv3)
     flatten = layers.Flatten()(conv4)
     return flatten
 
@@ -54,7 +54,7 @@ for i in range(8):
     # Slicing the ith channel:
     out = layers.Lambda(lambda x: x[:, :, :, :, i])(input_layer)
     print(out.shape)
-    branch_outputs.append(getConv(out))
+    branch_outputs.append(getConv(out, i))
 
 # layer_3d = tf.keras.layers.Conv3D(16, 3, activation='relu')(input_layer)
 # max_pool = tf.keras.layers.MaxPooling3D()(layer_3d)
@@ -98,7 +98,7 @@ fc_df = fc_df.rename(columns={'power': 'fc'})
 forecasts = pd.concat([test, fc_df], axis=1)
 # print(df)
 
-model_name = 'conv_3d_model_2'
+model_name = 'conv_2d_with_images'
 model_new_name = f'{model_name}/{run}'
 dir_path = f'swis_combined_nn_results/new_models/{model_new_name}'
 if not os.path.exists(dir_path):
@@ -108,3 +108,5 @@ forecasts.to_csv(f'{dir_path}/grid.csv')
 
 with open(f'{dir_path}/training_loss_grid_iteration', 'wb') as file_loss:
     pickle.dump(history.history, file_loss)
+
+model_3d_conv.save(f'{dir_path}/{model_name}')
