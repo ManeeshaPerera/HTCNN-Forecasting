@@ -41,7 +41,9 @@ def calculate_grid_error(grid_model_path, dir_path, ts_array, run, model_name):
     forecasts = sum_fc_results(ts_array, dir_path, run, model_name).values
     horizon = 18
 
-    mean_err, _ = err.test_errors_nrmse(train_df.values, test_sample, forecasts, horizon)
+    mean_err, error_dis = err.test_errors_nrmse(train_df.values, test_sample, forecasts, horizon)
+    error_dis_df = pd.DataFrame(error_dis, columns=[model_name])
+    error_dis_df.to_csv(f'swis_combined_nn_results/error_dis/{model_name}_{run}_error_dist.csv')
     return mean_err
 
 
