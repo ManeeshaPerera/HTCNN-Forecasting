@@ -107,7 +107,12 @@ def get_grid_error_per_run(grid_model_path, model_path, run, model_name, notcomb
 #           '3': {'name': 'swis_pc_grid_parallel', 'dir': 'swis_combined_nn_results/new_models', 'runs': 10}
 #           }
 
-models = {'5': {'name': 'concat_pc_with_grid_tcn2', 'dir': 'swis_combined_nn_results/new_models', 'runs': 10},
+models = {'0': {'name': 'naive', 'dir': 'benchmark_results/swis_benchmarks', 'runs': 1},
+            '1': {'name': 'arima', 'dir': 'benchmark_results/swis_benchmarks', 'runs': 1},
+            '2': {'name': 'conventional_lstm', 'dir': 'swis_conventional_nn_results', 'runs': 10},
+            '3': {'name': 'conventional_cnn', 'dir': 'swis_conventional_nn_results', 'runs': 10},
+            '4': {'name': 'conventional_tcn', 'dir': 'swis_conventional_nn_results', 'runs': 10},
+            '5': {'name': 'concat_pc_with_grid_tcn2', 'dir': 'swis_combined_nn_results/new_models', 'runs': 10},
           '21': {'name': 'concat_pc_with_grid_tcn2_for_cluster', 'dir': 'swis_combined_nn_results/new_models',
                  'runs': 10},
           '10': {'name': 'SWIS_APPROACH_A_more_layer_without_norm', 'dir': 'swis_combined_nn_results/approachA',
@@ -222,7 +227,7 @@ for model_number in models:
 
 all_error_df = pd.DataFrame(all_errors, columns=['model_name', 'error', 'run', 'Level'])
 
-error_path = f'swis_combined_nn_results/all_fc_errors.csv'
+error_path = f'swis_combined_nn_results/paper_errors.csv'
 all_error_df.to_csv(error_path)
 # if not os.path.exists(error_path):
 #     os.makedirs(error_path)

@@ -68,7 +68,8 @@ def test_errors_nrmse(train_sample, test_sample, forecasts, horizon):
     nrmse_errors = []
     for h in range(0, len(test_sample), horizon):
         rmse = mean_squared_error(test_sample[h: h + horizon], forecasts[h: h + horizon], squared=False)
-        nrmse = rmse / np.mean(train_sample)
+        # nrmse = rmse / np.mean(train_sample)
+        nrmse = rmse/np.mean(test_sample[h: h + horizon])
         nrmse_errors.append(nrmse)
 
     return np.mean(nrmse_errors), nrmse_errors
