@@ -28,7 +28,7 @@ def sum_fc_results(ts_array, model_path, run, model_name):
     return concat_df
 
 
-def calculate_grid_error(grid_model_path, dir_path, ts_array, run, model_name):
+def calculate_grid_error(grid_model_path, dir_path, ts_array, run, model_name, ts_name='grid'):
     data = pd.read_csv('swis_ts_data/ts_data/grid.csv', index_col=[0])
 
     train, test = util.split_train_test_statmodels_swis(data)
@@ -43,7 +43,7 @@ def calculate_grid_error(grid_model_path, dir_path, ts_array, run, model_name):
 
     mean_err, error_dis = err.test_errors_nrmse(train_df.values, test_sample, forecasts, horizon)
     error_dis_df = pd.DataFrame(error_dis, columns=[model_name])
-    error_dis_df.to_csv(f'swis_combined_nn_results/error_dis/{model_name}_{run}_error_dist.csv')
+    error_dis_df.to_csv(f'swis_combined_nn_results/error_dis/{model_name}_{ts_name}_{run}_error_dist.csv')
     return mean_err
 
 
@@ -60,10 +60,11 @@ def get_grid_error_per_run(grid_model_path, model_path, run, model_name, notcomb
                 ts_to_run.append(f'cluster_{clusters}')
             for other_ts in const.OTHER_TS:
                 ts_to_run.append(other_ts)
-            cluster_rmse = calculate_grid_error(grid_model_path, model_path, ts_to_run, run, model_name)
+            cluster_rmse = calculate_grid_error(grid_model_path, model_path, ts_to_run, run, model_name, 'cluster')
             level_rmse.append(cluster_rmse)
         else:
-            pc_rmse = calculate_grid_error(grid_model_path, model_path, const.SWIS_POSTCODES, run, model_name)
+            pc_rmse = calculate_grid_error(grid_model_path, model_path, const.SWIS_POSTCODES, run, model_name,
+                                           'postcode')
             level_rmse.append(pc_rmse)
     return level_rmse
 
@@ -110,11 +111,11 @@ def get_grid_error_per_run(grid_model_path, model_path, run, model_name, notcomb
 #           }
 
 models = {'0': {'name': 'naive', 'dir': 'benchmark_results/swis_benchmarks', 'runs': 1},
-            '1': {'name': 'arima', 'dir': 'benchmark_results/swis_benchmarks', 'runs': 1},
-            '2': {'name': 'conventional_lstm', 'dir': 'swis_conventional_nn_results', 'runs': 10},
-            '3': {'name': 'conventional_cnn', 'dir': 'swis_conventional_nn_results', 'runs': 10},
-            '4': {'name': 'conventional_tcn', 'dir': 'swis_conventional_nn_results', 'runs': 10},
-            '5': {'name': 'concat_pc_with_grid_tcn2', 'dir': 'swis_combined_nn_results/new_models', 'runs': 10},
+          '1': {'name': 'arima', 'dir': 'benchmark_results/swis_benchmarks', 'runs': 1},
+          '2': {'name': 'conventional_lstm', 'dir': 'swis_conventional_nn_results', 'runs': 10},
+          '3': {'name': 'conventional_cnn', 'dir': 'swis_conventional_nn_results', 'runs': 10},
+          '4': {'name': 'conventional_tcn', 'dir': 'swis_conventional_nn_results', 'runs': 10},
+          '5': {'name': 'concat_pc_with_grid_tcn2', 'dir': 'swis_combined_nn_results/new_models', 'runs': 10},
           '21': {'name': 'concat_pc_with_grid_tcn2_for_cluster', 'dir': 'swis_combined_nn_results/new_models',
                  'runs': 10},
           '10': {'name': 'SWIS_APPROACH_A_more_layer_without_norm', 'dir': 'swis_combined_nn_results/approachA',
