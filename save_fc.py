@@ -12,7 +12,7 @@ def sum_fc_results(ts_array, model_path, run, model_name):
         elif model_name in clustering or model_name in clustering_and_pc:
             if ts in const.OTHER_TS:
                 ts_fc = \
-                    pd.read_csv(f'../swis_conventional_nn_results/conventional_tcn/{ts}/{run}/grid.csv', index_col=[0])[
+                    pd.read_csv(f'swis_conventional_nn_results/conventional_tcn/{ts}/{run}/grid.csv', index_col=[0])[
                         ['fc']]
             else:
                 ts_fc = pd.read_csv(f'{model_path}/{ts}/{run}/grid.csv', index_col=[0])[['fc']]
@@ -43,21 +43,21 @@ def get_grid_error_per_run(grid_model_path, model_path, run, model_name, notcomb
 
 
 
-models = {'0': {'name': 'naive', 'dir': '../benchmark_results/swis_benchmarks', 'runs': 1},
-          '1': {'name': 'arima', 'dir': '../benchmark_results/swis_benchmarks', 'runs': 1},
-          '2': {'name': 'conventional_lstm', 'dir': '../swis_conventional_nn_results', 'runs': 1},
-          '3': {'name': 'conventional_cnn', 'dir': '../swis_conventional_nn_results', 'runs': 1},
-          '4': {'name': 'conventional_tcn', 'dir': '../swis_conventional_nn_results', 'runs': 1},
-          '5': {'name': 'concat_pc_with_grid_tcn2', 'dir': '../swis_combined_nn_results/new_models', 'runs': 1},
-          '21': {'name': 'concat_pc_with_grid_tcn2_for_cluster', 'dir': '../swis_combined_nn_results/new_models',
+models = {'0': {'name': 'naive', 'dir': 'benchmark_results/swis_benchmarks', 'runs': 1},
+          '1': {'name': 'arima', 'dir': 'benchmark_results/swis_benchmarks', 'runs': 1},
+          '2': {'name': 'conventional_lstm', 'dir': 'swis_conventional_nn_results', 'runs': 1},
+          '3': {'name': 'conventional_cnn', 'dir': 'swis_conventional_nn_results', 'runs': 1},
+          '4': {'name': 'conventional_tcn', 'dir': 'swis_conventional_nn_results', 'runs': 1},
+          '5': {'name': 'concat_pc_with_grid_tcn2', 'dir': 'swis_combined_nn_results/new_models', 'runs': 1},
+          '21': {'name': 'concat_pc_with_grid_tcn2_for_cluster', 'dir': 'swis_combined_nn_results/new_models',
                  'runs': 1},
-          '10': {'name': 'SWIS_APPROACH_A_more_layer_without_norm', 'dir': '../swis_combined_nn_results/approachA',
+          '10': {'name': 'SWIS_APPROACH_A_more_layer_without_norm', 'dir': 'swis_combined_nn_results/approachA',
                  'runs': 1},
           '11': {'name': 'SWIS_APPROACH_A_more_layer_without_norm_cluster',
-                 'dir': '../swis_combined_nn_results/new_models',
+                 'dir': 'swis_combined_nn_results/new_models',
                  'runs': 1},
           '14': {'name': 'conventional_TCN_approach',
-                 'dir': '../swis_combined_nn_results/new_models',
+                 'dir': 'swis_combined_nn_results/new_models',
                  'runs': 1}
           }
 
