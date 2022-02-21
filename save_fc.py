@@ -19,7 +19,7 @@ def sum_fc_results(ts_array, model_path, run, model_name):
         else:
             ts_fc = pd.read_csv(f'{model_path}/{run}/grid.csv', index_col=[0])[['fc']]
         dfs.append(ts_fc)
-    concat_df = pd.concat(dfs, axis=1).sum(axis=1)
+    concat_df = pd.DataFrame(pd.concat(dfs, axis=1).sum(axis=1), columns=[model_name])
     return concat_df
 
 
@@ -27,6 +27,7 @@ def get_grid_error_per_run(grid_model_path, model_path, run, model_name, notcomb
     if model_name not in no_grid:
         grid_fc= sum_fc_results([const.ALL_SWIS_TS[0]], model_path, run, model_name)
         print(model_name, grid_fc)
+        return grid_fc
     if notcombined:
 
         if model_name in clustering:
@@ -37,9 +38,11 @@ def get_grid_error_per_run(grid_model_path, model_path, run, model_name, notcomb
                 ts_to_run.append(other_ts)
             cluster_fc = sum_fc_results(ts_to_run, model_path, run, model_name)
             print(model_name, cluster_fc)
+            return cluster_fc
         else:
             pc_fc= sum_fc_results(const.SWIS_POSTCODES, model_path, run, model_name)
             print(model_name, pc_fc)
+            return pc_fc
 
 
 
@@ -80,7 +83,7 @@ no_grid = ['grid_conv_in_each_pc_seperately', 'concat_pc_with_grid_tcn2_for_clus
 clustering = ['concat_pc_with_grid_tcn2_for_cluster', 'SWIS_APPROACH_A_more_layer_without_norm_cluster']
 clustering_and_pc = ['conventional_TCN_approach']
 
-all_errors = []
+all_fc = []
 
 for model_number in models:
     MODEL_NAME = models[model_number]['name']
@@ -102,4 +105,6 @@ for model_number in models:
         notcombined = True
         if MODEL_NAME in combined:
             notcombined = False
-        get_grid_error_per_run(one_grid_path, dir_path, RUN, MODEL_NAME, notcombined)
+        fc_df = get_grid_error_per_run(one_grid_path, dir_path, RUN, MODEL_NAME, notcombined)
+        all_fc.append(fc_df)
+print(pd.concat(all_fc), axis=1)
