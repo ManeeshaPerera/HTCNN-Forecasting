@@ -1,6 +1,7 @@
 import pandas as pd
 import constants as const
 
+
 def sum_fc_results(ts_array, model_path, run, model_name):
     dfs = []
     for ts in ts_array:
@@ -19,15 +20,15 @@ def sum_fc_results(ts_array, model_path, run, model_name):
         else:
             ts_fc = pd.read_csv(f'{model_path}/{run}/grid.csv', index_col=[0])[['fc']]
         dfs.append(ts_fc)
-    concat_df = pd.DataFrame(pd.concat(dfs, axis=1).sum(axis=1), columns=[model_name])
+    concat_df = pd.DataFrame(pd.concat(dfs, axis=1).sum(axis=1))
     return concat_df
 
 
 def get_grid_error_per_run(grid_model_path, model_path, run, model_name, notcombined=True):
     if model_name not in no_grid:
-        grid_fc= sum_fc_results([const.ALL_SWIS_TS[0]], model_path, run, model_name)
-        print(model_name, grid_fc)
-        return grid_fc
+        grid_fc = sum_fc_results([const.ALL_SWIS_TS[0]], model_path, run, model_name)
+        grid_fc.columns = [f'{model_name}.Direct']
+        all_fc.append(grid_fc)
     if notcombined:
 
         if model_name in clustering:
@@ -37,13 +38,12 @@ def get_grid_error_per_run(grid_model_path, model_path, run, model_name, notcomb
             for other_ts in const.OTHER_TS:
                 ts_to_run.append(other_ts)
             cluster_fc = sum_fc_results(ts_to_run, model_path, run, model_name)
-            print(model_name, cluster_fc)
-            return cluster_fc
+            cluster_fc.columns = [f'{model_name}.Subregion']
+            all_fc.append(cluster_fc)
         else:
-            pc_fc= sum_fc_results(const.SWIS_POSTCODES, model_path, run, model_name)
-            print(model_name, pc_fc)
-            return pc_fc
-
+            pc_fc = sum_fc_results(const.SWIS_POSTCODES, model_path, run, model_name)
+            pc_fc.columns = [f'{model_name}.PostcodeAGG']
+            all_fc.append(pc_fc)
 
 
 models = {'0': {'name': 'naive', 'dir': 'benchmark_results/swis_benchmarks', 'runs': 1},
@@ -105,6 +105,6 @@ for model_number in models:
         notcombined = True
         if MODEL_NAME in combined:
             notcombined = False
-        fc_df = get_grid_error_per_run(one_grid_path, dir_path, RUN, MODEL_NAME, notcombined)
-        all_fc.append(fc_df)
+        get_grid_error_per_run(one_grid_path, dir_path, RUN, MODEL_NAME, notcombined)
+
 print(pd.concat(all_fc, axis=1))
