@@ -107,4 +107,4 @@ for model_number in models:
             notcombined = False
         fc_df = get_grid_error_per_run(one_grid_path, dir_path, RUN, MODEL_NAME, notcombined)
         all_fc.append(fc_df)
-print(pd.concat(all_fc), axis=1)
+print(pd.concat(all_fc, axis=1))
