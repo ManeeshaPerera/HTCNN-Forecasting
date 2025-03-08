@@ -1,4 +1,4 @@
-# Regional solar power forecasting with hierarchical temporal convolutional neural networks
+## Regional solar power forecasting with hierarchical temporal convolutional neural networks
 This repository includes the code for the paper titled "Day-ahead regional solar power forecasting with hierarchical temporal convolutional neural networks using historical power generation and weather data".
 
 ```
@@ -12,3 +12,13 @@ This repository includes the code for the paper titled "Day-ahead regional solar
   publisher={Elsevier}
 }
 ```
+
+Folder structure:
+```
+src - This folder contains all source code related to the neural network architectures
+run_benchmarks.py - Includes benchmark models: seasonal naive and ARIMA
+run_benchmark_nns.py: Includes the starting point to run all benchmark neural network models: LSTM, 1D CNN and TCN
+run_global_approach_for_swis.py: Includes the starting point to run the _Direct Forecast Strategy with approach HTCNN A1 and A2_ (please refer to the paper for an detailed explanation)
+run_global_approach_for_swis_clustering_approach.py - Includes the starting point to run the _SubRegionAGG Forecast Strategy with approach HTCNN A1 and A2_ (please refer to the paper for an detailed explanation)
+```
+
